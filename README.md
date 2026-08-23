@@ -37,10 +37,24 @@ Implementation is beginning with **Phase 0 — Engineering Foundation**.
 
 ```text
 backend/    Laravel backend (TASK-002) — structural foundation only.
-frontend/   Next.js frontend (TASK-003) — structural foundation only.
+frontend/   Next.js frontend (TASK-003, TASK-003A) — structural foundation only.
 ```
 
-Neither implements business functionality yet. Remaining infrastructure
-setup (local dev environment, PostgreSQL, Redis, CI, ...) follows
-starting with TASK-004. See `backend/README.md` and `frontend/README.md`
-for validated local setup/run commands for each.
+Neither implements business functionality yet.
+
+## Development
+
+A reproducible local environment (frontend, backend, PostgreSQL, Redis,
+S3-compatible object storage) is established by TASK-004 — see
+[`docs/development/LOCAL_DEVELOPMENT.md`](docs/development/LOCAL_DEVELOPMENT.md)
+for full setup, startup, shutdown and troubleshooting instructions.
+Quick start once installed:
+
+```bash
+scripts/dev-up.sh     # start PostgreSQL, Redis, MinIO
+cd backend && php artisan serve
+cd frontend && npm run dev
+```
+
+Remaining foundation work (CI, testing architecture, FR/AR foundation,
+...) follows starting with TASK-007.

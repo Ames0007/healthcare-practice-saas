@@ -8,7 +8,10 @@ convention established by TASK-003.
 
 No business functionality is implemented yet (Phase 0 — Engineering
 Foundation). This is backend-independent: it builds and runs without the
-Laravel backend.
+Laravel backend. See
+[`../docs/development/LOCAL_DEVELOPMENT.md`](../docs/development/LOCAL_DEVELOPMENT.md)
+for the full local environment (backend, PostgreSQL, Redis, MinIO)
+established by TASK-004, if you want the whole stack running.
 
 ## Requirements (as validated in TASK-003)
 

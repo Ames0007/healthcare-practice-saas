@@ -142,3 +142,23 @@ Decision Required Before
 **Affected Tasks:** TASK-234, TASK-235, TASK-250
 **Description:** Target recovery point/time objectives for backup and restore have not been defined.
 **Decision Required Before:** TASK-234 (backup procedure).
+
+---
+
+### RISK-014
+
+**Topic:** No Docker/Docker Compose on the primary development machine
+**Status:** MITIGATED (TASK-004 native/portable infrastructure, ADR-002)
+**Affected Tasks:** TASK-004, any future task that assumes a `compose.yml`
+**Description:** Docker and Docker Compose are not installed, and WSL2 is
+not confirmed working (checking the underlying Windows feature requires
+admin rights unavailable in this environment). TASK-004 therefore runs
+PostgreSQL/Redis/MinIO as native/portable processes under the user's
+local profile instead of containers (see ADR-002 in DECISIONS.md). No
+`compose.yml` exists in the repository. If a developer machine with
+working Docker joins the project, a compose file equivalent to
+`scripts/dev-*.sh` should be authored and validated then — not before it
+can actually be run.
+**Decision Required Before:** Any task that assumes Docker Compose is the
+local infrastructure mechanism (e.g. authoring CI service containers that
+mirror local dev, or onboarding a Docker-equipped developer).

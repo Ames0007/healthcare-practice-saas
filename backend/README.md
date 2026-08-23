@@ -23,9 +23,13 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-`DB_CONNECTION` defaults to `pgsql` with local placeholder credentials —
-no PostgreSQL server is provisioned yet (TASK-005). Do not run
-`php artisan migrate` until a real database is configured.
+`DB_CONNECTION` defaults to `pgsql`. A real local PostgreSQL instance is
+provisioned by TASK-004 — see
+[`../docs/development/LOCAL_DEVELOPMENT.md`](../docs/development/LOCAL_DEVELOPMENT.md)
+— and `.env.example`'s credentials already match it. Migrations are not
+run yet; that's TASK-005's scope (migration infrastructure, UUID
+strategy, base DB test infrastructure). Do not run `php artisan migrate`
+before TASK-005.
 
 ## Running locally
 

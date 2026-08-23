@@ -40,3 +40,17 @@ All notable changes to this project are documented in this file.
   validated instead via compiled-CSS hex inspection and SSR HTML/dir/lang
   inspection across FR and AR for all five route areas. No business
   functionality, no backend integration.
+- Local development infrastructure established (TASK-004): PostgreSQL
+  18.6, Redis 8.10.1 and MinIO run as native/portable processes — no
+  Docker on this development machine, see `DECISIONS.md` ADR-002 and
+  `RISKS_AND_BLOCKERS.md` RISK-014 — managed via `scripts/dev-up.sh` /
+  `dev-down.sh` / `dev-status.sh` / `dev-reset.sh`. Backend connects to a
+  real local PostgreSQL database and, via `predis/predis` (the portable
+  PHP build has no native `phpredis` extension), a real local Redis
+  instance; MinIO provides local S3-compatible object storage with a
+  `healthcare-practice-dev` bucket. Full local stack (frontend + backend
+  + all three infrastructure services) validated running simultaneously;
+  PostgreSQL and MinIO data confirmed to survive a stop/restart cycle.
+  New `docs/development/LOCAL_DEVELOPMENT.md` guide. No migrations, no
+  queue architecture, no application file-storage behavior — those remain
+  TASK-005/TASK-006 scope.
