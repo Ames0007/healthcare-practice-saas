@@ -17,7 +17,7 @@ A task cannot be marked COMPLETE without acceptance-criteria evidence.
 | Task | Phase | Status | Commit | Notes |
 |------|-------|--------|--------|-------|
 | TASK-001 | Phase 0 | COMPLETE | 8d381b6 | Repository bootstrap |
-| TASK-002 | Phase 0 | NOT_STARTED | — | Backend bootstrap (Laravel) |
+| TASK-002 | Phase 0 | COMPLETE | pending | Backend bootstrap (Laravel 13.26.1 / PHP 8.5.9) |
 | TASK-003 | Phase 0 | NOT_STARTED | — | Frontend bootstrap (Next.js) |
 | TASK-004 | Phase 0 | NOT_STARTED | — | Local development environment |
 | TASK-005 | Phase 0 | NOT_STARTED | — | PostgreSQL foundation |

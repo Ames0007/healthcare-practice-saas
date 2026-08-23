@@ -35,4 +35,7 @@ CLAUDE.md               Permanent engineering instructions
 
 Implementation is beginning with **Phase 0 — Engineering Foundation**.
 
-No application code exists yet. Backend, frontend and infrastructure setup will be introduced starting with TASK-002.
+Backend bootstrap (Laravel, under `backend/`) exists as of TASK-002 —
+structural foundation only, no business functionality yet. Frontend
+(`frontend/`) and remaining infrastructure setup follow starting with
+TASK-003.
