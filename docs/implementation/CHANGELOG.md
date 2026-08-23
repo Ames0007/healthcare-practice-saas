@@ -87,3 +87,30 @@ All notable changes to this project are documented in this file.
   record the material decisions. RLS remains an open, deliberately
   deferred decision (RISK-007, unchanged). No business-domain tables,
   no TASK-006 (Redis queue/cache) functionality implemented.
+- Aujourd'hui dashboard prototype (UI-001), replacing the TASK-003
+  foundation/demo page as the real `/app` landing screen. Built entirely
+  against a new centralized mock-data layer
+  (`frontend/src/features/today/mock-data.ts`, synthetic Moroccan-context
+  names only) — no backend/API integration. Composed from new reusable
+  components: `MetricCard` and `AttentionItem`
+  (`components/ui/`, domain-neutral) and `AppointmentCard` plus a central
+  appointment status → tone/label registry
+  (`components/domain/appointments/`, intended for reuse by Agenda/
+  UI-002). Implements the header (greeting + locale-aware business date),
+  four operational KPI cards, a prominent "Prochain rendez-vous" section
+  with a prototype-only local-state "Patient arrivé" interaction
+  (Confirmed → Arrived, no persistence), "Agenda du jour", a neutral "À
+  faire" attention list, and a typography-led (not green/red-coded)
+  "Finances aujourd'hui" snapshot — all reusing the existing AppShell,
+  design tokens and graphic charter. Loading (shape-matched skeleton),
+  empty-day and error states are implemented and covered by tests; the
+  live page only exercises loading→loaded (a fixed prototype delay, no
+  real fetch) since there is nothing to error against yet. Full FR/AR
+  translations added under a new `aujourdhui.*` dictionary namespace;
+  RTL verified. Added `frontend/src/features/today/today-dashboard.test.tsx`
+  (7 tests: FR content, AR/RTL, the local status-change interaction, empty/
+  loading/error states). Renamed the stale `emptyState.backToFoundation`
+  translation key to `emptyState.backToHome` since the catch-all `/app/*`
+  placeholder now points back to a real dashboard, not a demo page. All
+  13 frontend tests, typecheck, lint and build pass; backend regression
+  (10 tests) unaffected — no backend files touched.

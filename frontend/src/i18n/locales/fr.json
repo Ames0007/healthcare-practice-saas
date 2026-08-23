@@ -76,7 +76,58 @@
   "emptyState": {
     "notImplementedTitle": "Pas encore implémenté",
     "notImplementedDescription": "Cet écran fait partie d'une tâche ultérieure. TASK-003 prouve uniquement l'architecture de navigation.",
-    "backToFoundation": "Retour à la fondation"
+    "backToHome": "Retour à Aujourd'hui"
+  },
+  "aujourdhui": {
+    "pageTitle": "Aujourd'hui",
+    "greeting": "Bonjour {{name}}",
+    "subtitle": "Voici l'activité de votre cabinet aujourd'hui.",
+    "kpis": {
+      "total": "Rendez-vous",
+      "confirmed": "Confirmés",
+      "toConfirm": "À confirmer",
+      "noShow": "Absent"
+    },
+    "nextAppointment": {
+      "title": "Prochain rendez-vous",
+      "open": "Ouvrir",
+      "markArrived": "Patient arrivé"
+    },
+    "agenda": {
+      "title": "Agenda du jour",
+      "viewAll": "Voir l'agenda"
+    },
+    "attention": {
+      "title": "À faire",
+      "toConfirm": "{{count}} rendez-vous à confirmer",
+      "overdue": "{{count}} échéances en retard",
+      "recall": "{{count}} patient à rappeler",
+      "lowStock": "{{count}} articles en stock faible"
+    },
+    "finance": {
+      "title": "Finances aujourd'hui",
+      "collected": "Encaissé",
+      "pending": "À encaisser",
+      "expenses": "Décaissements",
+      "caisse": "Caisse"
+    },
+    "status": {
+      "toConfirm": "À confirmer",
+      "confirmed": "Confirmé",
+      "arrived": "Arrivé",
+      "inConsultation": "En consultation",
+      "completed": "Terminé",
+      "noShow": "Absent"
+    },
+    "empty": {
+      "title": "Aucun rendez-vous aujourd'hui.",
+      "description": "Votre journée est libre pour le moment.",
+      "action": "Créer un rendez-vous"
+    },
+    "error": {
+      "title": "Impossible de charger les informations du jour.",
+      "retry": "Réessayer"
+    }
   },
   "admin": {
     "brand": "Platform Admin",

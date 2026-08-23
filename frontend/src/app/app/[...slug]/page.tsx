@@ -19,7 +19,7 @@ export default function AppPlaceholderPage() {
       description={t("emptyState.notImplementedDescription")}
       primaryAction={
         <Link href="/app" className={buttonClassNames("primary", "sm")}>
-          {t("emptyState.backToFoundation")}
+          {t("emptyState.backToHome")}
         </Link>
       }
     />

@@ -76,7 +76,58 @@
   "emptyState": {
     "notImplementedTitle": "لم يُنفَّذ بعد",
     "notImplementedDescription": "هذه الشاشة جزء من مهمة لاحقة. تثبت TASK-003 بنية التنقل فقط.",
-    "backToFoundation": "العودة إلى الأساس"
+    "backToHome": "العودة إلى اليوم"
+  },
+  "aujourdhui": {
+    "pageTitle": "اليوم",
+    "greeting": "مرحباً {{name}}",
+    "subtitle": "إليك نشاط عيادتكم اليوم.",
+    "kpis": {
+      "total": "المواعيد",
+      "confirmed": "مؤكدة",
+      "toConfirm": "بانتظار التأكيد",
+      "noShow": "غياب"
+    },
+    "nextAppointment": {
+      "title": "الموعد القادم",
+      "open": "فتح",
+      "markArrived": "وصل المريض"
+    },
+    "agenda": {
+      "title": "جدول اليوم",
+      "viewAll": "عرض الأجندة"
+    },
+    "attention": {
+      "title": "للمتابعة",
+      "toConfirm": "{{count}} مواعيد بانتظار التأكيد",
+      "overdue": "{{count}} مستحقات متأخرة",
+      "recall": "{{count}} مريض يجب معاودة الاتصال به",
+      "lowStock": "{{count}} أصناف بمخزون منخفض"
+    },
+    "finance": {
+      "title": "المالية اليوم",
+      "collected": "المُحصَّل",
+      "pending": "قيد التحصيل",
+      "expenses": "المصروفات",
+      "caisse": "الصندوق"
+    },
+    "status": {
+      "toConfirm": "بانتظار التأكيد",
+      "confirmed": "مؤكد",
+      "arrived": "وصل",
+      "inConsultation": "أثناء الاستشارة",
+      "completed": "منتهٍ",
+      "noShow": "غياب"
+    },
+    "empty": {
+      "title": "لا توجد مواعيد اليوم.",
+      "description": "يومكم متاح حالياً بالكامل.",
+      "action": "إنشاء موعد"
+    },
+    "error": {
+      "title": "تعذّر تحميل معلومات اليوم.",
+      "retry": "إعادة المحاولة"
+    }
   },
   "admin": {
     "brand": "إدارة المنصة",

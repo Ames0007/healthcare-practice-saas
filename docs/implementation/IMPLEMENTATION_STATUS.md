@@ -31,3 +31,13 @@ A task cannot be marked COMPLETE without acceptance-criteria evidence.
 | TASK-012 | Phase 0 | NOT_STARTED | — | Request/correlation IDs |
 
 Foundation Validation Gate must pass before Phase 1 (Identity, Tenancy & Security) begins.
+
+## UI Prototype Sequence
+
+Frontend-only prototype screens built against synthetic mock data, ahead of
+backend integration. Separate numbering from TASK-001–TASK-255; does not
+imply Phase 0/1 sequencing or backend readiness.
+
+| Task | Status | Commit | Notes |
+|------|--------|--------|-------|
+| UI-001 | COMPLETE | (pending) | Aujourd'hui dashboard prototype (mock data only, no backend integration) |

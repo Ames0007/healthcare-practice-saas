@@ -34,9 +34,11 @@ src/app/
 under `/app` (Agenda, Patients, Finance, ...) resolves to a shared "not
 implemented yet" placeholder until its task lands, instead of a bare 404.
 
-Only `/app` has real foundation content (`src/app/app/page.tsx`) —
-explicitly marked as demo content via `<FoundationBadge />`, not a real
-Aujourd'hui dashboard.
+`/app` (`src/app/app/page.tsx`) is the real Aujourd'hui dashboard (UI-001),
+composed from `src/features/today/`. It replaces the TASK-003 foundation/
+demo page — the `<FoundationBadge />` component and `foundation.*`
+dictionary keys still exist (unused by any route) as a record of the
+original component/token proof, but no longer back a page.
 
 No authentication, route guards, or permission checks exist. Do not add
 them here — that is a later task (see `CLAUDE.md` §9-10).
@@ -46,10 +48,26 @@ them here — that is a later task (see `CLAUDE.md` §9-10).
 ```text
 src/components/
   ui/       Generic primitives: Button, Input, Card, StatusBadge, Skeleton,
-            EmptyState. No business knowledge.
+            EmptyState, MetricCard, AttentionItem. No business knowledge.
   app/      Shell/domain-agnostic app components: AppShell, AppSidebar,
             AppTopbar, MobileNav, PageHeader, LanguageSwitcher,
             FoundationBadge, AreaPlaceholder.
+  domain/   Reusable components that know about one business concept but
+            not about a specific screen (Spec #8 §85), e.g.
+            `domain/appointments/` (AppointmentCard + the appointment
+            status → tone/label registry). Agenda (UI-002) is expected to
+            reuse `AppointmentCard` rather than building its own.
+
+src/features/
+  today/    Aujourd'hui screen composition (UI-001): `types.ts` (mock
+            data shape), `mock-data.ts` (synthetic data — the seam a
+            future `TodayDashboardQuery`/API call replaces),
+            `today-dashboard.tsx` (loading/loaded/empty/error states),
+            `components/` (page-local presentational panels: KpiRow,
+            NextAppointmentSection, AgendaPanel, AttentionPanel,
+            FinancePanel, TodayDashboardSkeleton). A `features/<name>/`
+            folder is the convention for screen-specific composition that
+            isn't a reusable `components/ui` or `components/domain` piece.
 
 src/design-system/
   tokens.css   Semantic CSS custom properties (--ds-color-*, --ds-space-*,
@@ -66,8 +84,8 @@ src/lib/
                   this array; do not fork the sidebar per role (Spec #8 §76).
 ```
 
-Only the components TASK-003 needs exist. The other ~50 components listed
-in Specification #8 §97 (Drawer, Modal, Tabs, Table, Calendar,
+Only the components a landed task needs exist. The remaining components
+listed in Specification #8 §97 (Drawer, Modal, Tabs, Table, Calendar,
 PatientHeader, ...) are created by the tasks that first need them.
 
 ## Design tokens
