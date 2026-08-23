@@ -40,4 +40,4 @@ imply Phase 0/1 sequencing or backend readiness.
 
 | Task | Status | Commit | Notes |
 |------|--------|--------|-------|
-| UI-001 | COMPLETE | (pending) | Aujourd'hui dashboard prototype (mock data only, no backend integration) |
+| UI-001 | COMPLETE | bb1dec8 | Aujourd'hui dashboard prototype (mock data only, no backend integration) |
