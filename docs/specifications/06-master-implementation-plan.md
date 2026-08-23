@@ -15,6 +15,12 @@ test → validate → report → commit.
 Claude Code must treat Specifications #1--#5 as the product and
 architecture source of truth.
 
+Any task that touches frontend UI must additionally treat Specifications
+#7 (Frontend UX/UI), #8 (Design System & Component Architecture) and #9
+(Detailed Screens & Wireframes) as the frontend source of truth. Do not
+begin frontend implementation before reading the specific sections of
+#7--#9 relevant to the screen/component in scope.
+
 Implementation must be:
 
 -   Modular-monolith.
@@ -118,6 +124,9 @@ docs/
     04-domain-data-architecture.md
     05-technical-api-security.md
     06-master-implementation-plan.md
+    07-frontend-ux-ui-specification.md
+    08-design-system-component-architecture.md
+    09-detailed-screens-wireframes.md
 
   implementation/
     IMPLEMENTATION_STATUS.md
@@ -210,6 +219,9 @@ Do not implement business modules.
 
 ## TASK-003 --- Frontend bootstrap
 
+Required reading: Specifications #7 (UX principles), #8 (design tokens
+and component architecture) and #9 (application shell composition).
+
 Implement:
 
 -   Next.js + TypeScript.
@@ -217,6 +229,10 @@ Implement:
 -   base layout.
 -   authenticated/public shells.
 -   design tokens foundation.
+
+Shell/layout structure must match the application shell defined in
+Specification #9 §2--#3 and the token architecture defined in
+Specification #8 §4.
 
 ## TASK-004 --- Local development environment
 
@@ -1266,6 +1282,9 @@ Approve/reject/void with reason.
 
 # 23. PHASE 16 --- FR/AR, UX & Responsive Hardening
 
+Every task in this phase must be validated against Specifications #7
+(UX behavior), #8 (design system/tokens) and #9 (screen wireframes).
+
 ## TASK-208 --- Translation completeness audit
 
 No missing keys/hardcoded strings.
@@ -1480,6 +1499,8 @@ Every `TASK-XXX.md` should use:
 
 ## Required reading
 - Specification sections
+- Specifications #7–#9 (UX, design system, wireframes) for any task
+  that touches frontend UI
 - Existing modules/files
 
 ## Preconditions
@@ -1811,8 +1832,9 @@ Only then begin Phase 1.
 # 39. Final execution model
 
 ``` text
-Specifications #1–#5
-          |
+Specifications #1–#5      Specifications #7–#9
+   (product/architecture)   (frontend UX/design system/wireframes,
+          |                  required for any UI-touching task)
 Specification #6
           |
        CLAUDE.md

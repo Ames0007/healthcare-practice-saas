@@ -38,6 +38,9 @@ docs/specifications/
   04-domain-data-architecture.md
   05-technical-api-security.md
   06-master-implementation-plan.md
+  07-frontend-ux-ui-specification.md
+  08-design-system-component-architecture.md
+  09-detailed-screens-wireframes.md
 ```
 
 Priority when instructions conflict:
@@ -46,12 +49,26 @@ Priority when instructions conflict:
 1. Explicit current task instructions
 2. Approved architectural decisions in docs/implementation/DECISIONS.md
 3. CLAUDE.md
-4. Specifications #1–#6
+4. Specifications #1–#9
 5. Existing implementation patterns
 ```
 
 Do not silently resolve material contradictions. Record them and stop if
 they affect correctness, security, data integrity or product behavior.
+
+Any task that touches frontend UI (screens, components, layout,
+navigation, styling, forms, wireframe composition) must additionally be
+read against:
+
+``` text
+07-frontend-ux-ui-specification.md      (UX behavior/interaction rules)
+08-design-system-component-architecture.md  (tokens/component vocabulary)
+09-detailed-screens-wireframes.md       (screen composition/wireframes)
+```
+
+Do not implement or modify frontend UI without consulting Specifications
+#7–#9. Do not invent visual patterns, components or copy that these
+specifications already define.
 
 ------------------------------------------------------------------------
 
