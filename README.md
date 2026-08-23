@@ -35,7 +35,12 @@ CLAUDE.md               Permanent engineering instructions
 
 Implementation is beginning with **Phase 0 — Engineering Foundation**.
 
-Backend bootstrap (Laravel, under `backend/`) exists as of TASK-002 —
-structural foundation only, no business functionality yet. Frontend
-(`frontend/`) and remaining infrastructure setup follow starting with
-TASK-003.
+```text
+backend/    Laravel backend (TASK-002) — structural foundation only.
+frontend/   Next.js frontend (TASK-003) — structural foundation only.
+```
+
+Neither implements business functionality yet. Remaining infrastructure
+setup (local dev environment, PostgreSQL, Redis, CI, ...) follows
+starting with TASK-004. See `backend/README.md` and `frontend/README.md`
+for validated local setup/run commands for each.

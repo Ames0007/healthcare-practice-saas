@@ -1,0 +1,116 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "skipToContent": "Aller au contenu principal",
+    "foundationBadge": "Fondation / Démo"
+  },
+  "nav": {
+    "aujourdhui": "Aujourd'hui",
+    "agenda": "Agenda",
+    "patients": "Patients",
+    "finance": "Finance",
+    "equipe": "Équipe",
+    "stock": "Stock",
+    "communication": "Communication",
+    "rapports": "Rapports",
+    "parametres": "Paramètres",
+    "abonnement": "Abonnement",
+    "plus": "Plus"
+  },
+  "topbar": {
+    "practiceName": "Cabinet (exemple)",
+    "searchPlaceholder": "Rechercher un patient, un numéro, une facture...",
+    "quickCreate": "Créer",
+    "notifications": "Notifications",
+    "language": "Langue",
+    "user": "Compte"
+  },
+  "sidebar": {
+    "navigation": "Navigation principale",
+    "collapse": "Réduire la barre latérale",
+    "expand": "Déplier la barre latérale"
+  },
+  "foundation": {
+    "title": "Fondation frontend",
+    "description": "Cette page démontre les composants et jetons de base établis par TASK-003. Ce n'est pas un tableau de bord réel — aucune donnée métier n'est affichée.",
+    "buttonsTitle": "Boutons",
+    "buttons": {
+      "primary": "Primaire",
+      "secondary": "Secondaire",
+      "outline": "Contour",
+      "ghost": "Fantôme",
+      "danger": "Danger",
+      "loading": "Chargement",
+      "disabled": "Désactivé"
+    },
+    "inputTitle": "Champ de saisie",
+    "input": {
+      "label": "Nom du patient (exemple)",
+      "placeholder": "Rechercher...",
+      "helper": "Texte d'aide facultatif.",
+      "errorLabel": "Champ avec erreur (exemple)",
+      "error": "Ce champ est requis."
+    },
+    "cardTitle": "Carte",
+    "card": {
+      "title": "Carte type",
+      "description": "Surface, bordure et rayon standard — sans ombre lourde."
+    },
+    "statusTitle": "Statuts",
+    "status": {
+      "confirmed": "Confirmé",
+      "toConfirm": "À confirmer",
+      "completed": "Terminé",
+      "overdue": "En retard"
+    },
+    "skeletonTitle": "Squelette de chargement",
+    "emptyStateTitle": "État vide",
+    "emptyState": {
+      "title": "Aucun élément pour le moment",
+      "description": "Ceci est un exemple d'état vide réutilisable.",
+      "primaryAction": "Action principale",
+      "secondaryAction": "Action secondaire"
+    }
+  },
+  "emptyState": {
+    "notImplementedTitle": "Pas encore implémenté",
+    "notImplementedDescription": "Cet écran fait partie d'une tâche ultérieure. TASK-003 prouve uniquement l'architecture de navigation.",
+    "backToFoundation": "Retour à la fondation"
+  },
+  "admin": {
+    "brand": "Platform Admin",
+    "nav": {
+      "dashboard": "Tableau de bord",
+      "cabinets": "Cabinets",
+      "subscriptions": "Abonnements",
+      "plans": "Plans",
+      "masterData": "Master Data",
+      "referrals": "Parrainages",
+      "operations": "Operations",
+      "audit": "Audit"
+    }
+  },
+  "areas": {
+    "auth": {
+      "title": "Authentification",
+      "description": "Fondation de mise en page uniquement. L'authentification réelle (connexion, session, mot de passe oublié) sera implémentée dans une tâche ultérieure."
+    },
+    "onboarding": {
+      "title": "Intégration du cabinet",
+      "description": "Fondation de mise en page uniquement. Le parcours d'intégration réel sera implémenté dans une tâche ultérieure."
+    },
+    "book": {
+      "title": "Réservation en ligne",
+      "description": "Fondation de mise en page uniquement. Le formulaire de réservation publique réel sera implémenté dans une tâche ultérieure."
+    },
+    "admin": {
+      "title": "Administration de la plateforme",
+      "description": "Fondation de mise en page uniquement, surface distincte de l'application du cabinet. L'administration SaaS réelle sera implémentée dans une tâche ultérieure."
+    }
+  },
+  "home": {
+    "title": "Healthcare Practice Management SaaS",
+    "description": "Fondation frontend (TASK-003). Aucune fonctionnalité métier n'est implémentée.",
+    "areasTitle": "Zones de l'application"
+  }
+}

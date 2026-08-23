@@ -1,0 +1,29 @@
+@import "tailwindcss";
+@import "../design-system/tokens.css";
+
+body {
+  background: var(--ds-color-background);
+  color: var(--ds-color-text);
+  font-family: var(--font-latin), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+}
+
+:lang(ar) {
+  font-family: var(--font-arabic), var(--font-latin), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Visible focus (Spec #7 §38 / #8 §82) — never remove outline without a replacement. */
+:focus-visible {
+  outline: 2px solid var(--ds-color-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--ds-radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

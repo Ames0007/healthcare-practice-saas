@@ -1,0 +1,116 @@
+{
+  "common": {
+    "loading": "جارٍ التحميل...",
+    "skipToContent": "الانتقال إلى المحتوى الرئيسي",
+    "foundationBadge": "أساس / تجريبي"
+  },
+  "nav": {
+    "aujourdhui": "اليوم",
+    "agenda": "المواعيد",
+    "patients": "المرضى",
+    "finance": "المالية",
+    "equipe": "الفريق",
+    "stock": "المخزون",
+    "communication": "التواصل",
+    "rapports": "التقارير",
+    "parametres": "الإعدادات",
+    "abonnement": "الاشتراك",
+    "plus": "المزيد"
+  },
+  "topbar": {
+    "practiceName": "العيادة (مثال)",
+    "searchPlaceholder": "البحث عن مريض، رقم، فاتورة...",
+    "quickCreate": "إنشاء",
+    "notifications": "الإشعارات",
+    "language": "اللغة",
+    "user": "الحساب"
+  },
+  "sidebar": {
+    "navigation": "التنقل الرئيسي",
+    "collapse": "طي الشريط الجانبي",
+    "expand": "توسيع الشريط الجانبي"
+  },
+  "foundation": {
+    "title": "أساس الواجهة الأمامية",
+    "description": "توضح هذه الصفحة المكونات والرموز الأساسية التي أنشأتها TASK-003. هذه ليست لوحة تحكم حقيقية — لا تُعرض أي بيانات فعلية.",
+    "buttonsTitle": "الأزرار",
+    "buttons": {
+      "primary": "أساسي",
+      "secondary": "ثانوي",
+      "outline": "محدد",
+      "ghost": "شفاف",
+      "danger": "خطر",
+      "loading": "جارٍ التحميل",
+      "disabled": "معطّل"
+    },
+    "inputTitle": "حقل إدخال",
+    "input": {
+      "label": "اسم المريض (مثال)",
+      "placeholder": "بحث...",
+      "helper": "نص مساعد اختياري.",
+      "errorLabel": "حقل به خطأ (مثال)",
+      "error": "هذا الحقل مطلوب."
+    },
+    "cardTitle": "بطاقة",
+    "card": {
+      "title": "بطاقة نموذجية",
+      "description": "سطح وحدود ونصف قطر قياسي — دون ظل ثقيل."
+    },
+    "statusTitle": "الحالات",
+    "status": {
+      "confirmed": "مؤكد",
+      "toConfirm": "بانتظار التأكيد",
+      "completed": "منتهٍ",
+      "overdue": "متأخر"
+    },
+    "skeletonTitle": "هيكل التحميل",
+    "emptyStateTitle": "حالة فارغة",
+    "emptyState": {
+      "title": "لا توجد عناصر حالياً",
+      "description": "هذا مثال على حالة فارغة قابلة لإعادة الاستخدام.",
+      "primaryAction": "إجراء أساسي",
+      "secondaryAction": "إجراء ثانوي"
+    }
+  },
+  "emptyState": {
+    "notImplementedTitle": "لم يُنفَّذ بعد",
+    "notImplementedDescription": "هذه الشاشة جزء من مهمة لاحقة. تثبت TASK-003 بنية التنقل فقط.",
+    "backToFoundation": "العودة إلى الأساس"
+  },
+  "admin": {
+    "brand": "إدارة المنصة",
+    "nav": {
+      "dashboard": "لوحة التحكم",
+      "cabinets": "العيادات",
+      "subscriptions": "الاشتراكات",
+      "plans": "الخطط",
+      "masterData": "البيانات المرجعية",
+      "referrals": "الإحالات",
+      "operations": "العمليات",
+      "audit": "التدقيق"
+    }
+  },
+  "areas": {
+    "auth": {
+      "title": "المصادقة",
+      "description": "أساس التخطيط فقط. سيتم تنفيذ المصادقة الفعلية (تسجيل الدخول، الجلسة، نسيت كلمة المرور) في مهمة لاحقة."
+    },
+    "onboarding": {
+      "title": "الإعداد الأولي للعيادة",
+      "description": "أساس التخطيط فقط. سيتم تنفيذ مسار الإعداد الفعلي في مهمة لاحقة."
+    },
+    "book": {
+      "title": "الحجز عبر الإنترنت",
+      "description": "أساس التخطيط فقط. سيتم تنفيذ نموذج الحجز العام الفعلي في مهمة لاحقة."
+    },
+    "admin": {
+      "title": "إدارة المنصة",
+      "description": "أساس التخطيط فقط، وهو سطح منفصل عن تطبيق العيادة. سيتم تنفيذ إدارة SaaS الفعلية في مهمة لاحقة."
+    }
+  },
+  "home": {
+    "title": "منصة إدارة العيادات الصحية",
+    "description": "أساس الواجهة الأمامية (TASK-003). لم يتم تنفيذ أي وظيفة تجارية.",
+    "areasTitle": "أقسام التطبيق"
+  }
+}
