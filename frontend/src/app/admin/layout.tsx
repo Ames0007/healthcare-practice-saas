@@ -24,8 +24,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="flex min-h-dvh flex-col bg-background">
-      <header className="flex h-14 items-center border-b border-border-strong bg-text px-4">
-        <span className="text-sm font-semibold text-text-inverse">{t("admin.brand")}</span>
+      <header className="flex h-14 items-center border-b border-border bg-surface px-4">
+        <span className="text-sm font-semibold text-text">{t("admin.brand")}</span>
       </header>
 
       <div className="flex flex-1">

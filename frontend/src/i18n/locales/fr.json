@@ -60,6 +60,7 @@
     "status": {
       "confirmed": "Confirmé",
       "toConfirm": "À confirmer",
+      "inConsultation": "En consultation",
       "completed": "Terminé",
       "overdue": "En retard"
     },
@@ -101,7 +102,9 @@
     },
     "book": {
       "title": "Réservation en ligne",
-      "description": "Fondation de mise en page uniquement. Le formulaire de réservation publique réel sera implémenté dans une tâche ultérieure."
+      "description": "Fondation de mise en page uniquement. Le formulaire de réservation publique réel sera implémenté dans une tâche ultérieure.",
+      "cabinetPlaceholder": "Identité du cabinet (exemple)",
+      "primaryActionPlaceholder": "Prendre rendez-vous"
     },
     "admin": {
       "title": "Administration de la plateforme",

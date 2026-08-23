@@ -127,6 +127,7 @@ docs/
     07-frontend-ux-ui-specification.md
     08-design-system-component-architecture.md
     09-detailed-screens-wireframes.md
+    10-visual-identity-graphic-charter.md
 
   implementation/
     IMPLEMENTATION_STATUS.md
@@ -1283,7 +1284,8 @@ Approve/reject/void with reason.
 # 23. PHASE 16 --- FR/AR, UX & Responsive Hardening
 
 Every task in this phase must be validated against Specifications #7
-(UX behavior), #8 (design system/tokens) and #9 (screen wireframes).
+(UX behavior), #8 (design system/tokens), #9 (screen wireframes) and #10
+(approved visual identity/palette/typography).
 
 ## TASK-208 --- Translation completeness audit
 
@@ -1499,8 +1501,8 @@ Every `TASK-XXX.md` should use:
 
 ## Required reading
 - Specification sections
-- Specifications #7–#9 (UX, design system, wireframes) for any task
-  that touches frontend UI
+- Specifications #7–#10 (UX, design system, wireframes, approved visual
+  identity) for any task that touches frontend UI
 - Existing modules/files
 
 ## Preconditions
@@ -1832,9 +1834,9 @@ Only then begin Phase 1.
 # 39. Final execution model
 
 ``` text
-Specifications #1–#5      Specifications #7–#9
-   (product/architecture)   (frontend UX/design system/wireframes,
-          |                  required for any UI-touching task)
+Specifications #1–#5      Specifications #7–#10
+   (product/architecture)   (frontend UX/design system/wireframes/visual
+          |                  identity, required for any UI-touching task)
 Specification #6
           |
        CLAUDE.md

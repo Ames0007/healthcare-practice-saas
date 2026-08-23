@@ -19,6 +19,7 @@ A task cannot be marked COMPLETE without acceptance-criteria evidence.
 | TASK-001 | Phase 0 | COMPLETE | 8d381b6 | Repository bootstrap |
 | TASK-002 | Phase 0 | COMPLETE | a227f3b | Backend bootstrap (Laravel 13.26.1 / PHP 8.5.9) |
 | TASK-003 | Phase 0 | COMPLETE | c6e656e | Frontend bootstrap (Next.js 16.3.2 / React 19.2.8) |
+| TASK-003A | Phase 0 | IN_PROGRESS | — | Graphic charter alignment & visual QA (Spec #10) |
 | TASK-004 | Phase 0 | NOT_STARTED | — | Local development environment |
 | TASK-005 | Phase 0 | NOT_STARTED | — | PostgreSQL foundation |
 | TASK-006 | Phase 0 | NOT_STARTED | — | Redis and queue foundation |

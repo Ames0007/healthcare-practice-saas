@@ -25,7 +25,7 @@ export function Card({ className, variant = "standard", ...props }: CardProps) {
       className={cn(
         "rounded-lg border border-border bg-surface",
         paddingByVariant[variant],
-        variant === "alert" && "border-warning bg-warning-subtle",
+        variant === "alert" && "border-warning bg-warning-soft",
         className,
       )}
       {...props}

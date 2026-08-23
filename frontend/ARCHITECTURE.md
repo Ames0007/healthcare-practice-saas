@@ -1,8 +1,9 @@
 # Frontend Architecture
 
-Backend-local companion to `CLAUDE.md` and Specifications #5, #7, #8, #9.
-Records the structural conventions established by TASK-003 (frontend
-bootstrap). **No business functionality is implemented yet.**
+Backend-local companion to `CLAUDE.md` and Specifications #5, #7, #8, #9,
+#10. Records the structural conventions established by TASK-003 (frontend
+bootstrap) and the graphic-charter alignment applied by TASK-003A.
+**No business functionality is implemented yet.**
 
 ## Stack
 
@@ -71,6 +72,37 @@ PatientHeader, ...) are created by the tasks that first need them.
 
 ## Design tokens
 
+`src/design-system/tokens.css` is the single authoritative token source —
+feature code must consume the semantic Tailwind utilities it generates
+(`bg-primary`, `text-text-muted`, `bg-success-soft`, ...) and must not
+hardcode hex colors. Values are frozen by **Specification #10 (Visual
+Identity & Graphic Charter)**, applied by TASK-003A:
+
+```text
+primary          #0F766E   primary-hover     #115E59
+primary-strong   #134E4A   primary-support   #0D9488
+primary-soft     #F0FDFA   primary-foreground #FFFFFF
+
+background       #F8FAFC   surface           #FFFFFF
+surface-subtle   #F1F5F9
+
+text             #0F172A   text-secondary    #475569
+text-muted       #64748B   text-disabled     #94A3B8
+
+border           #E2E8F0   border-strong     #CBD5E1
+
+success  #15803D / success-soft #F0FDF4
+warning  #B45309 / warning-soft #FFFBEB
+danger   #B91C1C / danger-soft  #FEF2F2
+info     #1D4ED8 / info-soft    #EFF6FF
+```
+
+Radii (small 6px / medium 8px / large 12px / xl 16px — buttons/inputs
+~8px, cards ~12px) were already Spec #10-compliant since TASK-003 and were
+not changed. StatusBadge additionally exposes a `primary` tone (restrained
+teal, Spec #10 §6 — e.g. appointment "In consultation") alongside
+success/warning/danger/info/neutral.
+
 Dark mode is explicitly not a V1 requirement (Spec #8 §90) — light tokens
 only, no `prefers-color-scheme` branching.
 
@@ -124,7 +156,8 @@ direction under `dir="rtl"`. The few genuinely directional icons (e.g. the
 
 ## Typography
 
-Latin: Inter. Arabic: Noto Sans Arabic. Both loaded via `next/font/google`
+Latin: **Inter** (Spec #10 §7). Arabic: **Noto Sans Arabic** (Spec #10
+§8). Both loaded via `next/font/google`
 (self-hosted at build time, no runtime request to Google, no font files
 committed to the repo) as CSS variables (`--font-latin`, `--font-arabic`)
 consumed by `globals.css`; `:lang(ar)` swaps the font stack order so
@@ -144,8 +177,9 @@ md–lg  (tablet)   Icon-only collapsed sidebar rail.
 
 `lucide-react` — one consistent stroke-based icon library, used
 everywhere an icon appears (nav, topbar, StatusBadge tones, directional
-indicators). Not an ADR-worthy decision (Spec #6 §40 examples an icon
-library is not among them) but recorded here for traceability.
+indicators). Confirmed as the approved family by Spec #10 §25. Not an
+ADR-worthy decision (Spec #6 §40 examples an icon library is not among
+them) but recorded here for traceability.
 
 ## Server-state strategy (future)
 

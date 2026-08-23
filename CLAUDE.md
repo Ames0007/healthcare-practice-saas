@@ -41,6 +41,7 @@ docs/specifications/
   07-frontend-ux-ui-specification.md
   08-design-system-component-architecture.md
   09-detailed-screens-wireframes.md
+  10-visual-identity-graphic-charter.md
 ```
 
 Priority when instructions conflict:
@@ -49,7 +50,7 @@ Priority when instructions conflict:
 1. Explicit current task instructions
 2. Approved architectural decisions in docs/implementation/DECISIONS.md
 3. CLAUDE.md
-4. Specifications #1–#9
+4. Specifications #1–#10
 5. Existing implementation patterns
 ```
 
@@ -64,11 +65,14 @@ read against:
 07-frontend-ux-ui-specification.md      (UX behavior/interaction rules)
 08-design-system-component-architecture.md  (tokens/component vocabulary)
 09-detailed-screens-wireframes.md       (screen composition/wireframes)
+10-visual-identity-graphic-charter.md   (approved palette/typography — visual identity)
 ```
 
 Do not implement or modify frontend UI without consulting Specifications
-#7–#9. Do not invent visual patterns, components or copy that these
-specifications already define.
+#7–#10 as applicable. Do not invent visual patterns, components, colors
+or copy that these specifications already define. Specification #10 is
+the authoritative source for approved colors and typography; Spec #8
+defines the token architecture that carries them.
 
 ------------------------------------------------------------------------
 

@@ -80,6 +80,7 @@ export default function FoundationDemoPage() {
         <div className="flex flex-wrap gap-3">
           <StatusBadge tone="info">{t("foundation.status.confirmed")}</StatusBadge>
           <StatusBadge tone="warning">{t("foundation.status.toConfirm")}</StatusBadge>
+          <StatusBadge tone="primary">{t("foundation.status.inConsultation")}</StatusBadge>
           <StatusBadge tone="success">{t("foundation.status.completed")}</StatusBadge>
           <StatusBadge tone="danger">{t("foundation.status.overdue")}</StatusBadge>
         </div>

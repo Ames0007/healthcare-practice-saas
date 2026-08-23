@@ -23,3 +23,20 @@ All notable changes to this project are documented in this file.
   foundation (cookie-backed, no flash), responsive shell (mobile bottom
   nav / tablet collapsed rail / desktop expanded sidebar). No business
   functionality, no backend integration.
+- Specification #10 (Visual Identity & Graphic Charter) approved and added
+  to the repository (TASK-003A). Design tokens realigned to the approved
+  palette (primary hover, secondary/disabled text, and all four semantic
+  "soft" tones corrected to the approved HEX values; `primary-strong`,
+  `primary-support`, `primary-soft`, `text-disabled` added). Typography
+  confirmed (Inter / Noto Sans Arabic, unchanged from TASK-003). Fixed two
+  charter deviations found during audit: the SaaS Admin shell used a dark
+  header bar (prohibited by Spec #10 §32) and the sidebar's selected-item
+  background used a generic neutral instead of the approved Primary-50
+  soft surface (Spec #10 §16/§19). Added a `primary` StatusBadge tone
+  (restrained teal, for "in consultation"-style active-process states).
+  Aligned the `/book` placeholder with the charter (cabinet-identity area,
+  teal primary action — still non-functional). Rendered browser visual QA
+  was not possible in this environment (no browser-automation tooling);
+  validated instead via compiled-CSS hex inspection and SSR HTML/dir/lang
+  inspection across FR and AR for all five route areas. No business
+  functionality, no backend integration.

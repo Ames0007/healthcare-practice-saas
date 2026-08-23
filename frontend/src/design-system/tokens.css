@@ -11,36 +11,40 @@
  */
 
 :root {
-  /* Color — brand/accent (restrained teal, Spec #8 §5) */
-  --ds-color-primary: #0f766e;
-  --ds-color-primary-hover: #0d5f59;
+  /* Color — brand/accent (Specification #10 §3-4, approved graphic charter) */
+  --ds-color-primary: #0f766e; /* Primary 700 */
+  --ds-color-primary-hover: #115e59; /* Primary 800 */
+  --ds-color-primary-strong: #134e4a; /* Primary 900 — rare deep emphasis */
+  --ds-color-primary-support: #0d9488; /* Primary 600 — supporting primary/data series */
+  --ds-color-primary-soft: #f0fdfa; /* Primary 50 — soft brand surface (e.g. selected nav item) */
   --ds-color-primary-foreground: #ffffff;
 
-  /* Color — surfaces */
+  /* Color — surfaces (Spec #10 §4) */
   --ds-color-background: #f8fafc;
   --ds-color-surface: #ffffff;
   --ds-color-surface-subtle: #f1f5f9;
   --ds-color-surface-raised: #ffffff;
 
-  /* Color — text */
+  /* Color — text (Spec #10 §4) */
   --ds-color-text: #0f172a;
-  --ds-color-text-secondary: #334155;
+  --ds-color-text-secondary: #475569;
   --ds-color-text-muted: #64748b;
+  --ds-color-text-disabled: #94a3b8;
   --ds-color-text-inverse: #f8fafc;
 
-  /* Color — borders */
+  /* Color — borders (Spec #10 §4) */
   --ds-color-border: #e2e8f0;
   --ds-color-border-strong: #cbd5e1;
 
-  /* Color — semantic status */
+  /* Color — semantic status (Spec #10 §6) */
   --ds-color-success: #15803d;
-  --ds-color-success-subtle: #dcfce7;
+  --ds-color-success-soft: #f0fdf4;
   --ds-color-warning: #b45309;
-  --ds-color-warning-subtle: #fef3c7;
+  --ds-color-warning-soft: #fffbeb;
   --ds-color-danger: #b91c1c;
-  --ds-color-danger-subtle: #fee2e2;
+  --ds-color-danger-soft: #fef2f2;
   --ds-color-info: #1d4ed8;
-  --ds-color-info-subtle: #dbeafe;
+  --ds-color-info-soft: #eff6ff;
 
   /* Focus ring */
   --ds-color-focus-ring: #0f766e;
@@ -83,6 +87,9 @@
 @theme inline {
   --color-primary: var(--ds-color-primary);
   --color-primary-hover: var(--ds-color-primary-hover);
+  --color-primary-strong: var(--ds-color-primary-strong);
+  --color-primary-support: var(--ds-color-primary-support);
+  --color-primary-soft: var(--ds-color-primary-soft);
   --color-primary-foreground: var(--ds-color-primary-foreground);
 
   --color-background: var(--ds-color-background);
@@ -93,19 +100,20 @@
   --color-text: var(--ds-color-text);
   --color-text-secondary: var(--ds-color-text-secondary);
   --color-text-muted: var(--ds-color-text-muted);
+  --color-text-disabled: var(--ds-color-text-disabled);
   --color-text-inverse: var(--ds-color-text-inverse);
 
   --color-border: var(--ds-color-border);
   --color-border-strong: var(--ds-color-border-strong);
 
   --color-success: var(--ds-color-success);
-  --color-success-subtle: var(--ds-color-success-subtle);
+  --color-success-soft: var(--ds-color-success-soft);
   --color-warning: var(--ds-color-warning);
-  --color-warning-subtle: var(--ds-color-warning-subtle);
+  --color-warning-soft: var(--ds-color-warning-soft);
   --color-danger: var(--ds-color-danger);
-  --color-danger-subtle: var(--ds-color-danger-subtle);
+  --color-danger-soft: var(--ds-color-danger-soft);
   --color-info: var(--ds-color-info);
-  --color-info-subtle: var(--ds-color-info-subtle);
+  --color-info-soft: var(--ds-color-info-soft);
 
   --radius-sm: var(--ds-radius-sm);
   --radius-md: var(--ds-radius-md);
