@@ -24,8 +24,24 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>
-        <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value=":memory:"/>
+        <!--
+        TASK-005: real PostgreSQL, not SQLite — PostgreSQL-specific
+        behavior (native uuid columns, TIMESTAMPTZ, NUMERIC precision,
+        future pg_trgm/JSONB) must be testable against PostgreSQL itself.
+        DB_DATABASE is a *distinct* database from backend/.env's
+        development DB (healthcare_practice) by name alone, so
+        `php artisan test` cannot accidentally target normal development
+        data even if backend/.env is misconfigured — these <env> values
+        always take precedence during a test run. Dev-only placeholder
+        credentials (see docs/development/LOCAL_DEVELOPMENT.md),
+        matching scripts/dev-up.sh's automated provisioning.
+        -->
+        <env name="DB_CONNECTION" value="pgsql"/>
+        <env name="DB_HOST" value="127.0.0.1"/>
+        <env name="DB_PORT" value="5432"/>
+        <env name="DB_DATABASE" value="healthcare_practice_test"/>
+        <env name="DB_USERNAME" value="healthcare"/>
+        <env name="DB_PASSWORD" value="healthcare_dev_only"/>
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>

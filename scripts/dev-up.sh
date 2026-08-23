@@ -58,6 +58,17 @@ if [ "$exists" != "1" ]; then
     -U "$POSTGRES_USER" "$POSTGRES_DB"
 fi
 
+# Dedicated test database (TASK-005) — kept structurally separate from
+# $POSTGRES_DB so `php artisan test` (phpunit.xml) cannot ever target the
+# normal development database, by name alone.
+test_exists="$(PGPASSWORD="$POSTGRES_PASSWORD" "$PG_BIN/psql.exe" -h 127.0.0.1 -p "$POSTGRES_PORT" \
+  -U "$POSTGRES_USER" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname = '$POSTGRES_TEST_DB'")"
+if [ "$test_exists" != "1" ]; then
+  echo "==> Creating test database '$POSTGRES_TEST_DB'..."
+  PGPASSWORD="$POSTGRES_PASSWORD" "$PG_BIN/createdb.exe" -h 127.0.0.1 -p "$POSTGRES_PORT" \
+    -U "$POSTGRES_USER" "$POSTGRES_TEST_DB"
+fi
+
 # --- Redis ---------------------------------------------------------------
 
 if "$REDIS_DIR/redis-cli.exe" -p "$REDIS_PORT" ping >/dev/null 2>&1; then
@@ -104,7 +115,7 @@ export MC_HOST_healthcaredev="http://$MINIO_ROOT_USER:$MINIO_ROOT_PASSWORD@127.0
 cat <<EOF
 
 Local infrastructure is up:
-  PostgreSQL  127.0.0.1:$POSTGRES_PORT   (db=$POSTGRES_DB user=$POSTGRES_USER)
+  PostgreSQL  127.0.0.1:$POSTGRES_PORT   (db=$POSTGRES_DB, test db=$POSTGRES_TEST_DB, user=$POSTGRES_USER)
   Redis       127.0.0.1:$REDIS_PORT
   MinIO API   http://127.0.0.1:$MINIO_API_PORT   (bucket=$MINIO_BUCKET)
   MinIO UI    http://127.0.0.1:$MINIO_CONSOLE_PORT

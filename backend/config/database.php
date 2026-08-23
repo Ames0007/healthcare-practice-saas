@@ -97,6 +97,12 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+            // TASK-005 (Spec #4 §2.6): the connection always operates in
+            // UTC regardless of server locale (local initdb defaulted to
+            // Africa/Casablanca) — absolute instants stored/read
+            // unambiguously; tenant/display timezone conversion is a
+            // future, application-layer concern, not a DB session setting.
+            'timezone' => env('DB_TIMEZONE', 'UTC'),
         ],
 
         'sqlsrv' => [

@@ -54,3 +54,36 @@ All notable changes to this project are documented in this file.
   New `docs/development/LOCAL_DEVELOPMENT.md` guide. No migrations, no
   queue architecture, no application file-storage behavior — those remain
   TASK-005/TASK-006 scope.
+- PostgreSQL application foundation established (TASK-005). Reviewed
+  Laravel's three default migrations (users/password_reset_tokens/
+  sessions, cache/cache_locks, jobs/job_batches/failed_jobs) against
+  Specification #4 before they were ever applied and removed all three —
+  `database/migrations/` is deliberately empty (see
+  `database/migrations/README.md`); the `users` schema conflicted with
+  Spec #4 §4.1's UUID-based Identity model and auth/cache/queue are later
+  tasks' scope (TASK-014/015, TASK-006). Removed `app/Models/User.php`
+  and its factory as a consequence; `config/auth.php` no longer
+  hardcodes a default Authenticatable model. `SESSION_DRIVER`/
+  `CACHE_STORE`/`QUEUE_CONNECTION` moved from `database` to `file`/
+  `file`/`sync` accordingly — no behavior silently depended on the
+  removed tables. Established the UUID convention: application-generated
+  UUIDv7 (RFC 9562) via a new `App\Models\Concerns\HasUuidPrimaryKey`
+  trait wrapping Laravel's native `HasUuids` (already UUIDv7-based in
+  13.26.1 — no custom generation code needed), stored as native
+  PostgreSQL `uuid` columns. `config/database.php`'s `pgsql` connection
+  now pins the session to UTC regardless of server locale. Added a
+  dedicated `healthcare_practice_test` database (provisioned by
+  `scripts/dev-up.sh` alongside the development database) and
+  reconfigured `phpunit.xml` to run the full suite against real
+  PostgreSQL instead of SQLite, with the test database hardcoded so
+  `php artisan test` cannot reach development data by name alone. Added
+  `tests/Feature/Database/DatabaseFoundationTest.php` (6 tests) proving
+  the PostgreSQL connection, UUIDv7 generation/round-tripping, and
+  NUMERIC(14,2) money precision against a test-only fixture table
+  (created/dropped per test, never a migration). New
+  `backend/database/README.md` documents the UUID/timestamp/money/
+  tenant-table/tenant-aware-FK/migration/constraint/index conventions;
+  ADR-003 (single `public` schema for V1) and ADR-004 (UUIDv7 strategy)
+  record the material decisions. RLS remains an open, deliberately
+  deferred decision (RISK-007, unchanged). No business-domain tables,
+  no TASK-006 (Redis queue/cache) functionality implemented.

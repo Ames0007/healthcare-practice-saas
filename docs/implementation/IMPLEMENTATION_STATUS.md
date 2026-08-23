@@ -21,7 +21,7 @@ A task cannot be marked COMPLETE without acceptance-criteria evidence.
 | TASK-003 | Phase 0 | COMPLETE | c6e656e | Frontend bootstrap (Next.js 16.3.2 / React 19.2.8) |
 | TASK-003A | Phase 0 | COMPLETE | 287666b | Graphic charter alignment & visual QA (Spec #10) |
 | TASK-004 | Phase 0 | COMPLETE | 59d478a | Local development environment (PostgreSQL 18.6/Redis 8.10.1/MinIO, native/portable) |
-| TASK-005 | Phase 0 | NOT_STARTED | — | PostgreSQL foundation |
+| TASK-005 | Phase 0 | COMPLETE | pending | PostgreSQL foundation (UUIDv7, test DB, empty migration baseline) |
 | TASK-006 | Phase 0 | NOT_STARTED | — | Redis and queue foundation |
 | TASK-007 | Phase 0 | NOT_STARTED | — | Testing foundation |
 | TASK-008 | Phase 0 | NOT_STARTED | — | Static analysis and linting |

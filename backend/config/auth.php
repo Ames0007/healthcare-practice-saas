@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\User;
-
 return [
 
     /*
@@ -62,9 +60,12 @@ return [
     */
 
     'providers' => [
+        // No default Authenticatable model yet — Identity (TASK-014/015)
+        // introduces a UUID-based User entity per Specification #4 §4.1
+        // and sets AUTH_MODEL/this default then (TASK-005).
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', User::class),
+            'model' => env('AUTH_MODEL'),
         ],
 
         // 'users' => [

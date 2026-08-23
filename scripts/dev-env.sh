@@ -15,6 +15,7 @@ if [ -f "$ROOT_DIR/.env" ]; then
 fi
 
 : "${POSTGRES_DB:=healthcare_practice}"
+: "${POSTGRES_TEST_DB:=healthcare_practice_test}"
 : "${POSTGRES_USER:=healthcare}"
 : "${POSTGRES_PASSWORD:=healthcare_dev_only}"
 : "${POSTGRES_PORT:=5432}"
