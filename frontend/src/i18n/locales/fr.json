@@ -2,7 +2,9 @@
   "common": {
     "loading": "Chargement...",
     "skipToContent": "Aller au contenu principal",
-    "foundationBadge": "Fondation / Démo"
+    "foundationBadge": "Fondation / Démo",
+    "previous": "Précédent",
+    "next": "Suivant"
   },
   "nav": {
     "aujourdhui": "Aujourd'hui",
@@ -245,6 +247,59 @@
         "status": "Statut"
       }
     }
+  },
+  "patients": {
+    "pageTitle": "Patients",
+    "pageDescription": "Gérez les patients de votre cabinet.",
+    "newPatient": "+ Nouveau patient",
+    "newPatientNotice": "La création de patient sera disponible dans une prochaine étape.",
+    "open": "Ouvrir",
+    "searchLabel": "Rechercher nom, téléphone, numéro patient...",
+    "resultCount": "{{count}} patients",
+    "pageLabel": "Page {{page}} / {{pageCount}}",
+    "table": {
+      "patient": "Patient",
+      "phone": "Téléphone",
+      "practitioner": "Praticien",
+      "lastVisit": "Dernière visite",
+      "nextAppointment": "Prochain RDV",
+      "balance": "Solde",
+      "actions": "Actions"
+    },
+    "balance": {
+      "none": "—"
+    },
+    "noLastVisit": "—",
+    "noNextAppointment": "—",
+    "filters": {
+      "practitionerLabel": "Praticien",
+      "allPractitioners": "Tous",
+      "nextAppointmentLabel": "Prochain rendez-vous",
+      "nextAppointmentAll": "Tous",
+      "nextAppointmentToday": "Aujourd'hui",
+      "nextAppointmentUpcoming": "À venir",
+      "nextAppointmentNone": "Sans prochain RDV",
+      "clear": "Effacer les filtres"
+    },
+    "empty": {
+      "title": "Aucun patient pour le moment.",
+      "description": "Ajoutez votre premier patient pour commencer.",
+      "action": "Ajouter un patient"
+    },
+    "filteredEmpty": {
+      "title": "Aucun patient ne correspond à vos critères.",
+      "action": "Effacer les filtres"
+    },
+    "error": {
+      "title": "Impossible de charger les patients.",
+      "retry": "Réessayer"
+    }
+  },
+  "patientDetail": {
+    "notFoundTitle": "Patient introuvable",
+    "notFoundDescription": "Ce patient n'existe pas dans les données de démonstration.",
+    "notice": "Référence : {{number}} · Le dossier patient complet (Patient 360°) sera implémenté dans une prochaine étape (UI-004).",
+    "back": "Retour à la liste des patients"
   },
   "admin": {
     "brand": "Platform Admin",

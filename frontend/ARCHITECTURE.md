@@ -51,7 +51,9 @@ src/components/
             StatusBadge, Skeleton, EmptyState, MetricCard, AttentionItem,
             Dialog (one focus-trapped, portal-rendered implementation
             backing drawer/modal/alert variants — see UI-002), ConfirmDialog,
-            Toast (single-slot, not a global provider). No business
+            Toast (single-slot, not a global provider), Avatar
+            (initials-fallback, no photo support), Pagination (compact
+            prev/next, no numbered list — see UI-003A). No business
             knowledge.
   app/      Shell/domain-agnostic app components: AppShell, AppSidebar,
             AppTopbar, MobileNav, PageHeader, LanguageSwitcher,
@@ -92,6 +94,22 @@ src/features/
             A `features/<name>/` folder is the convention for screen-
             specific composition that isn't a reusable `components/ui` or
             `components/domain` piece.
+  patients/ Patients list screen composition (UI-003A): `types.ts`/
+            `mock-data.ts` (16 synthetic patients — administrative/
+            operational fields only, no clinical data, see CLAUDE.md §13),
+            `format.ts` (date/money formatting, reusing `toIntlLocale`
+            exported from `features/today/format.ts` rather than
+            duplicating it), `filter-patients.ts` (pure local search +
+            practitioner + next-appointment filtering, no backend query),
+            `patients-page.tsx` (owns search/filter/pagination state),
+            `components/` (PatientsFilters, PatientTable, PatientCardList
+            — the same desktop-table/mobile-card dual-render pattern as
+            Agenda's Waiting Room — PatientsSkeleton). Row links go to
+            `app/app/patients/[id]/page.tsx`, a minimal placeholder that
+            previews the selected patient's synthetic name/reference and
+            defers the real Patient 360° overview to UI-004. Patient
+            creation ("+ Nouveau patient") shows a future-feature toast —
+            UI-003B scope, not built here.
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,

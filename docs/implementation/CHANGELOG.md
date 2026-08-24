@@ -167,3 +167,43 @@ All notable changes to this project are documented in this file.
   empty/loading/error states, and FR/AR/RTL). All 33 frontend tests
   (13 UI-001 + 20 UI-002), typecheck, lint and build pass; backend
   regression (10 tests) unaffected — no backend files touched.
+- Patient list prototype (UI-003A) at `/app/patients`, replacing the
+  placeholder — the first real Patients workspace. New
+  `frontend/src/features/patients/` composition against a centralized
+  mock dataset (`mock-data.ts`, 16 synthetic Moroccan-context patients:
+  patient number, name, phone, responsible practitioner, last visit, next
+  appointment, outstanding balance — administrative/operational fields
+  only, no clinical data per CLAUDE.md §13). Desktop table (Patient/
+  Téléphone/Praticien/Dernière visite/Prochain RDV/Solde, "Dernière
+  visite" hidden below `lg`) and a separate mobile card presentation
+  (`PatientTable`/`PatientCardList`, the same dual-render pattern as
+  Agenda's Waiting Room) share one `filterPatients()` pure function
+  (`filter-patients.ts`) for local, case-insensitive search across name/
+  phone/patient number plus practitioner and next-appointment (Today/
+  Upcoming/None) filters — result count and a "Effacer les filtres"
+  action give active-filter feedback. Compact prev/next pagination
+  (`components/ui/pagination.tsx`, 10/page) and an initials-fallback
+  `components/ui/avatar.tsx` are new generic primitives (Spec #8 §47/§58).
+  Each row links to a new `/app/patients/[id]` route that previews the
+  selected patient's synthetic name and reference while explicitly
+  deferring the real Patient 360° overview to UI-004; "+ Nouveau patient"
+  shows a future-feature toast rather than a creation form (UI-003B
+  scope). Three list states beyond loading/loaded: the global empty state
+  ("Aucun patient pour le moment"), a distinct filtered/search-empty state
+  ("Aucun patient ne correspond à vos critères") that never suggests
+  adding a first patient when patients merely happen to be filtered out,
+  and an error state with retry. Full FR/AR under a new `patients.*`/
+  `patientDetail.*` dictionary namespace; RTL verified (logical
+  properties throughout, phone/patient-number isolated `dir="ltr"` inside
+  RTL layout). `toIntlLocale` in `features/today/format.ts` was exported
+  (previously module-private) so `features/patients/format.ts` can reuse
+  it for locale-aware date formatting instead of duplicating it — no
+  behavioral change, confirmed by the unchanged UI-001 suite. Added
+  `frontend/src/features/patients/patients-page.test.tsx` (18 tests:
+  route render, rows, patient number, search by name/phone/patient
+  number, practitioner filter, next-appointment filter, clear filters,
+  filtered-empty, global empty, loading, error, FR/AR/RTL, the desktop/
+  mobile dual-render, the future-feature notice, and the Patient 360°
+  placeholder link). All 51 frontend tests (13 UI-001 + 20 UI-002 + 18
+  UI-003A), typecheck, lint and build pass; backend regression (10 tests)
+  unaffected — no backend files touched.

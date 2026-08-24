@@ -2,7 +2,9 @@
   "common": {
     "loading": "جارٍ التحميل...",
     "skipToContent": "الانتقال إلى المحتوى الرئيسي",
-    "foundationBadge": "أساس / تجريبي"
+    "foundationBadge": "أساس / تجريبي",
+    "previous": "السابق",
+    "next": "التالي"
   },
   "nav": {
     "aujourdhui": "اليوم",
@@ -245,6 +247,59 @@
         "status": "الحالة"
       }
     }
+  },
+  "patients": {
+    "pageTitle": "المرضى",
+    "pageDescription": "إدارة مرضى عيادتك.",
+    "newPatient": "+ مريض جديد",
+    "newPatientNotice": "ستتوفر ميزة إضافة مريض جديد في مرحلة لاحقة.",
+    "open": "فتح",
+    "searchLabel": "البحث بالاسم أو الهاتف أو رقم المريض...",
+    "resultCount": "{{count}} مريض",
+    "pageLabel": "الصفحة {{page}} / {{pageCount}}",
+    "table": {
+      "patient": "المريض",
+      "phone": "الهاتف",
+      "practitioner": "الممارس",
+      "lastVisit": "آخر زيارة",
+      "nextAppointment": "الموعد القادم",
+      "balance": "الرصيد",
+      "actions": "إجراءات"
+    },
+    "balance": {
+      "none": "—"
+    },
+    "noLastVisit": "—",
+    "noNextAppointment": "—",
+    "filters": {
+      "practitionerLabel": "الممارس",
+      "allPractitioners": "الكل",
+      "nextAppointmentLabel": "الموعد القادم",
+      "nextAppointmentAll": "الكل",
+      "nextAppointmentToday": "اليوم",
+      "nextAppointmentUpcoming": "قادم",
+      "nextAppointmentNone": "بدون موعد قادم",
+      "clear": "مسح المرشحات"
+    },
+    "empty": {
+      "title": "لا يوجد مرضى حاليًا.",
+      "description": "أضف مريضك الأول للبدء.",
+      "action": "إضافة مريض"
+    },
+    "filteredEmpty": {
+      "title": "لا يوجد مريض يطابق معاييرك.",
+      "action": "مسح المرشحات"
+    },
+    "error": {
+      "title": "تعذّر تحميل قائمة المرضى.",
+      "retry": "إعادة المحاولة"
+    }
+  },
+  "patientDetail": {
+    "notFoundTitle": "المريض غير موجود",
+    "notFoundDescription": "هذا المريض غير موجود في بيانات العرض التوضيحي.",
+    "notice": "المرجع: {{number}} · سيتم تنفيذ الملف الكامل للمريض (٣٦٠°) في مرحلة لاحقة (UI-004).",
+    "back": "العودة إلى قائمة المرضى"
   },
   "admin": {
     "brand": "إدارة المنصة",

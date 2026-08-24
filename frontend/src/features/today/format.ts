@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/config";
 
-function toIntlLocale(locale: Locale): string {
+export function toIntlLocale(locale: Locale): string {
   // ar-MA (not generic "ar"): Western digits for times/amounts stay
   // readable in Arabic (UI-001 §25), and the Gregorian calendar matches
   // Moroccan business use without relying on ICU locale defaults.
