@@ -174,4 +174,21 @@ describe("PatientDetailPage", () => {
     expect(screen.getByText("PAT-00281")).toHaveAttribute("dir", "ltr");
     expect(screen.getByText("06 12 34 56 78")).toHaveAttribute("dir", "ltr");
   });
+
+  it("renders real Rendez-vous content with the header and active tab preserved (UI-004B 1/2/3)", () => {
+    renderPatientDetail("fr", { patientId: "pat-1", activeTab: "appointments" });
+
+    expect(screen.getByRole("heading", { level: 1, name: "Ahmed El Mansouri" })).toBeInTheDocument();
+    const nav = screen.getByRole("navigation", { name: "Sections du patient" });
+    expect(within(nav).getByRole("link", { name: "Rendez-vous" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByText("Prochains rendez-vous")).toBeInTheDocument();
+    expect(screen.queryByText("Cette section sera implémentée dans une prochaine étape.")).not.toBeInTheDocument();
+  });
+
+  it("keeps the not-found state for an invalid patient on the Rendez-vous tab (UI-004B 22)", () => {
+    renderPatientDetail("fr", { patientId: "pat-999", activeTab: "appointments" });
+
+    expect(screen.getByText("Patient introuvable")).toBeInTheDocument();
+    expect(screen.queryByText("Prochains rendez-vous")).not.toBeInTheDocument();
+  });
 });

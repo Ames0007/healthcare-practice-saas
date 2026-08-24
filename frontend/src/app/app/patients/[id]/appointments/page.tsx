@@ -6,7 +6,7 @@ import { PatientDetailPage } from "@/features/patients/patient-detail-page";
 
 const LOADING_SIMULATION_MS = 400;
 
-/** Rendez-vous tab route — placeholder content, real header/tabs (UI-004A §24). A future task owns the real content. */
+/** Rendez-vous tab route — real content (UI-004B): patient-specific upcoming/history appointments derived from Agenda's mock fixtures. */
 export default function PatientAppointmentsRoutePage() {
   const { id } = useParams<{ id: string }>();
   const [ready, setReady] = useState(false);

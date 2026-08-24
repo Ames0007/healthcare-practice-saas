@@ -374,6 +374,30 @@
       "documentAdded": "Document ajouté",
       "appointmentConfirmed": "Rendez-vous confirmé",
       "treatmentSessionCompleted": "Séance effectuée"
+    },
+    "appointments": {
+      "newAppointment": "+ Nouveau RDV",
+      "upcomingTitle": "Prochains rendez-vous",
+      "historyTitle": "Historique des rendez-vous",
+      "resultCount": "{{count}} rendez-vous",
+      "filters": {
+        "all": "Tous",
+        "upcoming": "À venir",
+        "completed": "Terminés",
+        "cancelled": "Annulés",
+        "noShow": "Absents"
+      },
+      "viewAppointment": "Voir le rendez-vous",
+      "openInAgenda": "Ouvrir dans l'agenda",
+      "emptyUpcomingTitle": "Aucun rendez-vous à venir.",
+      "emptyUpcomingAction": "Planifier un rendez-vous",
+      "emptyHistoryTitle": "Aucun rendez-vous passé.",
+      "emptyAllTitle": "Aucun rendez-vous pour ce patient.",
+      "emptyAllDescription": "Planifiez son premier rendez-vous.",
+      "emptyAllAction": "Planifier un rendez-vous",
+      "emptyFilteredTitle": "Aucun rendez-vous ne correspond à ce filtre.",
+      "errorTitle": "Impossible de charger les rendez-vous du patient.",
+      "errorRetry": "Réessayer"
     }
   },
   "admin": {

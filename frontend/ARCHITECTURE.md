@@ -78,8 +78,11 @@ src/components/
             AppointmentStatus/AppointmentSchedulingType machine, Spec #2
             §57.1/#3 §3.1), `appointment-status.ts` (the central status →
             tone/label registry), `appointment-card.tsx` (row/prominent/
-            calendar variants). Both Aujourd'hui (UI-001) and Agenda
-            (UI-002) depend on this layer, not the other way around.
+            calendar variants; `showPatientName` — default `true` — lets a
+            patient-context caller suppress the redundant identity line and
+            show the practitioner instead, see Patient Rendez-vous below,
+            UI-004B). Both Aujourd'hui (UI-001) and Agenda (UI-002) depend
+            on this layer, not the other way around.
             `domain/patients/` (UI-004A) — `types.ts` (`PatientOverview`/
             `PatientActiveTreatment`/`PatientNextInstallment`/
             `PatientActivityItem`/`PatientTabKey`, kept separate from
@@ -116,6 +119,14 @@ src/features/
             RescheduleDialog, CancelConfirmDialog, NoShowConfirmDialog,
             WaitingRoom, AgendaSkeleton, SchedulingFields — the exact-time/
             arrival-window fields shared by create and reschedule).
+            `AppointmentDrawer`'s lifecycle callbacks (`onPrimaryAction`/
+            `onEdit`/`onReschedule`/`onCancel`/`onNoShow`) are optional —
+            a caller that doesn't own Agenda's mutable state (Patient
+            Rendez-vous, UI-004B) omits them and the corresponding controls
+            simply don't render, instead of a second detail drawer; a
+            `patientLinkHref`/`patientLinkLabel` pair overrides the bottom
+            identity link for that same caller. Agenda's own usage is
+            unchanged (still passes every callback).
             A `features/<name>/` folder is the convention for screen-
             specific composition that isn't a reusable `components/ui` or
             `components/domain` piece.
@@ -157,6 +168,32 @@ src/features/
             route. Real cross-page consistency is a backend-integration
             concern, not a frontend state-management one — no Redux/
             Zustand/global store was introduced to paper over it.
+            Rendez-vous tab (UI-004B): `patient-appointments.ts` (pure
+            derivation — filter Agenda's own `getAgendaMockAppointments()`
+            by `patientId`, no second appointment dataset; the upcoming/
+            history split and the five status-group filters share one
+            status-aware classification rule: a terminal-outcome
+            appointment, completed/cancelled/no-show/rescheduled, is
+            always history even with a future date, so a future
+            cancellation never reads as an upcoming visit),
+            `components/patient-appointments-content.tsx` (the tab's
+            composition — reuses `AppointmentCard` with
+            `showPatientName={false}`, `variant="prominent"` for upcoming
+            with per-card "Voir le rendez-vous"/"Ouvrir dans l'agenda"
+            actions, the denser `variant="row"` for history; opens the
+            shared `AppointmentDrawer` read-only, no lifecycle mutation),
+            `components/patient-appointment-filters.tsx` (Tous/À venir/
+            Terminés/Annulés/Absents, the same segmented-toggle visual as
+            Agenda's Day/Week switch, plus a live result count).
+            **Prototype limitation (UI-004B §9):** Agenda owns the one
+            mutable appointment array (UI-002); this tab only reads the
+            seed fixtures, so a status change made in Agenda during a
+            session does not appear here and vice versa — real
+            synchronization is a backend-integration concern, same
+            reasoning as the create/edit limitation above. "+ Nouveau RDV"
+            and "Ouvrir dans l'agenda" are plain links to `/app/agenda`, no
+            query-param prefill — UI-002's `AppointmentFormDialog` remains
+            the only appointment-creation UX.
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,

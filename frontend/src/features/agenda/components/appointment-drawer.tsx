@@ -15,11 +15,20 @@ export interface AppointmentDrawerProps {
   appointment: AgendaAppointment | null;
   open: boolean;
   onClose: () => void;
-  onPrimaryAction: (id: string, targetStatus: AppointmentStatus) => void;
-  onEdit: (appointment: AgendaAppointment) => void;
-  onReschedule: (appointment: AgendaAppointment) => void;
-  onCancel: (appointment: AgendaAppointment) => void;
-  onNoShow: (appointment: AgendaAppointment) => void;
+  /**
+   * Lifecycle actions are optional (UI-004B §22) — callers that don't own
+   * Agenda's mutable appointment state (e.g. Patient 360°'s read-focused
+   * Rendez-vous tab) omit them, and the corresponding controls simply don't
+   * render, rather than duplicating Agenda's state management.
+   */
+  onPrimaryAction?: (id: string, targetStatus: AppointmentStatus) => void;
+  onEdit?: (appointment: AgendaAppointment) => void;
+  onReschedule?: (appointment: AgendaAppointment) => void;
+  onCancel?: (appointment: AgendaAppointment) => void;
+  onNoShow?: (appointment: AgendaAppointment) => void;
+  /** Overrides the bottom identity link — Patient 360° points it at Agenda instead of Patients, since the patient page is already the current page (UI-004B §21/§23). */
+  patientLinkHref?: string;
+  patientLinkLabel?: string;
 }
 
 /**
@@ -37,6 +46,8 @@ export function AppointmentDrawer({
   onReschedule,
   onCancel,
   onNoShow,
+  patientLinkHref,
+  patientLinkLabel,
 }: AppointmentDrawerProps) {
   const { t, locale } = useLocale();
 
@@ -76,7 +87,7 @@ export function AppointmentDrawer({
 
         <StatusBadge tone={statusMeta.tone}>{t(statusMeta.translationKey)}</StatusBadge>
 
-        {primaryAction && (
+        {primaryAction && onPrimaryAction && (
           <Button
             className="w-full"
             disabled={primaryAction.targetStatus === null}
@@ -90,23 +101,29 @@ export function AppointmentDrawer({
         )}
 
         <div className="flex flex-wrap gap-3">
-          <Link href="/app/patients" className={buttonClassNames("outline", "sm")}>
-            {t("agenda.drawer.openPatient")}
+          <Link href={patientLinkHref ?? "/app/patients"} className={buttonClassNames("outline", "sm")}>
+            {patientLinkLabel ?? t("agenda.drawer.openPatient")}
           </Link>
-          <Button variant="outline" size="sm" onClick={() => onEdit(appointment)} disabled={isTerminal}>
-            {t("agenda.drawer.edit")}
-          </Button>
+          {onEdit && (
+            <Button variant="outline" size="sm" onClick={() => onEdit(appointment)} disabled={isTerminal}>
+              {t("agenda.drawer.edit")}
+            </Button>
+          )}
         </div>
 
-        {!isTerminal && (
+        {!isTerminal && (onReschedule || onCancel || (canNoShow && onNoShow)) && (
           <div className="flex flex-wrap gap-3 border-t border-border pt-4">
-            <Button variant="ghost" size="sm" onClick={() => onReschedule(appointment)}>
-              {t("agenda.drawer.reschedule")}
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => onCancel(appointment)}>
-              {t("agenda.drawer.cancel")}
-            </Button>
-            {canNoShow && (
+            {onReschedule && (
+              <Button variant="ghost" size="sm" onClick={() => onReschedule(appointment)}>
+                {t("agenda.drawer.reschedule")}
+              </Button>
+            )}
+            {onCancel && (
+              <Button variant="ghost" size="sm" onClick={() => onCancel(appointment)}>
+                {t("agenda.drawer.cancel")}
+              </Button>
+            )}
+            {canNoShow && onNoShow && (
               <Button variant="ghost" size="sm" className="text-danger hover:bg-danger-soft" onClick={() => onNoShow(appointment)}>
                 {t("agenda.drawer.noShow")}
               </Button>

@@ -23,6 +23,8 @@ export interface AppointmentCardProps {
   practitioner?: string;
   /** "row" (dense list), "prominent" (single highlighted card), "calendar" (compact grid cell). */
   variant?: "prominent" | "row" | "calendar";
+  /** Suppresses the patient-name line — used in patient-context lists where the identity is already obvious from the page (UI-004B §13). Defaults to `true` (unchanged Agenda/Aujourd'hui behavior). */
+  showPatientName?: boolean;
   /** Caller-supplied action buttons — this component holds no business logic (Spec #8 §61). */
   actions?: ReactNode;
   /** When provided, the card becomes an interactive button (Agenda's click-to-open-drawer). */
@@ -44,6 +46,7 @@ export function AppointmentCard({
   status,
   practitioner,
   variant = "row",
+  showPatientName = true,
   actions,
   onSelect,
   className,
@@ -100,9 +103,12 @@ export function AppointmentCard({
           )}
         </span>
         <span className="min-w-0 flex-1 truncate text-sm font-medium text-text">
-          {patientName}
-          {service && (
+          {showPatientName ? patientName : (service ?? patientName)}
+          {showPatientName && service && (
             <span className="ms-2 hidden font-normal text-text-muted sm:inline">{service}</span>
+          )}
+          {!showPatientName && practitioner && (
+            <span className="ms-2 hidden font-normal text-text-muted sm:inline">{practitioner}</span>
           )}
         </span>
         <StatusBadge tone={statusMeta.tone}>{t(statusMeta.translationKey)}</StatusBadge>
@@ -116,8 +122,12 @@ export function AppointmentCard({
         <div className="flex flex-col gap-1">
           <span className="text-2xl font-semibold tabular-nums text-text">{timeLabel}</span>
           {windowCaption && <span className="text-xs font-medium text-text-muted">{windowCaption}</span>}
-          <span className="text-base font-medium text-text">{patientName}</span>
-          {service && <span className="text-sm text-text-muted">{service}</span>}
+          {showPatientName && <span className="text-base font-medium text-text">{patientName}</span>}
+          {service && (
+            <span className={showPatientName ? "text-sm text-text-muted" : "text-base font-medium text-text"}>
+              {service}
+            </span>
+          )}
           {practitioner && <span className="text-xs text-text-muted">{practitioner}</span>}
         </div>
         <StatusBadge tone={statusMeta.tone}>{t(statusMeta.translationKey)}</StatusBadge>

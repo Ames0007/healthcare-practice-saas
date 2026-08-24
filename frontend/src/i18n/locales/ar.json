@@ -374,6 +374,30 @@
       "documentAdded": "تمت إضافة مستند",
       "appointmentConfirmed": "تأكيد الموعد",
       "treatmentSessionCompleted": "إتمام جلسة"
+    },
+    "appointments": {
+      "newAppointment": "+ موعد جديد",
+      "upcomingTitle": "المواعيد القادمة",
+      "historyTitle": "سجل المواعيد",
+      "resultCount": "{{count}} موعد",
+      "filters": {
+        "all": "الكل",
+        "upcoming": "القادمة",
+        "completed": "المنتهية",
+        "cancelled": "الملغاة",
+        "noShow": "الغياب"
+      },
+      "viewAppointment": "عرض الموعد",
+      "openInAgenda": "فتح في الأجندة",
+      "emptyUpcomingTitle": "لا توجد مواعيد قادمة.",
+      "emptyUpcomingAction": "جدولة موعد",
+      "emptyHistoryTitle": "لا توجد مواعيد سابقة.",
+      "emptyAllTitle": "لا توجد مواعيد لهذا المريض.",
+      "emptyAllDescription": "قم بجدولة أول موعد له.",
+      "emptyAllAction": "جدولة موعد",
+      "emptyFilteredTitle": "لا يوجد موعد يطابق هذا المرشح.",
+      "errorTitle": "تعذّر تحميل مواعيد المريض.",
+      "errorRetry": "إعادة المحاولة"
     }
   },
   "admin": {

@@ -14,6 +14,7 @@ import { getPatientOverview } from "./mock-overview-data";
 import { formatDayMonthTime, formatMad, getPatientFullName, getPatientInitials, computeAge } from "./format";
 import { getTodayIso } from "./patient-form-validation";
 import { PatientOverviewContent } from "./components/patient-overview-content";
+import { PatientAppointmentsContent } from "./components/patient-appointments-content";
 import { PatientTabPlaceholder } from "./components/patient-tab-placeholder";
 import { PatientDetailSkeleton } from "./components/patient-detail-skeleton";
 import type { Patient } from "./types";
@@ -138,6 +139,8 @@ export function PatientDetailPage({
 
       {activeTab === "overview" ? (
         <PatientOverviewContent overview={overview} nextAppointment={nextAppointment} balance={balance} />
+      ) : activeTab === "appointments" ? (
+        <PatientAppointmentsContent patientId={patientId} />
       ) : (
         <PatientTabPlaceholder tab={activeTab} />
       )}

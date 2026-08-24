@@ -342,3 +342,70 @@ All notable changes to this project are documented in this file.
   (13 UI-001 + 20 UI-002 + 30 UI-003A/B + 17 UI-004A), typecheck, lint
   and build pass; backend regression (10 tests) unaffected — no backend
   files touched.
+- Patient Rendez-vous tab (UI-004B), replacing `/app/patients/[id]/appointments`'s
+  UI-004A placeholder with real content: upcoming appointments (grouped by
+  date, chronological) and appointment history (grouped by date, newest
+  first). No second appointment dataset — `features/patients/patient-appointments.ts`
+  derives everything by filtering Agenda's own centralized mock fixtures
+  (`getAgendaMockAppointments()`, UI-002) by `patientId`, since both feature
+  areas already share the same `pat-N` ids. Classification is status-aware,
+  not date-only: a terminal-outcome appointment (completed/cancelled/no-show/
+  rescheduled) is always history, even with a future date, so a future
+  cancellation never reads as a normal upcoming visit — the opposite (a
+  stale non-terminal appointment before the fixed prototype business date)
+  also falls back to history. Documented prototype limitation: Agenda owns
+  the one mutable appointment array; this tab only reads the seed fixtures,
+  so a mutation made in Agenda during a session is not reflected here and
+  vice versa, until real API integration replaces both mock sources.
+  Reused rather than duplicated UI-002's appointment architecture per this
+  task's explicit instruction: extended `AppointmentCard` with an optional
+  `showPatientName` prop (defaults `true`, so all five existing call sites
+  are unaffected) so patient-context lists can suppress the redundant
+  identity line and show the practitioner/service instead — `variant="prominent"`
+  for upcoming (with per-card "Voir le rendez-vous"/"Ouvrir dans l'agenda"
+  actions) and the denser `variant="row"` for history (directly clickable,
+  matching Agenda's own day-view rows). Extended `AppointmentDrawer` rather
+  than forking a second detail drawer: `onPrimaryAction`/`onEdit`/
+  `onReschedule`/`onCancel`/`onNoShow` are now optional, and the
+  corresponding controls simply don't render when omitted — Patient 360°
+  passes none of them (read-focused detail per this task's explicit
+  guidance, since enabling lifecycle mutation here would mean duplicating
+  Agenda's state management), and adds a `patientLinkHref`/`patientLinkLabel`
+  override so the drawer's bottom link points at Agenda instead of Patients
+  (the patient page is already the current page). Agenda's own usage is
+  unchanged (still passes every callback), so its 20 existing tests were
+  unaffected. Lightweight status-group filtering (Tous/À venir/Terminés/
+  Annulés/Absents, the last grouping both `cancelled_by_patient` and
+  `cancelled_by_practice`) with a live result count, reusing the same
+  segmented-toggle visual pattern as Agenda's Day/Week switch. "+ Nouveau
+  RDV" and the per-card "Ouvrir dans l'agenda" action both navigate to
+  `/app/agenda` as a plain link — no query-param prefill wiring was added
+  to Agenda's `AppointmentFormDialog`, since this task marked that
+  optional and explicitly capped scope ("do not significantly expand
+  scope"); there remains exactly one appointment-creation UX
+  (`AppointmentFormDialog`, UI-002). Loading (shape-matched skeleton: new
+  RDV button, filter row, two card placeholders — no spinner), error
+  (component-level test seam, mirroring every other feature page), fully
+  empty (`EmptyState` + "Planifiez son premier rendez-vous"), empty
+  upcoming (restrained inline text + a "Planifier un rendez-vous" link)
+  and empty history (a single restrained sentence, no action) states all
+  implemented; patient not-found is unaffected, since `PatientDetailPage`
+  resolves that before any tab renders. Full FR/AR under a new
+  `patientDetail.appointments.*` namespace; status/arrival-window labels
+  are reused from the existing `appointment.*` namespace rather than
+  duplicated. RTL verified, with dates isolated `dir="ltr"` the same way
+  UI-004A already established. Added
+  `frontend/src/features/patients/components/patient-appointments-content.test.tsx`
+  (22 tests: upcoming/history ordering, exact vs arrival-window
+  presentation, the status registry, the future-cancelled classification
+  rule, all five filters including the cancelled-status grouping, the
+  live result count, opening the shared drawer and its Agenda link, the
+  three empty states, loading, error, French, Arabic/RTL, and that the
+  patient name never leaks into a card) plus two integration assertions
+  in `patient-detail-page.test.tsx` (header/tabs preserved with Rendez-vous
+  active, and not-found still wins for an invalid patient id on this tab).
+  All 104 frontend tests (13 UI-001 + 20 UI-002 + 30 UI-003A/B + 19
+  UI-004A + 22 UI-004B on the dedicated appointments-content suite, with
+  the remaining 2 new assertions folded into UI-004A's file), typecheck,
+  lint and build pass; backend regression (10 tests) unaffected — no
+  backend files touched.
