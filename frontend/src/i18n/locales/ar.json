@@ -398,6 +398,50 @@
       "emptyFilteredTitle": "لا يوجد موعد يطابق هذا المرشح.",
       "errorTitle": "تعذّر تحميل مواعيد المريض.",
       "errorRetry": "إعادة المحاولة"
+    },
+    "treatments": {
+      "newTreatment": "+ علاج جديد",
+      "newTreatmentNotice": "سيتم ربط إنشاء العلاج بمسار العمل التجاري لاحقًا.",
+      "activeTitle": "العلاج الجاري",
+      "completedTitle": "العلاجات المنتهية",
+      "noActiveTreatment": "لا يوجد علاج جارٍ.",
+      "emptyAllTitle": "لا توجد علاجات لهذا المريض.",
+      "emptyAllDescription": "ستظهر هنا خطط العلاج وجلساتها.",
+      "viewTreatment": "عرض العلاج",
+      "planNextSession": "جدولة الجلسة القادمة",
+      "planSession": "جدولة الجلسة",
+      "viewBilling": "عرض الفوترة",
+      "startDateLabel": "البداية",
+      "startDateInline": "البداية: {{date}}",
+      "completedOn": "انتهى في {{date}}",
+      "progressLabel": "تقدم العلاج",
+      "completedCount": "{{count}} منتهية",
+      "scheduledCount": "{{count}} مجدولة",
+      "remainingCount": "{{count}} متبقية",
+      "sessionsTitle": "الجلسات",
+      "sessionCellLabel": "الجلسة {{n}} — {{status}}",
+      "sessionHeading": "الجلسة {{n}} / {{total}}",
+      "nextSessionLabel": "الجلسة القادمة",
+      "backToTreatment": "العودة إلى العلاج",
+      "dateLabel": "التاريخ",
+      "practitionerLabel": "الممارس",
+      "appointmentRefLabel": "الموعد",
+      "futureConsultationLink": "عرض الاستشارة",
+      "errorTitle": "تعذّر تحميل علاجات المريض.",
+      "errorRetry": "إعادة المحاولة",
+      "status": {
+        "active": "جارٍ",
+        "completed": "منتهٍ",
+        "paused": "متوقف مؤقتًا",
+        "cancelled": "ملغى"
+      },
+      "sessionStatus": {
+        "completed": "منتهية",
+        "scheduled": "مجدولة",
+        "unscheduled": "بانتظار الجدولة",
+        "cancelled": "ملغاة",
+        "noShow": "غياب"
+      }
     }
   },
   "admin": {

@@ -409,3 +409,78 @@ All notable changes to this project are documented in this file.
   the remaining 2 new assertions folded into UI-004A's file), typecheck,
   lint and build pass; backend regression (10 tests) unaffected — no
   backend files touched.
+- Patient Traitements/Séances tab (UI-004C), replacing
+  `/app/patients/[id]/treatments`'s UI-004A placeholder with a treatment-
+  plan and session-management prototype, aimed at kiné-style multi-session
+  care plans. New domain layer `components/domain/treatments/`: `types.ts`
+  (`TreatmentPlan`/`TreatmentSession`, deliberately simplified from Spec #4
+  §14's backend ENUMs per this task's own explicit status lists — e.g.
+  `no_show`/`unscheduled` instead of the backend's `missed`/`planned`),
+  `treatment-status.ts`/`session-status.ts` (two separate small registries,
+  not a reuse of `APPOINTMENT_STATUS_MAP` — a session's lifecycle has
+  different semantics from an appointment's), `session-progress.tsx` (the
+  `SessionProgress` component named in Spec #8 §97 — completed/scheduled/
+  remaining always spelled out as text, never color-only, with a real
+  `role="progressbar"`), `session-tracker.tsx` (the compact accessible
+  session grid from Spec #9 Screen 22 — each cell a labeled button, e.g.
+  "Séance 13 — Planifiée", opening that session's detail; chosen over
+  duplicating a full 20-row list underneath it, since clicking a cell
+  already surfaces the same date/status/action detail Screen 23's session
+  list would show), `treatment-plan-card.tsx` (`TreatmentPlanCard` — an
+  "active" rich variant with an `actions` slot and a "completed" dense
+  clickable row, mirroring `AppointmentCard`'s own `variant`/`actions`/
+  `onSelect` API exactly for consistency). New `features/patients/`
+  pieces: `mock-treatments-data.ts` (centralized synthetic treatment-plan
+  fixtures — pat-1/Ahmed gets the active 20-session "Rééducation genou"
+  plan from Screen 22's own wireframe numbers, 12 completed/1 scheduled
+  Aug 26 15:00/7 unscheduled; pat-3/Fatima gets a fully completed 10-
+  session plan; pat-2/Sara deliberately has none at all — covering the
+  active, no-active-but-history, and fully-empty states from one seed
+  set), `treatments.ts` (pure derivation: filter-by-patientId, the active/
+  completed split, session-status counts, "prochaine séance" lookup, and
+  `getActiveTreatmentSummary`), `components/patient-treatments-content.tsx`
+  (the tab composition), `components/treatment-detail-drawer.tsx` (reuses
+  the shared `Dialog` drawer unmodified — one Dialog instance with two
+  internal views, treatment and a selected session, rather than a second
+  nested drawer; a `key` prop the parent increments on every open resets
+  the internal session-selection state, mirroring UI-002's
+  `formDialogKey` pattern, instead of a reset effect that
+  `react-hooks/set-state-in-effect` correctly flagged during lint).
+  **Overview consistency (§33):** `mock-overview-data.ts`'s
+  `getPatientOverview` no longer hand-types an `activeTreatment` number —
+  it now derives it from these same treatment fixtures via
+  `getActiveTreatmentSummary`, so the Aperçu card and the Treatments tab
+  can never disagree; verified by keeping every existing UI-004A overview
+  assertion green plus a new explicit consistency test. "+ Nouveau
+  traitement" shows a future-feature toast rather than a creation form
+  (§13, out of scope); "Voir la facturation" is a real link to the still-
+  placeholder `/invoices` tab with no finance figures anywhere in the
+  drawer (§32); completed-session detail shows a disabled future "Voir la
+  consultation" link and no clinical content; scheduled/unscheduled
+  session detail and "Planifier prochaine séance" all navigate to
+  `/app/agenda` as plain links — no second appointment-creation UX.
+  Documented prototype limitation (§34): treatment/session data is local
+  seed fixtures, same reasoning as UI-004B's Agenda-sync limitation. Full
+  FR/AR under a new `patientDetail.treatments.*` namespace, reusing
+  `patientDetail.overview.sessionsProgress` and
+  `patientDetail.appointments.openInAgenda` rather than duplicating them.
+  RTL verified, dates/session numbers isolated `dir="ltr"` per the
+  established pattern. Added
+  `frontend/src/features/patients/components/patient-treatments-content.test.tsx`
+  (17 tests: active treatment/practitioner/date, session counts, the
+  accessible progress bar, next session, the dense completed-treatment
+  section, the no-active-but-history and fully-empty states, opening/
+  closing the drawer with the session tracker, completed/scheduled/
+  unscheduled session detail — including an explicit no-clinical-content
+  check — the billing link with no finance figures, loading, error,
+  French, Arabic/RTL, and the new-treatment future notice) plus 3
+  integration assertions in `patient-detail-page.test.tsx` (header/tabs
+  preserved with Traitements/Séances active, the overview/tab session-
+  count consistency check, and not-found still wins for an invalid
+  patient id on this tab). All 124 frontend tests (13 UI-001 + 20 UI-002 +
+  30 UI-003A/B + 22 in the shared `patient-detail-page.test.tsx` file —
+  17 original UI-004A + 2 UI-004B + 3 UI-004C integration assertions —
+  + 22 UI-004B on the dedicated appointments-content suite + 17 UI-004C
+  on the dedicated treatments-content suite), typecheck, lint and build
+  pass; backend regression (10 tests) unaffected — no backend files
+  touched.

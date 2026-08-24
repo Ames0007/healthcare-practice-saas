@@ -1,10 +1,12 @@
 import type { PatientOverview } from "@/components/domain/patients/types";
+import { getTreatmentPlansMockData } from "./mock-treatments-data";
+import { getActiveTreatmentSummary, getTreatmentPlansForPatient } from "./treatments";
+
+type OverviewFixture = Omit<PatientOverview, "patientId" | "activeTreatment">;
 
 /** Synthetic, keyed by the same `pat-N` ids as `mock-data.ts` — no real patient information. */
-const OVERVIEW_BY_PATIENT_ID: Record<string, PatientOverview> = {
+const OVERVIEW_BY_PATIENT_ID: Record<string, OverviewFixture> = {
   "pat-1": {
-    patientId: "pat-1",
-    activeTreatment: { name: "Rééducation genou", completedSessions: 12, totalSessions: 20 },
     nextInstallment: { amount: 500, dueDate: "2026-09-01" },
     recentActivity: [
       { id: "act-1", date: "2026-08-23", type: "consultation", translationKey: "patientDetail.activity.consultationCompleted" },
@@ -15,8 +17,6 @@ const OVERVIEW_BY_PATIENT_ID: Record<string, PatientOverview> = {
     ],
   },
   "pat-2": {
-    patientId: "pat-2",
-    activeTreatment: null,
     nextInstallment: null,
     recentActivity: [
       { id: "act-6", date: "2026-08-20", type: "appointment", translationKey: "patientDetail.activity.appointmentConfirmed" },
@@ -24,12 +24,24 @@ const OVERVIEW_BY_PATIENT_ID: Record<string, PatientOverview> = {
   },
 };
 
-const EMPTY_OVERVIEW: Omit<PatientOverview, "patientId"> = {
-  activeTreatment: null,
+const EMPTY_OVERVIEW: OverviewFixture = {
   nextInstallment: null,
   recentActivity: [],
 };
 
+/**
+ * `activeTreatment` is derived from the centralized treatment-plan
+ * fixtures (`mock-treatments-data.ts`, UI-004C §33) rather than a
+ * hand-duplicated number, so the Aperçu overview card and the Treatments
+ * tab can never disagree.
+ */
 export function getPatientOverview(patientId: string): PatientOverview {
-  return OVERVIEW_BY_PATIENT_ID[patientId] ?? { patientId, ...EMPTY_OVERVIEW };
+  const fixture = OVERVIEW_BY_PATIENT_ID[patientId] ?? EMPTY_OVERVIEW;
+  const patientPlans = getTreatmentPlansForPatient(getTreatmentPlansMockData(), patientId);
+
+  return {
+    patientId,
+    activeTreatment: getActiveTreatmentSummary(patientPlans),
+    ...fixture,
+  };
 }

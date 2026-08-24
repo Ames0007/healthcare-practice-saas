@@ -398,6 +398,50 @@
       "emptyFilteredTitle": "Aucun rendez-vous ne correspond à ce filtre.",
       "errorTitle": "Impossible de charger les rendez-vous du patient.",
       "errorRetry": "Réessayer"
+    },
+    "treatments": {
+      "newTreatment": "+ Nouveau traitement",
+      "newTreatmentNotice": "La création d'un traitement sera connectée au workflow métier ultérieurement.",
+      "activeTitle": "Traitement actif",
+      "completedTitle": "Traitements terminés",
+      "noActiveTreatment": "Aucun traitement actif.",
+      "emptyAllTitle": "Aucun traitement pour ce patient.",
+      "emptyAllDescription": "Les plans de traitement et leurs séances apparaîtront ici.",
+      "viewTreatment": "Voir le traitement",
+      "planNextSession": "Planifier prochaine séance",
+      "planSession": "Planifier la séance",
+      "viewBilling": "Voir la facturation",
+      "startDateLabel": "Début",
+      "startDateInline": "Début : {{date}}",
+      "completedOn": "Terminé le {{date}}",
+      "progressLabel": "Progression du traitement",
+      "completedCount": "{{count}} terminées",
+      "scheduledCount": "{{count}} planifiées",
+      "remainingCount": "{{count}} restantes",
+      "sessionsTitle": "Séances",
+      "sessionCellLabel": "Séance {{n}} — {{status}}",
+      "sessionHeading": "Séance {{n}} / {{total}}",
+      "nextSessionLabel": "Prochaine séance",
+      "backToTreatment": "Retour au traitement",
+      "dateLabel": "Date",
+      "practitionerLabel": "Praticien",
+      "appointmentRefLabel": "Rendez-vous",
+      "futureConsultationLink": "Voir la consultation",
+      "errorTitle": "Impossible de charger les traitements du patient.",
+      "errorRetry": "Réessayer",
+      "status": {
+        "active": "Actif",
+        "completed": "Terminé",
+        "paused": "En pause",
+        "cancelled": "Annulé"
+      },
+      "sessionStatus": {
+        "completed": "Terminée",
+        "scheduled": "Planifiée",
+        "unscheduled": "À planifier",
+        "cancelled": "Annulée",
+        "noShow": "Absence"
+      }
     }
   },
   "admin": {

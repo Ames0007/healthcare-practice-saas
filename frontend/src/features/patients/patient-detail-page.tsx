@@ -15,6 +15,7 @@ import { formatDayMonthTime, formatMad, getPatientFullName, getPatientInitials, 
 import { getTodayIso } from "./patient-form-validation";
 import { PatientOverviewContent } from "./components/patient-overview-content";
 import { PatientAppointmentsContent } from "./components/patient-appointments-content";
+import { PatientTreatmentsContent } from "./components/patient-treatments-content";
 import { PatientTabPlaceholder } from "./components/patient-tab-placeholder";
 import { PatientDetailSkeleton } from "./components/patient-detail-skeleton";
 import type { Patient } from "./types";
@@ -141,6 +142,8 @@ export function PatientDetailPage({
         <PatientOverviewContent overview={overview} nextAppointment={nextAppointment} balance={balance} />
       ) : activeTab === "appointments" ? (
         <PatientAppointmentsContent patientId={patientId} />
+      ) : activeTab === "treatments" ? (
+        <PatientTreatmentsContent patientId={patientId} patients={patients} />
       ) : (
         <PatientTabPlaceholder tab={activeTab} />
       )}

@@ -93,7 +93,21 @@ src/components/
             strings/typed data from their caller — no dependency on
             `features/*` mock-data or formatting code, keeping the domain
             layer's isolation intact the same way `appointment-card.tsx`
-            does.
+            does. `domain/treatments/` (UI-004C) — `types.ts`
+            (`TreatmentPlan`/`TreatmentSession`, simplified from Spec #4
+            §14's backend ENUMs to this task's own status lists),
+            `treatment-status.ts`/`session-status.ts` (two separate small
+            registries — a session's lifecycle has different semantics
+            from an appointment's, so this does not reuse
+            `appointment-status.ts`), `session-progress.tsx` (Spec #8 §97
+            `SessionProgress` — completed/scheduled/remaining always
+            spelled out as text, a real `role="progressbar"`),
+            `session-tracker.tsx` (the compact accessible session grid,
+            Spec #9 Screen 22 — each cell a labeled button opening that
+            session's detail), `treatment-plan-card.tsx`
+            (`TreatmentPlanCard`, an "active"/"completed" `variant` plus
+            `actions`/`onSelect` — deliberately mirrors
+            `appointment-card.tsx`'s own API for consistency).
 
 src/features/
   today/    Aujourd'hui screen composition (UI-001): `types.ts` (mock
@@ -193,7 +207,28 @@ src/features/
             reasoning as the create/edit limitation above. "+ Nouveau RDV"
             and "Ouvrir dans l'agenda" are plain links to `/app/agenda`, no
             query-param prefill — UI-002's `AppointmentFormDialog` remains
-            the only appointment-creation UX.
+            the only appointment-creation UX. Traitements/Séances tab
+            (UI-004C): `mock-treatments-data.ts` (centralized synthetic
+            treatment-plan fixtures — pat-1's active 20-session plan,
+            pat-3's completed plan, pat-2 has none), `treatments.ts`
+            (filter-by-patientId, active/completed split, session-status
+            counts, "prochaine séance" lookup, `getActiveTreatmentSummary`),
+            `components/patient-treatments-content.tsx` (the tab
+            composition), `components/treatment-detail-drawer.tsx` (one
+            `Dialog` instance with two internal views — treatment and a
+            selected session — rather than a second nested drawer; the
+            parent increments a `key` on every open to reset the internal
+            session-selection state, mirroring Agenda's `formDialogKey`
+            pattern, instead of a reset effect). **Overview consistency
+            (UI-004C §33):** `mock-overview-data.ts`'s
+            `getPatientOverview` derives `activeTreatment` from these same
+            treatment fixtures (`getActiveTreatmentSummary`) instead of a
+            hand-typed number, so the Aperçu card and the Treatments tab
+            can never disagree. "+ Nouveau traitement" and a completed
+            session's "Voir la consultation" both show a future-feature
+            notice rather than a real workflow; "Voir la facturation" is a
+            real link to the still-placeholder `/invoices` tab, with no
+            finance figures anywhere in the drawer.
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,

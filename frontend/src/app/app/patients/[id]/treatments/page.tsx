@@ -6,7 +6,7 @@ import { PatientDetailPage } from "@/features/patients/patient-detail-page";
 
 const LOADING_SIMULATION_MS = 400;
 
-/** Traitements / Séances tab route — placeholder content, real header/tabs (UI-004A §24). UI-006 owns the real content. */
+/** Traitements / Séances tab route — real content (UI-004C): patient-specific treatment plans and session tracker derived from centralized mock fixtures. */
 export default function PatientTreatmentsRoutePage() {
   const { id } = useParams<{ id: string }>();
   const [ready, setReady] = useState(false);

@@ -191,4 +191,26 @@ describe("PatientDetailPage", () => {
     expect(screen.getByText("Patient introuvable")).toBeInTheDocument();
     expect(screen.queryByText("Prochains rendez-vous")).not.toBeInTheDocument();
   });
+
+  it("renders real Traitements/Séances content with the header and active tab preserved (UI-004C 1/2/3)", () => {
+    renderPatientDetail("fr", { patientId: "pat-1", activeTab: "treatments" });
+
+    expect(screen.getByRole("heading", { level: 1, name: "Ahmed El Mansouri" })).toBeInTheDocument();
+    const nav = screen.getByRole("navigation", { name: "Sections du patient" });
+    expect(within(nav).getByRole("link", { name: "Traitements / Séances" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByText("Traitement actif")).toBeInTheDocument();
+    expect(screen.queryByText("Cette section sera implémentée dans une prochaine étape.")).not.toBeInTheDocument();
+  });
+
+  it("keeps the overview and Treatments-tab session counts consistent for the same patient (UI-004C §33)", () => {
+    renderPatientDetail("fr", { patientId: "pat-1", activeTab: "overview" });
+    expect(screen.getByText("12 / 20 séances")).toBeInTheDocument();
+  });
+
+  it("keeps the not-found state for an invalid patient on the Treatments tab (UI-004C 24)", () => {
+    renderPatientDetail("fr", { patientId: "pat-999", activeTab: "treatments" });
+
+    expect(screen.getByText("Patient introuvable")).toBeInTheDocument();
+    expect(screen.queryByText("Traitement actif")).not.toBeInTheDocument();
+  });
 });
