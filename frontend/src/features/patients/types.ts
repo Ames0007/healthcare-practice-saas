@@ -21,6 +21,33 @@ export interface Patient {
   nextAppointment: PatientNextAppointment | null;
   /** MAD, fixed-precision mock amount. 0 means no outstanding balance. */
   outstandingBalance: number;
+
+  /** Optional administrative fields (UI-003B §10/§12) — still no clinical data. */
+  birthDate?: string | null;
+  email?: string | null;
+  city?: string | null;
+  address?: string | null;
+  emergencyContactName?: string | null;
+  emergencyContactPhone?: string | null;
+}
+
+/** Create/edit form model (UI-003B §12) — deliberately not the full future database entity. */
+export interface PatientFormValues {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  responsiblePractitionerId: string;
+  birthDate: string;
+  email: string;
+  city: string;
+  address: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+}
+
+export interface PatientDuplicateMatch {
+  patient: Patient;
+  reason: "phone" | "name";
 }
 
 export type NextAppointmentFilter = "all" | "today" | "upcoming" | "none";

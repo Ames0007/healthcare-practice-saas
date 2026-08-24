@@ -252,8 +252,8 @@
     "pageTitle": "Patients",
     "pageDescription": "Gérez les patients de votre cabinet.",
     "newPatient": "+ Nouveau patient",
-    "newPatientNotice": "La création de patient sera disponible dans une prochaine étape.",
     "open": "Ouvrir",
+    "edit": "Modifier",
     "searchLabel": "Rechercher nom, téléphone, numéro patient...",
     "resultCount": "{{count}} patients",
     "pageLabel": "Page {{page}} / {{pageCount}}",
@@ -293,6 +293,41 @@
     "error": {
       "title": "Impossible de charger les patients.",
       "retry": "Réessayer"
+    },
+    "toast": {
+      "created": "Patient créé.",
+      "updated": "Patient modifié."
+    },
+    "form": {
+      "createTitle": "Nouveau patient",
+      "editTitle": "Modifier le patient",
+      "close": "Fermer",
+      "patientNumberLabel": "Numéro patient : {{number}}",
+      "mainInfoTitle": "Informations principales",
+      "complementaryInfoTitle": "Informations complémentaires",
+      "firstNameLabel": "Prénom",
+      "lastNameLabel": "Nom",
+      "phoneLabel": "Téléphone",
+      "practitionerLabel": "Praticien responsable",
+      "birthDateLabel": "Date de naissance",
+      "emailLabel": "Email",
+      "cityLabel": "Ville",
+      "addressLabel": "Adresse",
+      "emergencyContactTitle": "Contact d'urgence",
+      "emergencyContactNameLabel": "Nom du contact",
+      "emergencyContactPhoneLabel": "Téléphone du contact",
+      "requiredError": "Ce champ est requis.",
+      "emailError": "Adresse email invalide.",
+      "phoneError": "Numéro de téléphone invalide.",
+      "birthDateError": "La date de naissance ne peut pas être dans le futur.",
+      "duplicateTitle": "Un patient similaire existe peut-être",
+      "duplicateReasonPhone": "Même numéro de téléphone",
+      "duplicateReasonName": "Nom similaire",
+      "openExisting": "Ouvrir ce patient",
+      "createAnyway": "Créer quand même",
+      "cancel": "Annuler",
+      "submitCreate": "Créer le patient",
+      "submitEdit": "Enregistrer"
     }
   },
   "patientDetail": {

@@ -1,11 +1,5 @@
 import type { Locale } from "@/i18n/config";
-
-export function toIntlLocale(locale: Locale): string {
-  // ar-MA (not generic "ar"): Western digits for times/amounts stay
-  // readable in Arabic (UI-001 §25), and the Gregorian calendar matches
-  // Moroccan business use without relying on ICU locale defaults.
-  return locale === "ar" ? "ar-MA" : "fr-FR";
-}
+import { toIntlLocale } from "@/i18n/intl-locale";
 
 export function formatBusinessDate(isoDate: string, locale: Locale): string {
   const date = new Date(`${isoDate}T00:00:00`);

@@ -252,8 +252,8 @@
     "pageTitle": "المرضى",
     "pageDescription": "إدارة مرضى عيادتك.",
     "newPatient": "+ مريض جديد",
-    "newPatientNotice": "ستتوفر ميزة إضافة مريض جديد في مرحلة لاحقة.",
     "open": "فتح",
+    "edit": "تعديل",
     "searchLabel": "البحث بالاسم أو الهاتف أو رقم المريض...",
     "resultCount": "{{count}} مريض",
     "pageLabel": "الصفحة {{page}} / {{pageCount}}",
@@ -293,6 +293,41 @@
     "error": {
       "title": "تعذّر تحميل قائمة المرضى.",
       "retry": "إعادة المحاولة"
+    },
+    "toast": {
+      "created": "تم إنشاء المريض.",
+      "updated": "تم تعديل بيانات المريض."
+    },
+    "form": {
+      "createTitle": "مريض جديد",
+      "editTitle": "تعديل بيانات المريض",
+      "close": "إغلاق",
+      "patientNumberLabel": "رقم المريض: {{number}}",
+      "mainInfoTitle": "المعلومات الرئيسية",
+      "complementaryInfoTitle": "معلومات إضافية",
+      "firstNameLabel": "الاسم الأول",
+      "lastNameLabel": "الاسم العائلي",
+      "phoneLabel": "الهاتف",
+      "practitionerLabel": "الممارس المسؤول",
+      "birthDateLabel": "تاريخ الميلاد",
+      "emailLabel": "البريد الإلكتروني",
+      "cityLabel": "المدينة",
+      "addressLabel": "العنوان",
+      "emergencyContactTitle": "جهة اتصال في حالات الطوارئ",
+      "emergencyContactNameLabel": "اسم جهة الاتصال",
+      "emergencyContactPhoneLabel": "هاتف جهة الاتصال",
+      "requiredError": "هذا الحقل مطلوب.",
+      "emailError": "بريد إلكتروني غير صالح.",
+      "phoneError": "رقم هاتف غير صالح.",
+      "birthDateError": "لا يمكن أن يكون تاريخ الميلاد في المستقبل.",
+      "duplicateTitle": "قد يكون هذا المريض موجودًا بالفعل",
+      "duplicateReasonPhone": "نفس رقم الهاتف",
+      "duplicateReasonName": "اسم مشابه",
+      "openExisting": "فتح هذا المريض",
+      "createAnyway": "إنشاء على أي حال",
+      "cancel": "إلغاء",
+      "submitCreate": "إنشاء المريض",
+      "submitEdit": "حفظ"
     }
   },
   "patientDetail": {

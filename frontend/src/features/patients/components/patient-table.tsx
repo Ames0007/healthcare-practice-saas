@@ -12,8 +12,13 @@ import {
 } from "@/features/patients/format";
 import type { Patient } from "@/features/patients/types";
 
-/** Desktop table (UI-003A §11-13, §23): all six columns + a compact "Ouvrir" action. */
-export function PatientTable({ patients }: { patients: Patient[] }) {
+export interface PatientTableProps {
+  patients: Patient[];
+  onEdit: (patient: Patient) => void;
+}
+
+/** Desktop table (UI-003A §11-13, §23): all six columns + compact "Ouvrir"/"Modifier" actions (UI-003B §25). */
+export function PatientTable({ patients, onEdit }: PatientTableProps) {
   const { t, locale } = useLocale();
 
   return (
@@ -62,12 +67,18 @@ export function PatientTable({ patients }: { patients: Patient[] }) {
                 {patient.outstandingBalance > 0 ? formatMad(patient.outstandingBalance, locale) : t("patients.balance.none")}
               </td>
               <td className="px-4 py-3 text-end">
-                <Link
-                  href={`/app/patients/${patient.id}`}
-                  className="font-medium text-primary hover:underline"
-                >
-                  {t("patients.open")}
-                </Link>
+                <div className="flex items-center justify-end gap-3">
+                  <Link href={`/app/patients/${patient.id}`} className="font-medium text-primary hover:underline">
+                    {t("patients.open")}
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => onEdit(patient)}
+                    className="font-medium text-text-secondary hover:text-text hover:underline"
+                  >
+                    {t("patients.edit")}
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

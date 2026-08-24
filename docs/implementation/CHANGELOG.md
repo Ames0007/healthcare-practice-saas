@@ -207,3 +207,59 @@ All notable changes to this project are documented in this file.
   placeholder link). All 51 frontend tests (13 UI-001 + 20 UI-002 + 18
   UI-003A), typecheck, lint and build pass; backend regression (10 tests)
   unaffected — no backend files touched.
+- Create/edit patient prototype (UI-003B) — "+ Nouveau patient" on
+  `/app/patients` now opens a real right-side drawer form instead of the
+  UI-003A future-feature toast (removed, along with its now-dead
+  `patients.newPatientNotice` key); each row gained a compact "Modifier"
+  action alongside "Ouvrir". `/app/patients` now owns a mutable
+  `Patient[]` in React state (was recomputed from mock data every render)
+  so created/edited patients flow straight through the existing search/
+  filter/pagination pipeline with no extra wiring — the same centralized-
+  state pattern as Agenda's appointment array (UI-002). New
+  `PatientFormDialog` (`components/patient-form-dialog.tsx`) is shared
+  by create and edit: primary fields (Prénom/Nom/Téléphone/Praticien
+  responsable, all required) plus a collapsible "Informations
+  complémentaires" section (birth date/email/city/address/emergency
+  contact, all optional, collapsed by default and auto-expanded when
+  editing a patient that already has any of these set) — still no
+  clinical fields. `Patient` gained the matching optional administrative
+  fields; the list/table columns are unchanged. Duplicate detection
+  (`duplicate-detection.ts` + `normalize.ts`, Spec #4 §8) flags a
+  probable match on normalized phone (`+212`/`00212`/spaced-format
+  aware) or same normalized first+last name (accent- and case-
+  insensitive); a match never blocks or merges — the form shows each
+  candidate's name/number/phone/practitioner with an "Ouvrir ce patient"
+  link and one "Créer quand même" override, mirroring Agenda's conflict-
+  suggestion UX (UI-002). Edit's duplicate check excludes the patient
+  being edited. A new prototype-only sequential generator
+  (`patient-number.ts`) continues the existing `PAT-00281`... series.
+  Validation (`patient-form-validation.ts`) is inline-rendered per field
+  (required first/last/phone/practitioner; optional email format, DOB-
+  not-in-future, and a loose Moroccan phone digit-count check reused for
+  the emergency contact number) — the form now sets `noValidate` so this
+  custom validation actually runs instead of being preempted by
+  unlocalized native browser constraint-validation popups, a real gap
+  found while writing the required-field test (agenda's own equivalent
+  form was never exercised against this exact case). Successful create/
+  edit shows a toast ("Patient créé."/"Patient modifié.") and closes the
+  drawer; Annuler/Escape discard the draft without submitting. Shared
+  locale-utility cleanup: `toIntlLocale` (added to `features/today/
+  format.ts` in UI-003A) moved to `frontend/src/i18n/intl-locale.ts` —
+  while moving it, found that `features/agenda/format.ts` had
+  independently defined the exact same two-line function during UI-002;
+  both Today and Agenda now import the one shared copy instead of
+  defining/duplicating it. Pure move, no behavioral change, confirmed by
+  the unchanged UI-001/UI-002 suites. Full FR/AR for every new form/
+  duplicate-warning string; RTL verified. Extended
+  `frontend/src/features/patients/patients-page.test.tsx` to 30 tests
+  (the 17 surviving UI-003A tests + 1 replacing the retired future-
+  feature-toast test + 12 new: required validation, optional/
+  complementary fields, no leaked appointment fields, create integrating
+  with list/search/practitioner-filter/number-generation in one flow,
+  phone duplicate + Open Existing, name duplicate, Create Anyway without
+  mutating the original record, edit prefill with a read-only patient
+  number, edit updating the list, edit self-exclusion, edit collision
+  with a different patient, cancel discarding the draft, and Arabic/RTL
+  for the form). All 63 frontend tests (13 UI-001 + 20 UI-002 + 30
+  UI-003A/B), typecheck, lint and build pass; backend regression
+  (10 tests) unaffected — no backend files touched.

@@ -11,18 +11,24 @@ import {
 } from "@/features/patients/format";
 import type { Patient } from "@/features/patients/types";
 
-/** Mobile compact cards (UI-003A §22) — the full row becomes one tap target, not a table. */
-export function PatientCardList({ patients }: { patients: Patient[] }) {
+export interface PatientCardListProps {
+  patients: Patient[];
+  onEdit: (patient: Patient) => void;
+}
+
+/**
+ * Mobile compact cards (UI-003A §22). Two compact actions ("Ouvrir"/
+ * "Modifier", UI-003B §25) sit in their own row rather than making the
+ * whole card a link, so a real edit button can exist without nesting
+ * interactive elements inside one another.
+ */
+export function PatientCardList({ patients, onEdit }: PatientCardListProps) {
   const { t, locale } = useLocale();
 
   return (
     <div className="flex flex-col divide-y divide-border md:hidden">
       {patients.map((patient) => (
-        <Link
-          key={patient.id}
-          href={`/app/patients/${patient.id}`}
-          className="flex flex-col gap-2 py-4 transition-colors hover:bg-surface-subtle"
-        >
+        <div key={patient.id} className="flex flex-col gap-2 py-4">
           <div className="flex items-center gap-3">
             <Avatar initials={getPatientInitials(patient)} />
             <div className="min-w-0">
@@ -55,7 +61,20 @@ export function PatientCardList({ patients }: { patients: Patient[] }) {
           </div>
 
           <p className="text-xs text-text-muted">{patient.responsiblePractitionerName}</p>
-        </Link>
+
+          <div className="mt-1 flex items-center gap-4 text-sm">
+            <Link href={`/app/patients/${patient.id}`} className="font-medium text-primary hover:underline">
+              {t("patients.open")}
+            </Link>
+            <button
+              type="button"
+              onClick={() => onEdit(patient)}
+              className="font-medium text-text-secondary hover:text-text hover:underline"
+            >
+              {t("patients.edit")}
+            </button>
+          </div>
+        </div>
       ))}
     </div>
   );

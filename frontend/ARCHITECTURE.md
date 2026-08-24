@@ -94,22 +94,30 @@ src/features/
             A `features/<name>/` folder is the convention for screen-
             specific composition that isn't a reusable `components/ui` or
             `components/domain` piece.
-  patients/ Patients list screen composition (UI-003A): `types.ts`/
-            `mock-data.ts` (16 synthetic patients — administrative/
-            operational fields only, no clinical data, see CLAUDE.md §13),
-            `format.ts` (date/money formatting, reusing `toIntlLocale`
-            exported from `features/today/format.ts` rather than
-            duplicating it), `filter-patients.ts` (pure local search +
-            practitioner + next-appointment filtering, no backend query),
-            `patients-page.tsx` (owns search/filter/pagination state),
-            `components/` (PatientsFilters, PatientTable, PatientCardList
-            — the same desktop-table/mobile-card dual-render pattern as
-            Agenda's Waiting Room — PatientsSkeleton). Row links go to
-            `app/app/patients/[id]/page.tsx`, a minimal placeholder that
-            previews the selected patient's synthetic name/reference and
-            defers the real Patient 360° overview to UI-004. Patient
-            creation ("+ Nouveau patient") shows a future-feature toast —
-            UI-003B scope, not built here.
+  patients/ Patients list (UI-003A) plus create/edit (UI-003B):
+            `types.ts`/`mock-data.ts` (16 synthetic patients — optional
+            administrative fields only, no clinical data, see CLAUDE.md
+            §13), `format.ts` (date/money formatting via `toIntlLocale`
+            from `@/i18n/intl-locale`), `filter-patients.ts` (pure local
+            search + practitioner + next-appointment filtering, no
+            backend query), `normalize.ts` (phone/name normalization for
+            comparison only — the visible field keeps what the user
+            typed), `duplicate-detection.ts` (probable-duplicate check,
+            Spec #4 §8 — never merges, never blocks), `patient-number.ts`
+            (prototype-only sequential `PAT-000NN` generator, no real
+            concurrency), `patient-form-validation.ts`,
+            `patients-page.tsx` (owns the single mutable `Patient[]` that
+            search/filter/pagination and create/edit all read from and
+            write to — the same centralized-state pattern as Agenda's
+            appointment array, UI-002), `components/` (PatientsFilters,
+            PatientTable, PatientCardList — the same desktop-table/
+            mobile-card dual-render pattern as Agenda's Waiting Room —
+            PatientsSkeleton, PatientFormDialog: the shared create/edit
+            drawer with its own inline duplicate-warning UX). Row actions
+            are "Ouvrir" (→ `app/app/patients/[id]/page.tsx`, a minimal
+            placeholder deferring the real Patient 360° overview to
+            UI-004) and "Modifier" (opens PatientFormDialog in edit mode,
+            prefilled).
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,
@@ -179,6 +187,14 @@ only, no `prefers-color-scheme` branching.
 src/i18n/
   config.ts            Locale list, default locale, dir-per-locale map,
                         bootstrap cookie name.
+  intl-locale.ts        `toIntlLocale()` — maps our two locales to full ICU
+                        tags (`ar-MA`/`fr-FR`) for `Intl.*` APIs. Shared by
+                        every feature that formats dates/money (Today,
+                        Agenda, Patients); moved here in UI-003B once a
+                        third feature needed it — Agenda had independently
+                        redefined the same two-line function during UI-002,
+                        so the move also removed a real duplicate, not just
+                        a Today-specific export.
   locales/fr.json       Dictionaries. Nested keys, dot-path lookup.
   locales/ar.json
   dictionary.ts         translate(messages, key, params) — dot-path

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useLocale } from "@/i18n/locale-provider";
 import { PageHeader } from "@/components/app/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -8,13 +8,16 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Pagination } from "@/components/ui/pagination";
 import { Toast } from "@/components/ui/toast";
-import { getEmptyPatientsMockData, getPatientsMockData, PATIENTS_TODAY_DATE } from "./mock-data";
+import { getEmptyPatientsMockData, getPatientsMockData, PATIENTS_TODAY_DATE, PRACTITIONERS } from "./mock-data";
 import { filterPatients } from "./filter-patients";
+import { findDuplicatePatients } from "./duplicate-detection";
+import { generatePatientNumber } from "./patient-number";
 import { PatientsFilters } from "./components/patients-filters";
 import { PatientTable } from "./components/patient-table";
 import { PatientCardList } from "./components/patient-card-list";
 import { PatientsSkeleton } from "./components/patients-skeleton";
-import type { NextAppointmentFilter, Patient } from "./types";
+import { PatientFormDialog, type PatientFormResult } from "./components/patient-form-dialog";
+import type { NextAppointmentFilter, Patient, PatientFormValues } from "./types";
 
 export type PatientsPageState = "loading" | "loaded" | "empty" | "error";
 
@@ -25,22 +28,38 @@ export interface PatientsPageProps {
   onRetry?: () => void;
 }
 
+interface FormDialogState {
+  mode: "create" | "edit";
+  editingId?: string;
+  patientNumber?: string;
+  initialValues?: Partial<PatientFormValues>;
+}
+
 const PAGE_SIZE = 10;
 
 /**
- * Patients — list, search and lightweight filters (UI-003A). Mock data
- * only; no backend integration, no patient creation/editing, no Patient
- * 360° (UI-003B/UI-004 scope).
+ * Patients — list, search, lightweight filters (UI-003A) and create/edit
+ * with duplicate detection (UI-003B). Owns the single centralized patient
+ * array — the list, search/filters and the create/edit drawer all read
+ * from and update this one array, so a new or edited patient is
+ * immediately visible everywhere without a separate sync step (mirrors
+ * Agenda's centralized appointment array, UI-002). Mock data only; nothing
+ * persists across refresh.
  */
 export function PatientsPage({ patients: providedPatients, state = "loaded", onRetry }: PatientsPageProps) {
   const { t } = useLocale();
-  const patients = providedPatients ?? (state === "empty" ? getEmptyPatientsMockData() : getPatientsMockData());
+  const [patients, setPatients] = useState<Patient[]>(
+    () => providedPatients ?? (state === "empty" ? getEmptyPatientsMockData() : getPatientsMockData()),
+  );
 
   const [search, setSearch] = useState("");
   const [practitionerId, setPractitionerId] = useState("all");
   const [nextAppointment, setNextAppointment] = useState<NextAppointmentFilter>("all");
   const [page, setPage] = useState(1);
+  const [formDialog, setFormDialog] = useState<FormDialogState | null>(null);
+  const [formDialogKey, setFormDialogKey] = useState(0);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const nextIdRef = useRef(1);
 
   if (state === "loading") {
     return <PatientsSkeleton />;
@@ -83,8 +102,78 @@ export function PatientsPage({ patients: providedPatients, state = "loaded", onR
     setPage(1);
   }
 
-  function handleNewPatientClick() {
-    setToastMessage(t("patients.newPatientNotice"));
+  function openCreateForm() {
+    setFormDialog({ mode: "create" });
+    setFormDialogKey((key) => key + 1);
+  }
+
+  function openEditForm(patient: Patient) {
+    setFormDialog({
+      mode: "edit",
+      editingId: patient.id,
+      patientNumber: patient.patientNumber,
+      initialValues: {
+        firstName: patient.firstName,
+        lastName: patient.lastName,
+        phone: patient.phone,
+        responsiblePractitionerId: patient.responsiblePractitionerId,
+        birthDate: patient.birthDate ?? "",
+        email: patient.email ?? "",
+        city: patient.city ?? "",
+        address: patient.address ?? "",
+        emergencyContactName: patient.emergencyContactName ?? "",
+        emergencyContactPhone: patient.emergencyContactPhone ?? "",
+      },
+    });
+    setFormDialogKey((key) => key + 1);
+  }
+
+  function handlePatientFormSubmit(values: PatientFormValues, options: { forceCreate: boolean }): PatientFormResult {
+    const editingId = formDialog?.mode === "edit" ? formDialog.editingId : undefined;
+
+    if (!options.forceCreate) {
+      const duplicates = findDuplicatePatients(patients, values, editingId);
+      if (duplicates.length > 0) {
+        return { ok: false, duplicates };
+      }
+    }
+
+    const practitioner = PRACTITIONERS.find((item) => item.id === values.responsiblePractitionerId)!;
+    const administrativeFields = {
+      firstName: values.firstName,
+      lastName: values.lastName,
+      phone: values.phone,
+      responsiblePractitionerId: practitioner.id,
+      responsiblePractitionerName: practitioner.name,
+      birthDate: values.birthDate || null,
+      email: values.email || null,
+      city: values.city || null,
+      address: values.address || null,
+      emergencyContactName: values.emergencyContactName || null,
+      emergencyContactPhone: values.emergencyContactPhone || null,
+    };
+
+    if (editingId) {
+      setPatients((current) =>
+        current.map((patient) => (patient.id === editingId ? { ...patient, ...administrativeFields } : patient)),
+      );
+      setToastMessage(t("patients.toast.updated"));
+    } else {
+      const created: Patient = {
+        id: `pat-new-${nextIdRef.current}`,
+        patientNumber: generatePatientNumber(patients),
+        ...administrativeFields,
+        lastVisit: null,
+        nextAppointment: null,
+        outstandingBalance: 0,
+      };
+      nextIdRef.current += 1;
+      setPatients((current) => [created, ...current]);
+      setToastMessage(t("patients.toast.created"));
+    }
+
+    setFormDialog(null);
+    return { ok: true };
   }
 
   const hasNoPatients = patients.length === 0;
@@ -100,7 +189,7 @@ export function PatientsPage({ patients: providedPatients, state = "loaded", onR
         title={t("patients.pageTitle")}
         description={t("patients.pageDescription")}
         primaryAction={
-          <Button type="button" onClick={handleNewPatientClick}>
+          <Button type="button" onClick={openCreateForm}>
             {t("patients.newPatient")}
           </Button>
         }
@@ -111,7 +200,7 @@ export function PatientsPage({ patients: providedPatients, state = "loaded", onR
           title={t("patients.empty.title")}
           description={t("patients.empty.description")}
           primaryAction={
-            <Button size="sm" onClick={handleNewPatientClick}>
+            <Button size="sm" onClick={openCreateForm}>
               {t("patients.empty.action")}
             </Button>
           }
@@ -142,8 +231,8 @@ export function PatientsPage({ patients: providedPatients, state = "loaded", onR
           ) : (
             <>
               <Card className="p-0">
-                <PatientTable patients={pageItems} />
-                <PatientCardList patients={pageItems} />
+                <PatientTable patients={pageItems} onEdit={openEditForm} />
+                <PatientCardList patients={pageItems} onEdit={openEditForm} />
               </Card>
 
               <Pagination
@@ -158,6 +247,17 @@ export function PatientsPage({ patients: providedPatients, state = "loaded", onR
           )}
         </div>
       )}
+
+      <PatientFormDialog
+        key={formDialogKey}
+        open={formDialog !== null}
+        mode={formDialog?.mode ?? "create"}
+        initialValues={formDialog?.initialValues}
+        patientNumber={formDialog?.patientNumber}
+        onClose={() => setFormDialog(null)}
+        onSubmit={handlePatientFormSubmit}
+        practitioners={PRACTITIONERS}
+      />
 
       <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />
     </div>

@@ -1,5 +1,5 @@
 import type { Locale } from "@/i18n/config";
-import { toIntlLocale } from "@/features/today/format";
+import { toIntlLocale } from "@/i18n/intl-locale";
 import type { Patient, PatientNextAppointment } from "./types";
 
 export { formatMad } from "@/features/today/format";

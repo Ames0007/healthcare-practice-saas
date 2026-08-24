@@ -1,9 +1,6 @@
 import type { Locale } from "@/i18n/config";
 import { formatBusinessDate } from "@/features/today/format";
-
-function toIntlLocale(locale: Locale): string {
-  return locale === "ar" ? "ar-MA" : "fr-FR";
-}
+import { toIntlLocale } from "@/i18n/intl-locale";
 
 /**
  * Entirely UTC-based (construction, arithmetic and serialization) so the
