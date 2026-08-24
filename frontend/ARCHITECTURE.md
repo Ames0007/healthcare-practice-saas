@@ -47,27 +47,58 @@ them here — that is a later task (see `CLAUDE.md` §9-10).
 
 ```text
 src/components/
-  ui/       Generic primitives: Button, Input, Card, StatusBadge, Skeleton,
-            EmptyState, MetricCard, AttentionItem. No business knowledge.
+  ui/       Generic primitives: Button, Input, Select, Combobox, Card,
+            StatusBadge, Skeleton, EmptyState, MetricCard, AttentionItem,
+            Dialog (one focus-trapped, portal-rendered implementation
+            backing drawer/modal/alert variants — see UI-002), ConfirmDialog,
+            Toast (single-slot, not a global provider). No business
+            knowledge.
   app/      Shell/domain-agnostic app components: AppShell, AppSidebar,
             AppTopbar, MobileNav, PageHeader, LanguageSwitcher,
             FoundationBadge, AreaPlaceholder.
   domain/   Reusable components that know about one business concept but
             not about a specific screen (Spec #8 §85), e.g.
-            `domain/appointments/` (AppointmentCard + the appointment
-            status → tone/label registry). Agenda (UI-002) is expected to
-            reuse `AppointmentCard` rather than building its own.
+            `domain/appointments/` — `types.ts` (the full 11-state
+            AppointmentStatus/AppointmentSchedulingType machine, Spec #2
+            §57.1/#3 §3.1), `appointment-status.ts` (the central status →
+            tone/label registry), `appointment-card.tsx` (row/prominent/
+            calendar variants). Both Aujourd'hui (UI-001) and Agenda
+            (UI-002) depend on this layer, not the other way around.
 
 src/features/
   today/    Aujourd'hui screen composition (UI-001): `types.ts` (mock
-            data shape), `mock-data.ts` (synthetic data — the seam a
-            future `TodayDashboardQuery`/API call replaces),
-            `today-dashboard.tsx` (loading/loaded/empty/error states),
-            `components/` (page-local presentational panels: KpiRow,
-            NextAppointmentSection, AgendaPanel, AttentionPanel,
-            FinancePanel, TodayDashboardSkeleton). A `features/<name>/`
-            folder is the convention for screen-specific composition that
-            isn't a reusable `components/ui` or `components/domain` piece.
+            data shape — re-exports `AppointmentStatus` from the domain
+            layer), `mock-data.ts` (synthetic data — the seam a future
+            `TodayDashboardQuery`/API call replaces), `today-dashboard.tsx`
+            (loading/loaded/empty/error states), `components/` (page-local
+            presentational panels: KpiRow, NextAppointmentSection,
+            AgendaPanel, AttentionPanel, FinancePanel,
+            TodayDashboardSkeleton).
+  agenda/   Agenda & appointment screen composition (UI-002):
+            `types.ts`/`mock-data.ts` (practitioners/patients/services/
+            appointments — the same mock "today" anchor date as
+            `today/mock-data.ts`), `format.ts` (UTC-consistent date-only
+            arithmetic — see note below, plus time-slot generation/
+            bucketing), `conflict.ts` (frontend-only overlap check +
+            nearby-slot suggestions — UX demonstration, not real
+            enforcement), `status-actions.ts` (the state-aware primary-
+            action registry shared by the drawer and Waiting Room),
+            `agenda-page.tsx` (owns the single appointment array all
+            views/dialogs read and write), `components/` (AgendaHeader,
+            DayView, WeekView, AppointmentDrawer, AppointmentFormDialog,
+            RescheduleDialog, CancelConfirmDialog, NoShowConfirmDialog,
+            WaitingRoom, AgendaSkeleton, SchedulingFields — the exact-time/
+            arrival-window fields shared by create and reschedule).
+            A `features/<name>/` folder is the convention for screen-
+            specific composition that isn't a reusable `components/ui` or
+            `components/domain` piece.
+
+Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
+stay entirely UTC-based end to end (`Date.UTC()` construction,
+`setUTCDate`/`getUTCDate`, `toISOString()`) — mixing local-time `Date`
+parsing with UTC serialization silently shifts the result by a day on any
+machine whose timezone is ahead of UTC. Discovered via a real test failure
+(a "tomorrow" mock appointment collapsing onto "today"), not by inspection.
 
 src/design-system/
   tokens.css   Semantic CSS custom properties (--ds-color-*, --ds-space-*,

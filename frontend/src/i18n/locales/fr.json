@@ -111,14 +111,6 @@
       "expenses": "Décaissements",
       "caisse": "Caisse"
     },
-    "status": {
-      "toConfirm": "À confirmer",
-      "confirmed": "Confirmé",
-      "arrived": "Arrivé",
-      "inConsultation": "En consultation",
-      "completed": "Terminé",
-      "noShow": "Absent"
-    },
     "empty": {
       "title": "Aucun rendez-vous aujourd'hui.",
       "description": "Votre journée est libre pour le moment.",
@@ -127,6 +119,131 @@
     "error": {
       "title": "Impossible de charger les informations du jour.",
       "retry": "Réessayer"
+    }
+  },
+  "appointment": {
+    "arrivalWindow": "Arrivée entre {{start}} et {{end}}",
+    "arrivalWindowShort": "Fenêtre",
+    "status": {
+      "requested": "Demandé",
+      "toConfirm": "À confirmer",
+      "confirmed": "Confirmé",
+      "arrived": "Arrivé",
+      "waiting": "En attente",
+      "inConsultation": "En consultation",
+      "completed": "Terminé",
+      "rescheduled": "Reprogrammé",
+      "cancelledByPatient": "Annulé par le patient",
+      "cancelledByPractice": "Annulé par le cabinet",
+      "noShow": "Absent"
+    }
+  },
+  "agenda": {
+    "pageTitle": "Agenda",
+    "newAppointment": "Nouveau RDV",
+    "dateNavigation": "Navigation de date",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "today": "Aujourd'hui",
+    "viewMode": "Mode d'affichage",
+    "day": "Jour",
+    "week": "Semaine",
+    "practitioner": "Praticien",
+    "allPractitioners": "Tous",
+    "waitingRoom": "File d'attente",
+    "addAtTime": "Ajouter un rendez-vous à {{time}}",
+    "emptyTitle": "Aucun rendez-vous aujourd'hui.",
+    "emptyAction": "Créer un rendez-vous",
+    "errorTitle": "Impossible de charger l'agenda.",
+    "errorRetry": "Réessayer",
+    "actions": {
+      "title": "Actions",
+      "confirm": "Confirmer",
+      "markArrived": "Patient arrivé",
+      "markWaiting": "Mettre en attente",
+      "start": "Commencer",
+      "openConsultation": "Ouvrir consultation"
+    },
+    "drawer": {
+      "close": "Fermer",
+      "futureFeature": "Disponible dans une prochaine étape.",
+      "openPatient": "Ouvrir patient",
+      "edit": "Modifier",
+      "reschedule": "Reporter",
+      "cancel": "Annuler",
+      "noShow": "Absent"
+    },
+    "form": {
+      "createTitle": "Nouveau rendez-vous",
+      "editTitle": "Modifier le rendez-vous",
+      "patientLabel": "Patient",
+      "patientPlaceholder": "Rechercher nom / téléphone...",
+      "patientEmpty": "Aucun patient trouvé.",
+      "createPatient": "+ Créer un nouveau patient",
+      "createPatientUnavailable": "La création de patient sera disponible dans une prochaine étape.",
+      "practitionerLabel": "Praticien",
+      "serviceLabel": "Service / Motif",
+      "servicePlaceholder": "Sélectionner...",
+      "dateLabel": "Date",
+      "typeLabel": "Type de rendez-vous",
+      "typeExact": "Heure fixe",
+      "typeWindow": "Plage horaire",
+      "timeLabel": "Heure",
+      "durationLabel": "Durée",
+      "windowStartLabel": "De",
+      "windowEndLabel": "À",
+      "statusLabel": "Statut initial",
+      "statusToConfirm": "À confirmer",
+      "statusConfirmed": "Confirmé",
+      "noteLabel": "Note interne",
+      "requiredError": "Ce champ est requis.",
+      "windowRangeError": "L'heure de fin doit être après l'heure de début.",
+      "conflictTitle": "Ce créneau n'est plus disponible.",
+      "conflictSuggestions": "Créneaux proches :",
+      "cancel": "Annuler",
+      "submitCreate": "Créer le rendez-vous",
+      "submitEdit": "Enregistrer"
+    },
+    "reschedule": {
+      "title": "Reporter le rendez-vous",
+      "dateLabel": "Nouvelle date",
+      "submit": "Reporter"
+    },
+    "cancel": {
+      "title": "Annuler ce rendez-vous ?",
+      "description": "{{name}} ne sera plus programmé à {{time}}. Le patient peut être notifié de cette annulation.",
+      "reasonLabel": "Motif d'annulation",
+      "reasonByPatient": "Annulé par le patient",
+      "reasonByPractice": "Annulé par le cabinet",
+      "noteLabel": "Motif (optionnel)",
+      "back": "Retour",
+      "confirm": "Confirmer l'annulation"
+    },
+    "noShowConfirm": {
+      "title": "Marquer ce rendez-vous comme absent ?",
+      "description": "{{name}} sera marqué absent pour le rendez-vous de {{time}}.",
+      "cancel": "Annuler",
+      "confirm": "Confirmer"
+    },
+    "toast": {
+      "created": "Rendez-vous créé.",
+      "updated": "Rendez-vous mis à jour.",
+      "rescheduled": "Rendez-vous reporté.",
+      "cancelled": "Rendez-vous annulé.",
+      "statusUpdated": "Statut mis à jour.",
+      "noShow": "Rendez-vous marqué absent."
+    },
+    "waitingRoomView": {
+      "emptyTitle": "Aucun patient en attente.",
+      "notArrived": "—",
+      "minutesShort": "{{count}} min",
+      "columns": {
+        "patient": "Patient",
+        "appointment": "RDV",
+        "arrived": "Arrivé",
+        "waiting": "Attente",
+        "status": "Statut"
+      }
     }
   },
   "admin": {

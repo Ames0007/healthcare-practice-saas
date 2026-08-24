@@ -41,3 +41,4 @@ imply Phase 0/1 sequencing or backend readiness.
 | Task | Status | Commit | Notes |
 |------|--------|--------|-------|
 | UI-001 | COMPLETE | bb1dec8 | Aujourd'hui dashboard prototype (mock data only, no backend integration) |
+| UI-002 | COMPLETE | (pending) | Agenda & appointment prototype: day/week views, drawer, create/edit/reschedule/cancel/no-show, waiting room (mock data only, no backend integration) |

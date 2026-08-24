@@ -1,19 +1,13 @@
 import type { LucideIcon } from "lucide-react";
 import type { StatusTone } from "@/components/ui/status-badge";
+import type { AppointmentStatus } from "@/components/domain/appointments/types";
 
 /**
- * Prototype subset of the full appointment state machine (Spec #2 §57.1 /
- * CLAUDE.md §16). UI-001 only exercises the statuses that appear on
- * Aujourd'hui; Agenda (UI-002) extends this when it needs the remaining
- * states (requested, waiting, rescheduled, cancelled_*).
+ * The full state machine lives in the domain layer (Spec #2 §57.1 / Spec
+ * #3 §3.1 / CLAUDE.md §16) since Agenda (UI-002) needs it too. Aujourd'hui
+ * only ever assigns 6 of its 11 members to mock data.
  */
-export type AppointmentStatus =
-  | "to_confirm"
-  | "confirmed"
-  | "arrived"
-  | "in_consultation"
-  | "completed"
-  | "no_show";
+export type { AppointmentStatus };
 
 export interface TodayAppointment {
   id: string;

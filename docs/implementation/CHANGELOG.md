@@ -114,3 +114,56 @@ All notable changes to this project are documented in this file.
   placeholder now points back to a real dashboard, not a demo page. All
   13 frontend tests, typecheck, lint and build pass; backend regression
   (10 tests) unaffected — no backend files touched.
+- Agenda & appointment prototype (UI-002) at `/app/agenda`, replacing the
+  placeholder. Extended the appointment domain layer for reuse across both
+  prototype screens: moved `AppointmentStatus` into
+  `components/domain/appointments/types.ts` (11-state machine — the
+  original UI-001 6-status subset keeps identical tones, so Aujourd'hui is
+  unaffected) and extended `AppointmentCard` with a `calendar` variant,
+  explicit `schedulingType`, and an `onSelect` handler. Added four new
+  generic `components/ui/` primitives shared across every dialog surface:
+  `Dialog` (one focus-trapped, portal-rendered implementation backing
+  drawer/modal/alert variants — Escape closes, focus returns to the
+  trigger), `ConfirmDialog`, `Toast` (single-slot, not a global provider),
+  `Combobox` (keyboard-navigable patient search with a "+ Créer un nouveau
+  patient" future-feature notice), and `Select`. New
+  `frontend/src/features/agenda/` composition: Day view (30-minute slots,
+  click-to-create empty slots) and Week view (desktop grid, mobile day-
+  selector + reused Day view list — seven columns are not usable on
+  mobile); exact-time vs arrival-window appointments render distinctly
+  everywhere (`AppointmentCard`'s "Arrivée entre" wording, not just a
+  dash-joined range). `AppointmentDrawer` exposes the state-aware primary
+  action from a new central `status-actions.ts` registry (Confirmer →
+  Patient arrivé → Mettre en attente → Commencer; Ouvrir consultation is a
+  disabled future-route placeholder per UI-005 scope) plus Ouvrir
+  patient/Modifier/Reporter/Annuler/Absent. Create/edit
+  (`AppointmentFormDialog`), reschedule (`RescheduleDialog`), cancellation
+  with a by-patient/by-practice reason (`CancelConfirmDialog`) and no-show
+  (`NoShowConfirmDialog`) are all local prototype state transitions on one
+  centralized appointment array — a status change from any surface (drawer,
+  Waiting Room) is immediately visible on every other surface, with no
+  cross-page sync needed since Waiting Room is an in-page toggle, not a
+  separate route. A lightweight frontend-only conflict check
+  (`features/agenda/conflict.ts`) blocks obviously overlapping exact/
+  window bookings per practitioner/date and suggests up to 3 nearby free
+  slots — explicitly UX demonstration only, not real server-side
+  enforcement. Full FR/AR translations under new `agenda.*` and
+  `appointment.*` dictionary namespaces (the latter replacing UI-001's now-
+  dead `aujourdhui.status.*` keys); RTL verified, including drawer/
+  dialog placement via logical CSS properties (no `rtl:` overrides
+  needed). Fixed two genuine bugs surfaced while testing this feature:
+  `addDaysIso` mixed local-time `Date` parsing with UTC `toISOString()`
+  serialization, silently shifting mock week-view dates by a day on any
+  machine ahead of UTC; and Day View matched appointments to time slots by
+  exact string equality, so any appointment not starting on an exact
+  30-minute boundary (e.g. a 08:55 arrival, or any time a user might type
+  into the create form's native time input) silently never rendered — both
+  fixed at the root (UTC-consistent date arithmetic; slot-containment
+  bucketing) rather than only adjusting mock data to avoid them. Added
+  `frontend/src/features/agenda/agenda-page.test.tsx` (20 tests covering
+  day/week rendering, exact/window distinction, practitioner filtering,
+  drawer open/close, every lifecycle transition, create/conflict/edit/
+  reschedule/cancel/no-show, Waiting Room + shared-state propagation,
+  empty/loading/error states, and FR/AR/RTL). All 33 frontend tests
+  (13 UI-001 + 20 UI-002), typecheck, lint and build pass; backend
+  regression (10 tests) unaffected — no backend files touched.

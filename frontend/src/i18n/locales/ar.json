@@ -111,14 +111,6 @@
       "expenses": "المصروفات",
       "caisse": "الصندوق"
     },
-    "status": {
-      "toConfirm": "بانتظار التأكيد",
-      "confirmed": "مؤكد",
-      "arrived": "وصل",
-      "inConsultation": "أثناء الاستشارة",
-      "completed": "منتهٍ",
-      "noShow": "غياب"
-    },
     "empty": {
       "title": "لا توجد مواعيد اليوم.",
       "description": "يومكم متاح حالياً بالكامل.",
@@ -127,6 +119,131 @@
     "error": {
       "title": "تعذّر تحميل معلومات اليوم.",
       "retry": "إعادة المحاولة"
+    }
+  },
+  "appointment": {
+    "arrivalWindow": "الوصول بين {{start}} و {{end}}",
+    "arrivalWindowShort": "فترة",
+    "status": {
+      "requested": "مطلوب",
+      "toConfirm": "بانتظار التأكيد",
+      "confirmed": "مؤكد",
+      "arrived": "وصل",
+      "waiting": "في الانتظار",
+      "inConsultation": "أثناء الاستشارة",
+      "completed": "منتهٍ",
+      "rescheduled": "أُعيدت جدولته",
+      "cancelledByPatient": "ألغاه المريض",
+      "cancelledByPractice": "ألغته العيادة",
+      "noShow": "غياب"
+    }
+  },
+  "agenda": {
+    "pageTitle": "الأجندة",
+    "newAppointment": "موعد جديد",
+    "dateNavigation": "التنقل بين التواريخ",
+    "previous": "السابق",
+    "next": "التالي",
+    "today": "اليوم",
+    "viewMode": "طريقة العرض",
+    "day": "يوم",
+    "week": "أسبوع",
+    "practitioner": "الممارس",
+    "allPractitioners": "الكل",
+    "waitingRoom": "قائمة الانتظار",
+    "addAtTime": "إضافة موعد في {{time}}",
+    "emptyTitle": "لا توجد مواعيد اليوم.",
+    "emptyAction": "إنشاء موعد",
+    "errorTitle": "تعذّر تحميل الأجندة.",
+    "errorRetry": "إعادة المحاولة",
+    "actions": {
+      "title": "إجراءات",
+      "confirm": "تأكيد",
+      "markArrived": "وصل المريض",
+      "markWaiting": "وضع في الانتظار",
+      "start": "بدء الاستشارة",
+      "openConsultation": "فتح الاستشارة"
+    },
+    "drawer": {
+      "close": "إغلاق",
+      "futureFeature": "ستتوفر هذه الميزة في مرحلة لاحقة.",
+      "openPatient": "فتح ملف المريض",
+      "edit": "تعديل",
+      "reschedule": "إعادة الجدولة",
+      "cancel": "إلغاء",
+      "noShow": "غياب"
+    },
+    "form": {
+      "createTitle": "موعد جديد",
+      "editTitle": "تعديل الموعد",
+      "patientLabel": "المريض",
+      "patientPlaceholder": "البحث بالاسم / الهاتف...",
+      "patientEmpty": "لم يتم العثور على مريض.",
+      "createPatient": "+ إنشاء مريض جديد",
+      "createPatientUnavailable": "سيتوفر إنشاء المرضى في مرحلة لاحقة.",
+      "practitionerLabel": "الممارس",
+      "serviceLabel": "الخدمة / السبب",
+      "servicePlaceholder": "اختيار...",
+      "dateLabel": "التاريخ",
+      "typeLabel": "نوع الموعد",
+      "typeExact": "وقت محدد",
+      "typeWindow": "فترة زمنية",
+      "timeLabel": "الوقت",
+      "durationLabel": "المدة",
+      "windowStartLabel": "من",
+      "windowEndLabel": "إلى",
+      "statusLabel": "الحالة الأولية",
+      "statusToConfirm": "بانتظار التأكيد",
+      "statusConfirmed": "مؤكد",
+      "noteLabel": "ملاحظة داخلية",
+      "requiredError": "هذا الحقل مطلوب.",
+      "windowRangeError": "يجب أن يكون وقت الانتهاء بعد وقت البدء.",
+      "conflictTitle": "هذا الموعد لم يعد متاحاً.",
+      "conflictSuggestions": "مواعيد قريبة:",
+      "cancel": "إلغاء",
+      "submitCreate": "إنشاء الموعد",
+      "submitEdit": "حفظ"
+    },
+    "reschedule": {
+      "title": "إعادة جدولة الموعد",
+      "dateLabel": "التاريخ الجديد",
+      "submit": "إعادة الجدولة"
+    },
+    "cancel": {
+      "title": "هل تريد إلغاء هذا الموعد؟",
+      "description": "لن يُبرمج {{name}} بعد الآن في الساعة {{time}}. يمكن إشعار المريض بهذا الإلغاء.",
+      "reasonLabel": "سبب الإلغاء",
+      "reasonByPatient": "ألغاه المريض",
+      "reasonByPractice": "ألغته العيادة",
+      "noteLabel": "السبب (اختياري)",
+      "back": "رجوع",
+      "confirm": "تأكيد الإلغاء"
+    },
+    "noShowConfirm": {
+      "title": "هل تريد تعليم هذا الموعد كغياب؟",
+      "description": "سيُعلَّم {{name}} كغائب عن موعد الساعة {{time}}.",
+      "cancel": "إلغاء",
+      "confirm": "تأكيد"
+    },
+    "toast": {
+      "created": "تم إنشاء الموعد.",
+      "updated": "تم تحديث الموعد.",
+      "rescheduled": "تمت إعادة جدولة الموعد.",
+      "cancelled": "تم إلغاء الموعد.",
+      "statusUpdated": "تم تحديث الحالة.",
+      "noShow": "تم تعليم الموعد كغياب."
+    },
+    "waitingRoomView": {
+      "emptyTitle": "لا يوجد مرضى في الانتظار.",
+      "notArrived": "—",
+      "minutesShort": "{{count}} د",
+      "columns": {
+        "patient": "المريض",
+        "appointment": "الموعد",
+        "arrived": "الوصول",
+        "waiting": "الانتظار",
+        "status": "الحالة"
+      }
     }
   },
   "admin": {
