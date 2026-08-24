@@ -42,4 +42,4 @@ imply Phase 0/1 sequencing or backend readiness.
 |------|--------|--------|-------|
 | UI-001 | COMPLETE | bb1dec8 | Aujourd'hui dashboard prototype (mock data only, no backend integration) |
 | UI-002 | COMPLETE | a655aac | Agenda & appointment prototype: day/week views, drawer, create/edit/reschedule/cancel/no-show, waiting room (mock data only, no backend integration) |
-| UI-003A | COMPLETE | (pending) | Patient list prototype: search, practitioner/next-RDV filters, pagination, Patient 360° route placeholder (mock data only, no creation/editing, no Patient 360°, no backend integration) |
+| UI-003A | COMPLETE | ce18978 | Patient list prototype: search, practitioner/next-RDV filters, pagination, Patient 360° route placeholder (mock data only, no creation/editing, no Patient 360°, no backend integration) |
