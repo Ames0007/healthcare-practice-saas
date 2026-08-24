@@ -40,6 +40,17 @@ demo page — the `<FoundationBadge />` component and `foundation.*`
 dictionary keys still exist (unused by any route) as a record of the
 original component/token proof, but no longer back a page.
 
+`src/app/app/patients/[id]/` (UI-004A) has 6 real routes — `page.tsx`
+(Aperçu) plus `health/`, `appointments/`, `treatments/`, `invoices/`,
+`payments/` — each a thin client page that reads the `id` param, runs the
+same simulated-loading transition as every other feature page, and
+renders `features/patients/patient-detail-page.tsx` with a fixed
+`activeTab`. Chosen over a shared `layout.tsx` wrapping `{children}` so
+the composition root stays a single, directly-testable component (see
+`features/patients/` below) rather than splitting testable logic across
+Next.js layout/page boundaries that are awkward to unit-test outside a
+real App Router runtime.
+
 No authentication, route guards, or permission checks exist. Do not add
 them here — that is a later task (see `CLAUDE.md` §9-10).
 
@@ -53,8 +64,11 @@ src/components/
             backing drawer/modal/alert variants — see UI-002), ConfirmDialog,
             Toast (single-slot, not a global provider), Avatar
             (initials-fallback, no photo support), Pagination (compact
-            prev/next, no numbered list — see UI-003A). No business
-            knowledge.
+            prev/next, no numbered list — see UI-003A), Tabs (real
+            `<nav>`/`aria-current="page"` navigation for URL-addressable
+            sections — not the ARIA `tablist` pattern, which is reserved
+            for JS-only panel switching with no URL change, see UI-004A).
+            No business knowledge.
   app/      Shell/domain-agnostic app components: AppShell, AppSidebar,
             AppTopbar, MobileNav, PageHeader, LanguageSwitcher,
             FoundationBadge, AreaPlaceholder.
@@ -66,6 +80,17 @@ src/components/
             tone/label registry), `appointment-card.tsx` (row/prominent/
             calendar variants). Both Aujourd'hui (UI-001) and Agenda
             (UI-002) depend on this layer, not the other way around.
+            `domain/patients/` (UI-004A) — `types.ts` (`PatientOverview`/
+            `PatientActiveTreatment`/`PatientNextInstallment`/
+            `PatientActivityItem`/`PatientTabKey`, kept separate from
+            `features/patients/types.ts`'s administrative `Patient` type
+            per CLAUDE.md §12), `patient-header.tsx` (persistent identity/
+            context header) and `patient-activity-timeline.tsx` (the
+            unified activity list). Both take only pre-resolved display
+            strings/typed data from their caller — no dependency on
+            `features/*` mock-data or formatting code, keeping the domain
+            layer's isolation intact the same way `appointment-card.tsx`
+            does.
 
 src/features/
   today/    Aujourd'hui screen composition (UI-001): `types.ts` (mock
@@ -114,10 +139,24 @@ src/features/
             mobile-card dual-render pattern as Agenda's Waiting Room —
             PatientsSkeleton, PatientFormDialog: the shared create/edit
             drawer with its own inline duplicate-warning UX). Row actions
-            are "Ouvrir" (→ `app/app/patients/[id]/page.tsx`, a minimal
-            placeholder deferring the real Patient 360° overview to
-            UI-004) and "Modifier" (opens PatientFormDialog in edit mode,
-            prefilled).
+            are "Ouvrir" and "Modifier" (opens PatientFormDialog in edit
+            mode, prefilled). Patient 360° (UI-004A):
+            `mock-overview-data.ts` (treatment/installment/activity
+            fixtures per patient id, falling back to an explicit empty
+            overview), `patient-detail-page.tsx` (the composition root —
+            not-found is derived from a real seed-dataset lookup miss,
+            not a simulated `state` value), `components/`
+            (PatientOverviewContent, PatientSummaryCard — a restrained
+            empty-state rendering distinct from MetricCard's bold
+            treatment — PatientTabPlaceholder, PatientDetailSkeleton).
+            **Prototype limitation (UI-004A §7):** UI-003B's create/edit
+            changes live only in `/app/patients`'s own component state;
+            `patient-detail-page.tsx` always looks the patient up in the
+            centralized seed dataset (`mock-data.ts`), so a patient
+            created in the list is not yet visible at its own `/{id}`
+            route. Real cross-page consistency is a backend-integration
+            concern, not a frontend state-management one — no Redux/
+            Zustand/global store was introduced to paper over it.
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,
@@ -142,8 +181,9 @@ src/lib/
 ```
 
 Only the components a landed task needs exist. The remaining components
-listed in Specification #8 §97 (Drawer, Modal, Tabs, Table, Calendar,
-PatientHeader, ...) are created by the tasks that first need them.
+listed in Specification #8 §97 (Calendar, ClinicalTimeline, HealthFlag,
+SessionProgress, InvoiceSummary, PaymentModal, ...) are created by the
+tasks that first need them.
 
 ## Design tokens
 

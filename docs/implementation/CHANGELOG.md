@@ -263,3 +263,82 @@ All notable changes to this project are documented in this file.
   for the form). All 63 frontend tests (13 UI-001 + 20 UI-002 + 30
   UI-003A/B), typecheck, lint and build pass; backend regression
   (10 tests) unaffected — no backend files touched.
+- Patient 360° header + overview (UI-004A), replacing `/app/patients/[id]`'s
+  UI-003A placeholder with 6 real routes: `/app/patients/{id}` (Aperçu,
+  the only tab with real content this task) plus `/health`, `/appointments`,
+  `/treatments`, `/invoices`, `/payments` — each a thin page rendering the
+  shared `features/patients/patient-detail-page.tsx` composition root with
+  a fixed `activeTab`, chosen over a Next.js `layout.tsx`+children-slot
+  approach so the composition root stays one directly-testable component
+  (mirrors `AgendaPage`/`PatientsPage`) without Next.js App Router test
+  friction; the header/tab lookup re-runs on every tab click, which is
+  imperceptible since it is synchronous local mock data. Documented
+  prototype limitation: UI-003B's create/edit changes live only in
+  `/app/patients`'s own component state, so a patient created there is not
+  yet visible here — this route always reads the centralized seed dataset
+  (`mock-data.ts`); real cross-page consistency arrives with backend
+  integration. New domain layer `components/domain/patients/`: `types.ts`
+  (`PatientOverview`/`PatientActiveTreatment`/`PatientNextInstallment`/
+  `PatientActivityItem`/`PatientTabKey` — kept separate from the
+  administrative `Patient` type per CLAUDE.md §12, so future domain
+  concepts don't get folded into it), `patient-header.tsx` (persistent
+  identity/context header — pure presentation, every value pre-resolved by
+  the caller, no mock-data coupling), `patient-activity-timeline.tsx`
+  (the unified activity list — also takes only pre-resolved display
+  strings, so the domain layer has no dependency on `features/*`
+  formatting code either). New generic `components/ui/tabs.tsx`: real
+  `<nav>`/`aria-current="page"` navigation (not the ARIA `tablist`
+  pattern, which is for JS-only panel switching with no URL change, as
+  Agenda's Day/Week toggle already uses) since these tabs are genuine
+  URL-addressable routes; horizontally scrollable so six tabs stay usable
+  on mobile. New `features/patients/` pieces: `mock-overview-data.ts`
+  (treatment/installment/activity fixtures for a couple of representative
+  patients, falling back to an explicit empty overview for the rest),
+  `patient-detail-page.tsx` (the composition root: loading/error states,
+  not-found derived from a real lookup miss rather than a simulated state,
+  header/tabs/Aperçu wiring), `components/patient-overview-content.tsx`
+  (the four summary cards — Prochain RDV, Traitement actif, Solde,
+  Prochaine échéance — plus the timeline section), `patient-summary-card.tsx`
+  (a restrained empty-state rendering, not `MetricCard`'s bold big-number
+  treatment, for sentences like "Aucun traitement actif"),
+  `patient-tab-placeholder.tsx` (keeps the header/tabs visible on the five
+  future tabs; cites the owning future task where UI-004A's own scope
+  sections name one — UI-005 for Dossier Santé, UI-006 for Traitements,
+  UI-007 for Factures/Paiements — and a generic message for Rendez-vous,
+  which wasn't given a number), `patient-detail-skeleton.tsx`. Small,
+  justified extensions to existing UI-003A/B code: `PatientNextAppointment`
+  gained an optional `service` field (display-only prototype enrichment,
+  documented as not a real Agenda/Patients cross-module join, which
+  doesn't exist yet); `mock-data.ts` gained a `birthDate` on two seed
+  patients so the header's age display ("34 ans") is actually
+  demonstrable — every other seed patient still has no birth date, so the
+  "age unknown → don't show one" path is exercised too; `format.ts` gained
+  `computeAge` (plain integer arithmetic on the ISO string parts, avoiding
+  any `Date`-object timezone parsing entirely — no UTC/local mismatch
+  possible, unlike the bug class fixed in UI-002's `addDaysIso`) and
+  `formatDayMonth`/`formatDayMonthTime` (Patient 360°'s "27 août" date
+  style, distinct from the list's numeric "27/08/2026"). Full FR/AR under
+  an expanded `patientDetail.*` namespace (header actions, tabs, overview
+  labels, activity-item translation keys — activity titles are always a
+  dot-path key, never a raw stored string, so they translate correctly);
+  RTL verified, including forcing `dir="ltr"` only around genuine
+  formatted dates/money/reference values and never around a translated
+  fallback sentence like "Aucun rendez-vous prévu" — the header/overview
+  data shape carries an explicit `null` for "no appointment"/"no balance"
+  rather than a single pre-resolved label string, specifically so the
+  component (not the data) decides when to apply `dir="ltr"`, avoiding
+  forcing Arabic prose into LTR reading direction for patients with no
+  next appointment or no balance. Added
+  `frontend/src/features/patients/patient-detail-page.test.tsx` (17
+  tests: identity/reference/phone/practitioner, next-appointment and
+  balance summaries in both header and overview, active-treatment with
+  session progress, the no-treatment/no-balance empty states,
+  next-installment, all six tabs with Aperçu active by default, a future
+  tab keeping the header/tabs visible, the activity timeline with an
+  explicit check that no clinical-sounding text leaks in, not-found for
+  an unknown id, loading, error, French, Arabic/RTL, header actions
+  including the Facturer/Encaisser/Plus future-feature toast, and
+  LTR isolation of the patient number/phone). All 80 frontend tests
+  (13 UI-001 + 20 UI-002 + 30 UI-003A/B + 17 UI-004A), typecheck, lint
+  and build pass; backend regression (10 tests) unaffected — no backend
+  files touched.

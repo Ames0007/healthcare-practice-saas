@@ -1,6 +1,13 @@
 export interface PatientNextAppointment {
   date: string;
   time: string;
+  /**
+   * Display-only prototype field (UI-004A §25/§33) — Agenda's own mock
+   * appointments are a separate, unlinked mock dataset (UI-002), so this
+   * is not a real cross-module join. A real Patient 360° reads this from
+   * the shared appointment record instead (CLAUDE.md §12).
+   */
+  service?: string;
 }
 
 /**

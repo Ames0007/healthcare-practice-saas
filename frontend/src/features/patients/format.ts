@@ -18,6 +18,38 @@ export function formatNextAppointment(next: PatientNextAppointment, locale: Loca
   return `${formatShortDate(next.date, locale)} · ${next.time}`;
 }
 
+/** "27 août" — day + month name, no year (Patient 360°'s date style, Spec #9 Screen 17). */
+export function formatDayMonth(isoDate: string, locale: Locale): string {
+  const date = new Date(`${isoDate}T00:00:00`);
+  return new Intl.DateTimeFormat(toIntlLocale(locale), {
+    day: "numeric",
+    month: "long",
+    calendar: "gregory",
+  }).format(date);
+}
+
+export function formatDayMonthTime(next: PatientNextAppointment, locale: Locale): string {
+  return `${formatDayMonth(next.date, locale)} · ${next.time}`;
+}
+
+/**
+ * Plain integer arithmetic on the ISO string parts — no `Date` object
+ * timezone parsing involved, so there is no UTC/local mismatch to guard
+ * against (see the `addDaysIso` note in `features/agenda/format.ts`).
+ */
+export function computeAge(birthDateIso: string, referenceIso: string): number {
+  const [birthYear, birthMonth, birthDay] = birthDateIso.split("-").map(Number);
+  const [refYear, refMonth, refDay] = referenceIso.split("-").map(Number);
+
+  let age = refYear - birthYear;
+  const hasHadBirthdayThisYear = refMonth > birthMonth || (refMonth === birthMonth && refDay >= birthDay);
+  if (!hasHadBirthdayThisYear) {
+    age -= 1;
+  }
+
+  return age;
+}
+
 export function getPatientFullName(patient: Pick<Patient, "firstName" | "lastName">): string {
   return `${patient.firstName} ${patient.lastName}`;
 }

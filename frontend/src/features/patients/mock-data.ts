@@ -20,8 +20,9 @@ export function getPatientsMockData(): Patient[] {
       responsiblePractitionerId: "pr-1",
       responsiblePractitionerName: "Dr. Benali",
       lastVisit: "2026-08-18",
-      nextAppointment: { date: "2026-08-27", time: "10:30" },
+      nextAppointment: { date: "2026-08-27", time: "10:30", service: "Consultation" },
       outstandingBalance: 1500,
+      birthDate: "1992-03-10",
     },
     {
       id: "pat-2",
@@ -34,6 +35,7 @@ export function getPatientsMockData(): Patient[] {
       lastVisit: "2026-08-20",
       nextAppointment: null,
       outstandingBalance: 0,
+      birthDate: "1998-11-02",
     },
     {
       id: "pat-3",

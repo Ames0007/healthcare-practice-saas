@@ -332,9 +332,49 @@
   },
   "patientDetail": {
     "notFoundTitle": "المريض غير موجود",
-    "notFoundDescription": "هذا المريض غير موجود في بيانات العرض التوضيحي.",
-    "notice": "المرجع: {{number}} · سيتم تنفيذ الملف الكامل للمريض (٣٦٠°) في مرحلة لاحقة (UI-004).",
-    "back": "العودة إلى قائمة المرضى"
+    "notFoundDescription": "هذا المريض غير موجود أو لم يعد متاحًا.",
+    "backToPatients": "العودة إلى المرضى",
+    "errorTitle": "تعذّر تحميل معلومات المريض.",
+    "errorRetry": "إعادة المحاولة",
+    "ageYears": "{{age}} سنة",
+    "noNextAppointment": "لا يوجد موعد مقرر",
+    "header": {
+      "newAppointment": "+ موعد",
+      "invoice": "إصدار فاتورة",
+      "collectPayment": "تحصيل دفعة",
+      "more": "المزيد",
+      "futureFeatureNotice": "ستتوفر هذه الميزة في مرحلة لاحقة."
+    },
+    "tabs": {
+      "navigationLabel": "أقسام المريض",
+      "overview": "نظرة عامة",
+      "health": "الملف الصحي",
+      "appointments": "المواعيد",
+      "treatments": "العلاجات / الجلسات",
+      "invoices": "الفواتير",
+      "payments": "المدفوعات",
+      "placeholder": "سيتم تنفيذ هذا القسم في مرحلة لاحقة.",
+      "placeholderWithTask": "سيتم تنفيذ هذا القسم ضمن {{task}}."
+    },
+    "overview": {
+      "nextAppointmentLabel": "الموعد القادم",
+      "activeTreatmentLabel": "العلاج الجاري",
+      "noActiveTreatment": "لا يوجد علاج جارٍ",
+      "sessionsProgress": "{{completed}} / {{total}} جلسة",
+      "balanceLabel": "الرصيد",
+      "noBalance": "لا يوجد رصيد مستحق",
+      "nextInstallmentLabel": "الدفعة القادمة",
+      "noInstallment": "لا توجد دفعة مستحقة قريبًا",
+      "recentActivityTitle": "النشاط الأخير",
+      "noActivity": "لا يوجد نشاط حديث."
+    },
+    "activity": {
+      "consultationCompleted": "انتهاء الاستشارة",
+      "paymentReceived": "دفعة مستلمة",
+      "documentAdded": "تمت إضافة مستند",
+      "appointmentConfirmed": "تأكيد الموعد",
+      "treatmentSessionCompleted": "إتمام جلسة"
+    }
   },
   "admin": {
     "brand": "إدارة المنصة",

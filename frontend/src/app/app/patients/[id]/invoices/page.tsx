@@ -4,11 +4,10 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { PatientDetailPage } from "@/features/patients/patient-detail-page";
 
-/** Manual-review-only prototype loading simulation — there is no real fetch yet (mirrors UI-001/002/003A). */
 const LOADING_SIMULATION_MS = 400;
 
-/** Patient 360° — Aperçu (UI-004A), replacing the UI-003A route placeholder. */
-export default function PatientOverviewRoutePage() {
+/** Factures tab route — placeholder content, real header/tabs (UI-004A §24). UI-007 owns the real content. */
+export default function PatientInvoicesRoutePage() {
   const { id } = useParams<{ id: string }>();
   const [ready, setReady] = useState(false);
 
@@ -17,5 +16,5 @@ export default function PatientOverviewRoutePage() {
     return () => clearTimeout(timer);
   }, []);
 
-  return <PatientDetailPage patientId={id} activeTab="overview" state={ready ? "loaded" : "loading"} />;
+  return <PatientDetailPage patientId={id} activeTab="invoices" state={ready ? "loaded" : "loading"} />;
 }

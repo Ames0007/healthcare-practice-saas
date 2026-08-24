@@ -332,9 +332,49 @@
   },
   "patientDetail": {
     "notFoundTitle": "Patient introuvable",
-    "notFoundDescription": "Ce patient n'existe pas dans les données de démonstration.",
-    "notice": "Référence : {{number}} · Le dossier patient complet (Patient 360°) sera implémenté dans une prochaine étape (UI-004).",
-    "back": "Retour à la liste des patients"
+    "notFoundDescription": "Ce patient n'existe pas ou n'est plus accessible.",
+    "backToPatients": "Retour aux patients",
+    "errorTitle": "Impossible de charger les informations du patient.",
+    "errorRetry": "Réessayer",
+    "ageYears": "{{age}} ans",
+    "noNextAppointment": "Aucun rendez-vous prévu",
+    "header": {
+      "newAppointment": "+ RDV",
+      "invoice": "Facturer",
+      "collectPayment": "Encaisser",
+      "more": "Plus",
+      "futureFeatureNotice": "Disponible dans une prochaine étape."
+    },
+    "tabs": {
+      "navigationLabel": "Sections du patient",
+      "overview": "Aperçu",
+      "health": "Dossier Santé",
+      "appointments": "Rendez-vous",
+      "treatments": "Traitements / Séances",
+      "invoices": "Factures",
+      "payments": "Paiements",
+      "placeholder": "Cette section sera implémentée dans une prochaine étape.",
+      "placeholderWithTask": "Cette section sera implémentée dans {{task}}."
+    },
+    "overview": {
+      "nextAppointmentLabel": "Prochain RDV",
+      "activeTreatmentLabel": "Traitement actif",
+      "noActiveTreatment": "Aucun traitement actif",
+      "sessionsProgress": "{{completed}} / {{total}} séances",
+      "balanceLabel": "Solde",
+      "noBalance": "Aucun solde à payer",
+      "nextInstallmentLabel": "Prochaine échéance",
+      "noInstallment": "Aucune échéance à venir",
+      "recentActivityTitle": "Activité récente",
+      "noActivity": "Aucune activité récente."
+    },
+    "activity": {
+      "consultationCompleted": "Consultation terminée",
+      "paymentReceived": "Paiement",
+      "documentAdded": "Document ajouté",
+      "appointmentConfirmed": "Rendez-vous confirmé",
+      "treatmentSessionCompleted": "Séance effectuée"
+    }
   },
   "admin": {
     "brand": "Platform Admin",
