@@ -132,3 +132,55 @@ export interface CabinetExpense {
   amount: MoneyAmount;
   status: ExpenseStatus;
 }
+
+/**
+ * Caisse domain (UI-006C, Spec #4 §18) — simplified frontend prototype of
+ * `cash_register_sessions`. Deliberately omits
+ * `expected_closing_balance`/`physical_closing_balance`/`difference_*`/
+ * `closed_by`/`closed_at` (UI-006E's own scope, not harmless to model half
+ * here) and narrows `status` to exactly the two values this task uses —
+ * the backend ENUM(open, closed) already matches 1:1, so no reconciliation
+ * is needed later.
+ */
+export type CashSessionStatus = "closed" | "open";
+
+export interface CashSession {
+  id: string;
+  businessDate: string;
+  status: CashSessionStatus;
+  /** Set only once opened — deterministic prototype value (UI-006C §22), never `Date.now()`. */
+  openedAt?: string;
+  openedBy?: string;
+  openingBalance: MoneyAmount;
+}
+
+export type CashMovementDirection = "in" | "out";
+
+/**
+ * Narrowed from Spec #4 §18.2's `source_type` ENUM(patient_payment,
+ * expense, correction, manual_authorized) to the two this prototype
+ * actually derives — no manual/correction movement creation anywhere in
+ * this task (§34).
+ */
+export type CashMovementType = "patient_payment" | "expense";
+
+/**
+ * Simplified frontend prototype of `cash_movements` (Spec #4 §18.2).
+ * Always derived from an existing `Payment`/`CabinetExpense` record — see
+ * `features/caisse/calculations.ts` — never independently authored.
+ */
+export interface CashMovement {
+  id: string;
+  cashSessionId: string;
+  /** Synthetic prototype time-of-day (`HH:MM`) — neither `Payment` nor `CabinetExpense` tracks real time, only date (UI-006C §22/§27). */
+  occurredAt: string;
+  direction: CashMovementDirection;
+  type: CashMovementType;
+  amount: MoneyAmount;
+  label: string;
+  /** Receipt/payment reference, set only for `type: "patient_payment"`. */
+  reference?: string;
+  patientId?: string;
+  paymentId?: string;
+  expenseId?: string;
+}

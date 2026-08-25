@@ -1276,3 +1276,88 @@ All notable changes to this project are documented in this file.
   through UI-006A + 39 new UI-006B tests), typecheck, lint and build
   pass on the first full-suite run; backend regression (10 tests, clean)
   unaffected — no backend files touched.
+- UI-006C — Caisse: Opening & Cash Movements: `/app/finance/caisse` —
+  Spec #2's own IA sitemap nests Caisse under Finance (alongside
+  Factures/Échéances/Encaissements/Décaissements), not a standalone
+  `/app/caisse`, so the task's own tentative route guess was reconciled
+  against the specification per CLAUDE.md §1's priority order and
+  documented as a deliberate choice, not an oversight. Today's cash
+  register: closed → opening-balance workflow → open, with a derived
+  movement history — deliberately distinct from the Finance dashboard
+  (UI-006A, "how much did the cabinet collect this period") and from
+  Patient 360°'s own Paiements tab (CLAUDE.md §12/§19). New
+  `CashSession`/`CashMovementDirection`/`CashMovementType`/
+  `CashMovement` types added to `components/domain/finance/types.ts`
+  (Spec #4 §18's `cash_register_sessions`/`cash_movements`, simplified —
+  every closing/reconciliation field
+  (`expected_closing_balance`/`physical_closing_balance`/`difference_*`/
+  `closed_by`/`closed_at`) deliberately omitted rather than modeled
+  early, since UI-006E owns them and they are not harmless to leave
+  half-defined) plus `cash-session-status.ts` (closed/open → tone/label,
+  mirroring `invoice-status.ts`'s own registry pattern). New
+  `features/caisse/` — `calculations.ts`'s `buildCashMovements` derives
+  every movement from the *existing* fixtures, never a second movement
+  universe: posted, cash-method patient payments matching the session's
+  business date (UI-004E, reversed excluded) and posted expenses
+  matching that date (UI-006A, cancelled excluded — proven against the
+  real `exp-5` fixture). Since neither `Payment` nor `CabinetExpense`
+  tracks a real time-of-day, a small deterministic synthetic-time
+  generator assigns each movement an `HH:MM` value from a stable sort
+  key (type then id) rather than inventing per-fixture times by hand —
+  general and reproducible for any input set, not coupled to specific
+  real IDs. Movements are then re-sorted newest-first for display.
+  Theoretical balance (opening + incoming − outgoing) reuses a new
+  `computeCashBalance` primitive extracted from UI-006A's own Position
+  Caisse formula (`features/finance/aggregations.ts`) — the smallest
+  safe refactor the task asked for (§43): `computeCashPosition` now
+  calls this shared one-liner internally with zero change to its own
+  public signature/behavior, verified by UI-006A's entire pre-existing
+  test suite passing unmodified. The two "opening" values keep
+  deliberately distinct semantics, documented directly in the shared
+  function's own doc comment: UI-006A's is the constant
+  `OPENING_CASH_POSITION` reused across all three period views (a
+  projection), while Caisse's is the real amount entered when today's
+  specific session was opened. `mock-data.ts` provides the deterministic
+  "Open Caisse" prototype defaults required by §21-22 (never
+  `Date.now()`) — `SESSION_OPENED_AT = "08:15"` and a new synthetic
+  receptionist name, `OPENED_BY_NAME = "Meryem Bakkali"`, deliberately
+  NOT "Sara Alaoui" (already the canonical empty-fixture patient across
+  UI-004D/E/UI-005*, pat-2) to avoid a staff/patient name collision that
+  Spec #9 Screen 33's own wireframe would have introduced if copied
+  verbatim. The live route defaults to an already-open synthetic session
+  (§17 — a reviewer can inspect movement history immediately) while
+  `CaissePage`'s own `initialSession` prop fully supports starting
+  `null` (closed) so the opening workflow itself is demonstrable and
+  tested; opening a second session is structurally impossible once open
+  — the opening form simply stops rendering, no separate guard needed.
+  A patient-payment movement row navigates to the existing
+  `/app/patients/{id}/payments` surface, never a duplicate payment
+  detail/capture. "Fermer la caisse" is shown (Spec #9 Screen 30's own
+  wireframe includes it) but is deliberately non-functional — it shows
+  only "La clôture de caisse sera implémentée dans UI-006E." and never
+  mutates session state, verified by a dedicated test. No expense entry,
+  no physical cash count, no discrepancy calculation, no real closing,
+  no accounting terminology anywhere. Added
+  `frontend/src/features/caisse/calculations.test.ts` (17 tests:
+  movement derivation from real payment/expense fixtures, reversed-
+  payment and cancelled-expense exclusion — the latter against the real
+  `exp-5` fixture, cross-day isolation, deterministic multi-movement
+  ordering, payment/expense reconciliation against
+  `getEffectivePaidAmount`'s own output, movement reference integrity,
+  the theoretical-balance formula, and the direct UI-006A/UI-006C
+  formula-consistency proof), `caisse-page.test.tsx` (14 tests: header,
+  closed state with the opening-balance input, negative-balance
+  rejection, zero-balance acceptance with success feedback, custom
+  opening balance represented in the summary, second-session
+  prevention, a combined payment+expense day exercising opened-at/
+  opened-by/summary/movement rendering/ordering/patient navigation,
+  reversed-payment exclusion, cancelled-expense exclusion doubling as
+  the open/no-movement state, the non-functional close notice, loading,
+  error, Arabic/RTL, and absence of every forbidden manual-creation/
+  payment-capture/expense-entry/cash-count/reconciliation/accounting
+  control), and one more case in `components/app/app-sidebar.test.tsx`
+  (Finance remains active for the new nested `/app/finance/caisse`
+  route too). All 532 frontend tests (500 carried over through UI-006B +
+  32 new UI-006C tests), typecheck, lint and build pass on the first
+  full-suite run; backend regression (10 tests, clean) unaffected — no
+  backend files touched.

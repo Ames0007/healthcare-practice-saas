@@ -774,6 +774,36 @@
       "emptyAllDescription": "Les factures du cabinet apparaîtront ici.",
       "errorTitle": "Impossible de charger les factures.",
       "errorRetry": "Réessayer"
+    },
+    "caisse": {
+      "pageTitle": "Caisse",
+      "status": {
+        "closed": "Fermée",
+        "open": "Ouverte"
+      },
+      "closedDescription": "La caisse doit être ouverte avant d'enregistrer les mouvements.",
+      "openingBalanceLabel": "Solde initial",
+      "openAction": "Ouvrir la caisse",
+      "openedSuccess": "Caisse ouverte.",
+      "openedAtLabel": "Ouverte à",
+      "openedByLabel": "Ouverte par",
+      "openedByRole": "Réception",
+      "summary": {
+        "opening": "Solde initial",
+        "incoming": "Encaissements",
+        "outgoing": "Décaissements",
+        "theoretical": "Solde théorique"
+      },
+      "movements": {
+        "title": "Mouvements",
+        "resultCount": "{{count}} mouvements",
+        "emptyTitle": "Aucun mouvement de caisse aujourd'hui.",
+        "viewPaymentAriaLabel": "Voir le paiement de {{patientName}}"
+      },
+      "closeAction": "Fermer la caisse",
+      "closeFutureNotice": "La clôture de caisse sera implémentée dans UI-006E.",
+      "errorTitle": "Impossible de charger la caisse.",
+      "errorRetry": "Réessayer"
     }
   },
   "admin": {

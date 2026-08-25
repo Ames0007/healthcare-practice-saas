@@ -774,6 +774,36 @@
       "emptyAllDescription": "ستظهر هنا فواتير العيادة.",
       "errorTitle": "تعذّر تحميل الفواتير.",
       "errorRetry": "إعادة المحاولة"
+    },
+    "caisse": {
+      "pageTitle": "الصندوق",
+      "status": {
+        "closed": "مغلق",
+        "open": "مفتوح"
+      },
+      "closedDescription": "يجب فتح الصندوق قبل تسجيل الحركات.",
+      "openingBalanceLabel": "الرصيد الافتتاحي",
+      "openAction": "فتح الصندوق",
+      "openedSuccess": "تم فتح الصندوق.",
+      "openedAtLabel": "وقت الفتح",
+      "openedByLabel": "بواسطة",
+      "openedByRole": "الاستقبال",
+      "summary": {
+        "opening": "الرصيد الافتتاحي",
+        "incoming": "المُحصَّل",
+        "outgoing": "المصروفات",
+        "theoretical": "الرصيد النظري"
+      },
+      "movements": {
+        "title": "الحركات",
+        "resultCount": "{{count}} حركة",
+        "emptyTitle": "لا توجد حركات نقدية اليوم.",
+        "viewPaymentAriaLabel": "عرض دفعة {{patientName}}"
+      },
+      "closeAction": "إغلاق الصندوق",
+      "closeFutureNotice": "سيتم تنفيذ إغلاق الصندوق في UI-006E.",
+      "errorTitle": "تعذّر تحميل الصندوق.",
+      "errorRetry": "إعادة المحاولة"
     }
   },
   "admin": {

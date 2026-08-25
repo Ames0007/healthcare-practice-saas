@@ -78,9 +78,25 @@ export function computeDisbursed(expenses: CabinetExpense[], range: PeriodRange)
     .reduce((sum, expense) => sum + expense.amount, 0);
 }
 
+/**
+ * Generic cash-flow balance primitive (UI-006C §43 refactor) shared by the
+ * Finance dashboard's Position Caisse below and Caisse's own theoretical
+ * balance (`features/caisse/calculations.ts`) — opening + incoming −
+ * outgoing. The two callers deliberately keep distinct semantics: this
+ * dashboard's "opening" is the constant `OPENING_CASH_POSITION` reused
+ * across all three period views (a documented projection, §41), while
+ * Caisse's "opening" is the real amount entered when today's specific
+ * `CashSession` was opened. Extracting the shared arithmetic here avoids
+ * two copies of the same one-line formula without pretending the two
+ * "opening" values mean the same thing.
+ */
+export function computeCashBalance(opening: MoneyAmount, incoming: MoneyAmount, outgoing: MoneyAmount): MoneyAmount {
+  return opening + incoming - outgoing;
+}
+
 /** Prototype cash-position formula (UI-006A §40): opening position + period collections − period disbursements. */
 export function computeCashPosition(collected: MoneyAmount, disbursed: MoneyAmount): MoneyAmount {
-  return OPENING_CASH_POSITION + collected - disbursed;
+  return computeCashBalance(OPENING_CASH_POSITION, collected, disbursed);
 }
 
 export function computeFinanceKpis(

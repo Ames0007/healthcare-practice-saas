@@ -146,6 +146,21 @@ src/components/
             screens reusing a Patient-360°-owned detail component should
             follow: inspect first, add one additive opt-in prop, never
             fork a second implementation.
+            `CashSession`/`CashMovementDirection`/`CashMovementType`/
+            `CashMovement` (UI-006C) — simplified from Spec #4 §18's
+            `cash_register_sessions`/`cash_movements`, deliberately
+            omitting every closing/reconciliation field
+            (`expected_closing_balance`/`physical_closing_balance`/
+            `difference_*`/`closed_by`/`closed_at`) rather than
+            half-modeling UI-006E's own future scope. `cash-session-
+            status.ts` (`CASH_SESSION_STATUS_MAP` — closed/open) mirrors
+            `invoice-status.ts`'s registry pattern exactly. A
+            `CashMovement` is always derived from an existing `Payment`
+            or `CabinetExpense` record (`features/caisse/
+            calculations.ts`) — never independently authored, the same
+            "read model, not a second source of truth" discipline as
+            `features/finance/aggregations.ts`'s own receivables/
+            activity builders.
             `domain/clinical/` (UI-005A) — the first real clinical
             prototype, deliberately separate from `domain/patients/`'s
             administrative `PatientOverview` and from
@@ -625,6 +640,36 @@ src/features/
             md:block` / `divide-y ... md:hidden` dual-render convention
             — the established responsive pattern for any tabular data in
             this codebase, not reinvented here.
+
+  caisse/   Today's cash register (UI-006C), at `/app/finance/caisse`
+            (Spec #2's own IA sitemap nests Caisse under Finance — not a
+            standalone top-level route). `calculations.ts`'s
+            `buildCashMovements` is the reuse boundary: it derives every
+            movement from the *existing* posted/cash-method Payment
+            fixtures (UI-004E) and posted CabinetExpense fixtures
+            (UI-006A) matching the session's own business date —
+            reversed payments and cancelled expenses excluded by the
+            same filters those modules already established, never a
+            second movement-authoring path. Since neither source fixture
+            tracks a real time-of-day, a small deterministic
+            synthetic-time generator (stable sort key → index → `HH:MM`)
+            gives each derived movement a reproducible display time
+            without hand-mapping specific fixture ids. Theoretical
+            balance reuses `computeCashBalance`
+            (`features/finance/aggregations.ts`) — extracted from
+            UI-006A's own Position Caisse formula via the smallest safe
+            refactor rather than a second copy of `opening + in − out`;
+            see that function's own doc comment for the documented
+            semantic difference between Finance's period-constant
+            "opening" and Caisse's own real entered opening balance.
+            `caisse-page.tsx` takes an `initialSession: CashSession |
+            null` prop — omitted for the live default (already open, so
+            movement history is inspectable immediately), or `null` to
+            exercise the closed/opening-workflow path — mirroring every
+            other top-level screen's own `state`/data prop-seam
+            convention. `components/` (ClosedCaissePanel, CaisseSummary
+            — Spec #8 §69's own named component, CaisseMovementList,
+            CaisseSkeleton).
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,
