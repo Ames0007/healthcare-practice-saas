@@ -1103,3 +1103,88 @@ All notable changes to this project are documented in this file.
   clean on the first run) unaffected — no backend files touched. This
   completes the Patient 360° clinical frontend prototype sequence
   (UI-005A/B/C/D).
+- UI-006A — Cabinet Finance Dashboard: `/app/finance` replaces the
+  generic "not implemented" placeholder with the first real cabinet-wide
+  financial command center (Spec #9 Screen 24), explicitly distinct from
+  Patient 360°'s own Factures/Paiements tabs (CLAUDE.md §12/§19) — no
+  patient-scoped screen is duplicated here. New `features/finance/`
+  introduces a bounded aggregation/read-model layer: `aggregations.ts`
+  derives every KPI from the *existing* UI-004D/E invoice/payment
+  fixtures rather than a second, possibly-diverging calculation —
+  `getFinancialSummary` (UI-004D) is reused unmodified across the full
+  cabinet-wide invoice set for À encaisser/En retard, and
+  `getEffectivePaidAmount` (UI-004E) is reused unmodified after
+  period-filtering for Encaissé, so cabinet totals can never
+  independently contradict Patient 360°'s own figures. A new
+  `CabinetExpense`/`ExpenseCategory`/`ExpenseStatus` sibling finance-
+  domain model was added to `components/domain/finance/types.ts`
+  (alongside the existing Invoice/Payment types), with its own read-only
+  synthetic fixture set (`features/finance/mock-expenses-data.ts`) —
+  supports the Décaissements KPI/activity aggregation only, no
+  expense-entry UI anywhere (UI-006D's own scope). KPIs: Encaissé, À
+  encaisser, En retard, Décaissements, Position caisse — deliberately
+  reconciling with the task's own §17/§18 five-metric set rather than
+  Spec #9 Screen 24's four-metric illustration (Facturé/Encaissé/À
+  encaisser/En retard), per CLAUDE.md §1's priority order (explicit task
+  instructions over specification). À encaisser/En retard are
+  deliberately NOT period-scoped (§18 never mentions a period for
+  them — they are current balances, not activity that occurred during a
+  window) while Encaissé/Décaissements/Position caisse do recompute on
+  every period switch; this asymmetry is documented directly in
+  `aggregations.ts`, not left implicit. Period switching (Aujourd'hui/
+  Cette semaine/Ce mois, defaulting to "Ce mois" per Screen 24's own
+  illustration) is resolved against the fixed `MOCK_BUSINESS_DATE`
+  ("2026-08-23") prototype convention already used by Aujourd'hui/Agenda
+  — "week" reuses Agenda's own Monday-start `getWeekStart` (UI-002)
+  rather than a second week-boundary rule. Cash position is an
+  explicitly documented prototype-only formula — opening position
+  (500 MAD, matching Spec #9 Screen 30's own illustrative "Solde
+  initial" rather than an invented number) + period collected − period
+  disbursed — with a supporting-text disclaimer on its own MetricCard
+  that this is a dashboard projection, not a real Caisse closing/
+  reconciliation result (§41); UI-006C/E own actual Caisse session UX.
+  The Receivables ("À encaisser") section resolves cabinet-wide
+  outstanding (non-cancelled, positive-remaining) invoices to
+  display-ready patient names, ordered overdue-first then currently-due
+  (`RECEIVABLE_RANK`, never fixture insertion order); each row is a real
+  `next/link` to the existing `/app/patients/{id}/invoices` workspace —
+  no duplicate InvoiceDetailDrawer under cabinet Finance (§24). "Voir
+  toutes les factures" shows a future-feature Toast notice rather than a
+  real screen — the global invoice list is UI-006B's scope, not
+  implemented early (§25/§51). "Activité récente" merges posted
+  payments and posted expenses for the selected period into one
+  newest-first list (`buildRecentActivity`), each row pairing a textual
+  type label ("Encaissement"/"Décaissement") with its amount — never
+  color/sign alone (§32) — and neither KPIs nor activity rows use
+  giant green/red financial color coding anywhere (§19/Spec #10 §22),
+  only MetricCard's existing restrained typography-emphasis convention
+  (danger only for a genuinely nonzero En retard). No accounting
+  terminology (Profit/Marge/EBITDA/Débit/Crédit/Grand livre) anywhere,
+  no Caisse open/close controls, no expense-entry controls, no
+  cabinet-level Encaisser/payment-capture workflow, no global invoice
+  screen — all verified by dedicated absence tests. Added
+  `frontend/src/features/finance/aggregations.test.ts` (16 tests:
+  period-boundary resolution, collected/receivable/overdue/disbursed/
+  cash-position math against the real fixtures, reversed-payment and
+  cancelled-expense/cancelled-invoice exclusion, receivable ordering,
+  activity merging/sorting), `mock-expenses-data.test.ts` (5
+  fixture-integrity tests), `components/app/app-sidebar.test.tsx` (1
+  test — the sidebar's generic `pathname.startsWith` active-state logic
+  was already correct and unmodified, but had no prior regression test
+  for any nav item; this is the first, and incidentally proves Finance
+  now resolves against real content rather than the catch-all), and
+  `finance-dashboard.test.tsx` (15 tests: header/default period,
+  all five KPIs against the real fixtures, period switching recomputing
+  the right three KPIs while leaving the other two unchanged,
+  receivables ordering/exclusion/navigation, the future-feature "Voir
+  toutes les factures" notice, recent activity rendering/ordering/
+  exclusion, empty receivables, empty-period activity with an
+  opening-only cash position, loading, error, French, Arabic/RTL, and
+  absence of every forbidden accounting/Caisse/expense-entry/payment-
+  capture control). All 461 frontend tests (424 carried over through
+  UI-005D + 37 new UI-006A tests), typecheck, lint and build pass on the
+  first full-suite run; backend regression (10 tests, clean) unaffected
+  — no backend files touched. `frontend/ARCHITECTURE.md` gained a new
+  "Cabinet Finance aggregation" convention paragraph documenting the
+  reuse-over-reimplementation rule for future UI-006B/C/D/E tasks to
+  follow.

@@ -545,6 +545,48 @@ src/features/
             what prevents a duplicate predefined selection (§50) — no
             extra bookkeeping inside `Combobox` itself.
 
+  finance/  Cabinet Finance dashboard composition (UI-006A) — deliberately
+            separate from `features/patients/`'s own Factures/Paiements
+            tab code, even though both read the same underlying
+            `Invoice`/`Payment` fixtures (CLAUDE.md §12/§19: cabinet
+            Finance and Patient 360° are different views of shared
+            records, never a duplicated dataset). `aggregations.ts` is
+            the reuse boundary and the convention future UI-006B/C/D/E
+            tasks should follow: `computeReceivableAndOverdue` calls
+            `getFinancialSummary` (`features/patients/finance.ts`,
+            UI-004D) unmodified, and `computeCollected` calls
+            `getEffectivePaidAmount` (`features/patients/payments.ts`,
+            UI-004E) unmodified after period-filtering — cabinet KPIs can
+            never independently drift from Patient 360°'s own numbers.
+            À encaisser/En retard are deliberately not period-scoped
+            (current balances, not a period activity flow) while
+            Encaissé/Décaissements/Position caisse do recompute per
+            period — documented directly in `aggregations.ts`, not left
+            implicit. `getPeriodRange` resolves Aujourd'hui/Cette
+            semaine/Ce mois against the same fixed `MOCK_BUSINESS_DATE`
+            convention as Aujourd'hui/Agenda, reusing Agenda's own
+            `getWeekStart` (`features/agenda/format.ts`) for the week
+            boundary rather than a second week rule. `mock-expenses-
+            data.ts` is a small, read-only, cabinet-only synthetic
+            `CabinetExpense` fixture set (type added to `components/
+            domain/finance/types.ts`, alongside the existing Invoice/
+            Payment) — it exists solely to give the Décaissements KPI/
+            activity something real to aggregate; no expense-entry UI
+            reads or writes it (UI-006D's own scope). Cash position is a
+            documented prototype-only formula (opening 500 MAD, matching
+            Spec #9 Screen 30's own illustrative "Solde initial" — +
+            period collected − period disbursed), never a real Caisse
+            session result (UI-006C/E own that). `finance-dashboard.tsx`
+            (loading/loaded/error states, mirroring every other
+            top-level screen's own `state` prop convention) composes
+            `components/` (PeriodSelector, KpiSummary,
+            ReceivablesSection, RecentActivitySection,
+            FinanceDashboardSkeleton). Receivables navigate to the
+            existing `/app/patients/{id}/invoices` route instead of a
+            duplicate detail drawer (§24); "Voir toutes les factures"
+            stays a future-feature Toast notice — the real global invoice
+            screen is UI-006B's own scope, not implemented early.
+
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,
 `setUTCDate`/`getUTCDate`, `toISOString()`) — mixing local-time `Date`

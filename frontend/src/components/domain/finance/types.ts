@@ -104,3 +104,31 @@ export interface Payment {
   /** Set only when `status` is "reversed" — documents why the payment no longer counts toward collected totals. */
   reversalReason?: string;
 }
+
+/**
+ * Read-only synthetic cabinet expense/décaissement (UI-006A §11), a sibling
+ * finance-domain concept to Invoice/Payment. Supports only the cabinet
+ * Finance dashboard's Décaissements KPI and recent-activity aggregation —
+ * this is not a real expense-entry domain model (no create/edit/delete
+ * anywhere in this prototype); UI-006D owns that.
+ */
+export type ExpenseCategory = "supplies" | "utilities" | "services" | "other";
+
+/**
+ * Kept shape-symmetric with `PaymentStatus` for a future real Décaissements
+ * module, mirroring the same deliberate-future-proofing convention used by
+ * UI-005D's `PrescriptionStatus`. This prototype only ever seeds "posted"
+ * expenses plus one deliberately "cancelled" one to prove exclusion from
+ * every aggregate (CLAUDE.md §27, UI-006A §36-39) — no cancellation
+ * workflow exists here.
+ */
+export type ExpenseStatus = "posted" | "cancelled";
+
+export interface CabinetExpense {
+  id: string;
+  date: string;
+  label: string;
+  category: ExpenseCategory;
+  amount: MoneyAmount;
+  status: ExpenseStatus;
+}

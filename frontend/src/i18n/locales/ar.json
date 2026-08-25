@@ -692,6 +692,49 @@
       "errorRetry": "إعادة المحاولة"
     }
   },
+  "finance": {
+    "pageTitle": "المالية",
+    "pageDescription": "نظرة عامة على النشاط المالي للعيادة.",
+    "period": {
+      "today": "اليوم",
+      "week": "هذا الأسبوع",
+      "month": "هذا الشهر",
+      "groupLabel": "الفترة"
+    },
+    "kpis": {
+      "collected": "المُحصَّل",
+      "receivable": "قيد التحصيل",
+      "overdue": "متأخر",
+      "disbursed": "المصروفات",
+      "cashPosition": "وضعية الصندوق"
+    },
+    "cashPositionNote": "توقّع تجريبي لواجهة العرض، وليس نتيجة إغلاق صندوق فعلي.",
+    "receivables": {
+      "title": "قيد التحصيل",
+      "resultCount": "{{count}} فاتورة",
+      "emptyTitle": "لا يوجد مبلغ قيد التحصيل.",
+      "viewInvoiceAriaLabel": "عرض الفاتورة {{invoiceNumber}} الخاصة بـ {{patientName}}",
+      "viewAllAction": "عرض جميع الفواتير",
+      "viewAllNotice": "ستتوفر شاشة الفواتير الشاملة لاحقًا."
+    },
+    "activity": {
+      "title": "النشاط الأخير",
+      "emptyTitle": "لا يوجد نشاط مالي لهذه الفترة.",
+      "emptyDescription": "ستظهر هنا عمليات التحصيل والمصروفات الخاصة بالعيادة.",
+      "payment": "تحصيل",
+      "expense": "مصروف"
+    },
+    "expenseCategory": {
+      "supplies": "لوازم",
+      "utilities": "مرافق",
+      "services": "مزوّدو خدمات",
+      "other": "أخرى"
+    },
+    "error": {
+      "title": "تعذّر تحميل المعلومات المالية.",
+      "retry": "إعادة المحاولة"
+    }
+  },
   "admin": {
     "brand": "إدارة المنصة",
     "nav": {
