@@ -576,6 +576,35 @@
         "emptyDescription": "Les consultations et séances terminées apparaîtront ici.",
         "filteredEmpty": "Aucun élément ne correspond à ce filtre."
       }
+    },
+    "consultation": {
+      "backToHealth": "Retour au dossier santé",
+      "heading": "Consultation",
+      "importantInfoTitle": "Informations importantes",
+      "status": {
+        "draft": "Brouillon",
+        "completed": "Terminée"
+      },
+      "form": {
+        "reasonLabel": "Motif de consultation",
+        "reasonPlaceholder": "Ex. Douleur au genou",
+        "reasonRequiredError": "Le motif de consultation est requis.",
+        "saveDraft": "Enregistrer le brouillon",
+        "complete": "Terminer la consultation",
+        "draftSaved": "Brouillon enregistré.",
+        "unsavedChanges": "Modifications non enregistrées"
+      },
+      "complete": {
+        "title": "Terminer la consultation ?",
+        "description": "Une fois terminée, cette consultation sera ajoutée à l'historique clinique et deviendra en lecture seule.",
+        "cancel": "Annuler",
+        "confirm": "Terminer"
+      },
+      "completedSuccess": "Consultation terminée.",
+      "notFoundTitle": "Consultation introuvable",
+      "notFoundDescription": "Cette consultation n'existe pas ou n'est plus accessible.",
+      "errorTitle": "Impossible de charger la consultation.",
+      "errorRetry": "Réessayer"
     }
   },
   "admin": {

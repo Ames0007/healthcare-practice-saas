@@ -576,6 +576,35 @@
         "emptyDescription": "ستظهر هنا الاستشارات والجلسات المنتهية.",
         "filteredEmpty": "لا يوجد عنصر يطابق هذا الفلتر."
       }
+    },
+    "consultation": {
+      "backToHealth": "العودة إلى الملف الصحي",
+      "heading": "استشارة",
+      "importantInfoTitle": "المعلومات المهمة",
+      "status": {
+        "draft": "مسودة",
+        "completed": "منتهية"
+      },
+      "form": {
+        "reasonLabel": "سبب الاستشارة",
+        "reasonPlaceholder": "مثال: ألم في الركبة",
+        "reasonRequiredError": "سبب الاستشارة مطلوب.",
+        "saveDraft": "حفظ المسودة",
+        "complete": "إنهاء الاستشارة",
+        "draftSaved": "تم حفظ المسودة.",
+        "unsavedChanges": "تغييرات غير محفوظة"
+      },
+      "complete": {
+        "title": "إنهاء الاستشارة؟",
+        "description": "بمجرد الإنهاء، ستُضاف هذه الاستشارة إلى السجل السريري وتصبح للقراءة فقط.",
+        "cancel": "إلغاء",
+        "confirm": "إنهاء"
+      },
+      "completedSuccess": "تم إنهاء الاستشارة.",
+      "notFoundTitle": "الاستشارة غير موجودة",
+      "notFoundDescription": "هذه الاستشارة غير موجودة أو لم تعد متاحة.",
+      "errorTitle": "تعذّر تحميل الاستشارة.",
+      "errorRetry": "إعادة المحاولة"
     }
   },
   "admin": {

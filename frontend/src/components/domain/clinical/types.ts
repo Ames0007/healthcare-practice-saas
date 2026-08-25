@@ -69,3 +69,33 @@ export interface ClinicalEncounter {
   sessionSequenceNumber?: number;
   sessionTotalCount?: number;
 }
+
+/**
+ * Active-consultation prototype model (UI-005C §7-8, Spec #4 §9.1
+ * `clinical_encounters`' `status` column simplified further still — only
+ * the two states this task needs, not the domain spec's full
+ * draft/active/completed/amended set (§7). Deliberately shaped so a
+ * completed `ActiveConsultation` is a near-direct match for
+ * `ClinicalEncounter`'s own consultation fields (§9) — see
+ * `features/patients/active-consultation.ts`'s `toClinicalEncounter` pure
+ * transformation.
+ */
+export type ConsultationStatus = "draft" | "completed";
+
+export interface ActiveConsultation {
+  id: string;
+  patientId: string;
+  practitionerId: string;
+  practitionerName: string;
+  appointmentId?: string;
+  date: string;
+  time?: string;
+  status: ConsultationStatus;
+  /** Required before completion (§16); a draft may be saved with this empty. */
+  reason: string;
+  observations?: string;
+  assessment?: string;
+  plan?: string;
+  /** Fixed prototype "now" (`PATIENTS_TODAY_DATE`), never a real server timestamp (§29). */
+  completedAt?: string;
+}

@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useLocale } from "@/i18n/locale-provider";
 import { Dialog } from "@/components/ui/dialog";
+import { ConsultationStructuredDetail } from "@/components/domain/clinical/consultation-structured-detail";
+import { RelatedAppointmentNote } from "@/components/domain/clinical/related-appointment-note";
 import type { ClinicalEncounter } from "@/components/domain/clinical/types";
 import { formatDayMonthYear } from "@/features/patients/format";
 
@@ -20,7 +21,10 @@ export interface ConsultationDetailDrawerProps {
  * historical clinical record is not ordinary CRUD (CLAUDE.md §24); future
  * correction governance is a separate, unimplemented concern. Consultation
  * creation/editing (UI-005C) and prescriptions/documents (UI-005D) are
- * explicitly out of scope here.
+ * explicitly out of scope here. The four structured sections and the
+ * "Rendez-vous associé" note are shared `components/domain/clinical/`
+ * pieces, reused unchanged by UI-005C's completed-consultation view
+ * (`ConsultationStructuredDetail`/`RelatedAppointmentNote`).
  */
 export function ConsultationDetailDrawer({ encounter, patientId, patientName, open, onClose }: ConsultationDetailDrawerProps) {
   const { t, locale } = useLocale();
@@ -48,57 +52,19 @@ export function ConsultationDetailDrawer({ encounter, patientId, patientName, op
           <p className="text-sm text-text">{patientName}</p>
         </div>
 
-        {encounter.reason && (
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-text-muted">
-              {t("patientDetail.health.history.reasonLabel")}
-            </p>
-            <p className="text-sm text-text">{encounter.reason}</p>
-          </div>
-        )}
-
-        {encounter.observations && (
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-text-muted">
-              {t("patientDetail.health.history.observationsLabel")}
-            </p>
-            <p className="text-sm text-text">{encounter.observations}</p>
-          </div>
-        )}
-
-        {encounter.assessment && (
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-text-muted">
-              {t("patientDetail.health.history.assessmentLabel")}
-            </p>
-            <p className="text-sm text-text">{encounter.assessment}</p>
-          </div>
-        )}
-
-        {encounter.plan && (
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-text-muted">
-              {t("patientDetail.health.history.planLabel")}
-            </p>
-            <p className="text-sm text-text">{encounter.plan}</p>
-          </div>
-        )}
+        <ConsultationStructuredDetail
+          reason={encounter.reason}
+          observations={encounter.observations}
+          assessment={encounter.assessment}
+          plan={encounter.plan}
+        />
 
         {encounter.appointmentId && (
-          <div className="border-t border-border pt-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-text-muted">
-              {t("patientDetail.health.history.relatedAppointmentLabel")}
-            </p>
-            <p className="text-sm text-text" dir="ltr">
-              {encounter.appointmentId}
-            </p>
-            <Link
-              href={`/app/patients/${patientId}/appointments`}
-              className="mt-1 inline-block text-sm font-medium text-primary underline-offset-2 hover:underline"
-            >
-              {t("patientDetail.health.history.viewAppointment")}
-            </Link>
-          </div>
+          <RelatedAppointmentNote
+            appointmentId={encounter.appointmentId}
+            href={`/app/patients/${patientId}/appointments`}
+            className="border-t border-border pt-4"
+          />
         )}
       </div>
     </Dialog>

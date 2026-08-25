@@ -148,8 +148,7 @@ src/components/
             selected-value pill used inside the edit drawer).
             UI-005B adds `ClinicalEncounter` to the same `types.ts` (Spec
             #4 §9.1 `clinical_encounters` simplified — bounded to
-            `consultation`/`session`, no amendment entity; active-
-            consultation authoring is UI-005C's domain) and
+            `consultation`/`session`, no amendment entity) and
             `clinical-timeline.tsx` (`ClinicalTimeline`) — a purpose-built
             chronology component rather than a reuse of
             `domain/patients/patient-activity-timeline.tsx`
@@ -163,6 +162,28 @@ src/components/
             (appointment/payment/document/treatment/consultation, one line
             each), while Dossier Santé gets its own richer, clinical-only
             chronology.
+            UI-005C adds `ActiveConsultation`/`ConsultationStatus` to the
+            same `types.ts` (Spec #4 §9.1's `status` column narrowed
+            further still to `draft`/`completed` only — not the domain
+            spec's full draft/active/completed/amended set), deliberately
+            shaped so a completed consultation is a near-direct match for
+            `ClinicalEncounter`'s own consultation fields (see
+            `features/patients/active-consultation.ts`'s
+            `toClinicalEncounter`), `consultation-status.ts`
+            (`CONSULTATION_STATUS_MAP` — `draft` → `neutral`, mirroring
+            `invoice-status.ts`'s own restrained `draft` tone; `completed`
+            → `success`, matching every other domain's "completed" tone),
+            and two small pieces extracted specifically to avoid
+            duplicating UI-005B's own read-only presentation a second time
+            (§30 of the task): `consultation-structured-detail.tsx`
+            (`ConsultationStructuredDetail`, the four labeled Motif/
+            Observations/Évaluation/Plan blocks) and `related-appointment-
+            note.tsx` (`RelatedAppointmentNote`, the "Rendez-vous associé"
+            block). Both are now shared by UI-005B's
+            `ConsultationDetailDrawer` (refactored to consume them instead
+            of its own inline copies — its existing tests pass unchanged,
+            confirming the refactor is behavior-preserving) and UI-005C's
+            completed-consultation view.
 
 src/features/
   today/    Aujourd'hui screen composition (UI-001): `types.ts` (mock
@@ -378,6 +399,40 @@ src/features/
             whole Dossier Santé tab (both the medical profile and the
             clinical history are the same frontend-only prototype fixture
             read, so there is no real network boundary to split them on).
+            **Active consultation workspace (UI-005C):** a dedicated
+            route, `app/app/patients/[id]/consultations/[consultationId]/
+            page.tsx`, composed from `consultation-workspace-page.tsx`
+            (`ConsultationWorkspacePage`) — independently addressable
+            rather than a sixth Patient 360° tab, since it is a focused
+            clinical task surface, not a browsing view. It deliberately
+            does not reuse `PatientHeader`/`Tabs` (that shell shows the
+            patient's financial balance, forbidden here by CLAUDE.md §40)
+            or UI-005A's `MedicalProfileEditDrawer` (context here is
+            strictly read-only — the existing Dossier Santé editor remains
+            the sole place to edit a MedicalProfile). New
+            `mock-active-consultations-data.ts` (cons-1/pat-1 draft,
+            cons-2/pat-4 completed — kept on a different patient than the
+            draft to avoid narrative overlap) and `active-
+            consultation.ts` (`isConsultationCompletionValid`,
+            `isConsultationDirty`, `toClinicalEncounter` — see the
+            `domain/clinical/` note above for the shared read-only
+            pieces this reuses). **Prototype lifecycle boundary,
+            deliberately not engineered around:** completing a
+            consultation only changes this component's own local state —
+            it is never written back into UI-005B's
+            `mock-clinical-encounters-data.ts`, no `/health` navigation or
+            Agenda appointment status is touched, and no global store
+            (Redux/Zustand/localStorage) was introduced purely to fake any
+            of that cross-route effect; `toClinicalEncounter` and its
+            tests are the proof the transformation itself is correct, real
+            cross-route persistence waits for the backend. **Unsaved-
+            changes warning, kept intentionally minimal:** the back link
+            to Dossier Santé is a plain, unguarded `Link` — no
+            `beforeunload`/router-interception was added (no precedent for
+            programmatic `useRouter` navigation exists anywhere else in
+            this codebase); a persistent "Modifications non enregistrées"
+            indicator is the chosen bounded warning instead, visible
+            before the practitioner navigates away.
 
   clinical/ Bounded prototype clinical master-data catalog (UI-005A §12-14,
             Spec #2 §17.2's "search by keyword / select predefined / add

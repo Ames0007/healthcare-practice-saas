@@ -843,3 +843,129 @@ All notable changes to this project are documented in this file.
   through UI-005A + 43 new UI-005B tests), typecheck, lint and build
   pass on the first run; backend regression (10 tests) unaffected — no
   backend files touched.
+- UI-005C — Active Consultation Workspace, independently addressable at
+  `/app/patients/{id}/consultations/{consultationId}` rather than a
+  Patient 360° tab (§6) — it deliberately does not reuse the full
+  `PatientHeader`/`Tabs` shell, since that shell shows the patient's
+  financial balance and this workspace must show none (CLAUDE.md §40).
+  New `ActiveConsultation`/`ConsultationStatus` on
+  `components/domain/clinical/types.ts` (Spec #4 §9.1's `status` column
+  narrowed further still to just `draft`/`completed` — not the domain
+  spec's full draft/active/completed/amended set, §7), deliberately
+  shaped so a completed consultation is a near-direct match for UI-005B's
+  `ClinicalEncounter`. New `features/patients/active-consultation.ts`:
+  `isConsultationCompletionValid` (a non-empty reason, required before
+  completion but never before a draft save), `isConsultationDirty`
+  (compares only the four editable fields, never `status`/`completedAt`)
+  and `toClinicalEncounter` — a pure transformation proving a completed
+  consultation is representable as history without a second, incompatible
+  clinical model (§9), covered by dedicated tests rather than only
+  rendered-text assertions (§50). **Deliberate terminology
+  reconciliation, same reasoning as UI-005B:** the task's own wireframe
+  and translation checklist require Motif/Observations/Évaluation/Plan;
+  reused UI-005B's exact same four labels rather than inventing new ones.
+  **Two new shared `components/domain/clinical/` pieces**, extracted so
+  UI-005C's completed-consultation view does not duplicate UI-005B's own
+  read-only presentation (§30): `consultation-structured-detail.tsx`
+  (`ConsultationStructuredDetail`, the four labeled Motif/Observations/
+  Évaluation/Plan blocks) and `related-appointment-note.tsx`
+  (`RelatedAppointmentNote`, the "Rendez-vous associé" block) —
+  `features/patients/components/consultation-detail-drawer.tsx`
+  (UI-005B) was refactored to consume both instead of its own inline
+  copies; all of UI-005B's existing tests pass unchanged, confirming the
+  refactor is behavior-preserving. New `consultation-status.ts` (draft →
+  `neutral` tone, same restrained choice as `invoice-status.ts`'s own
+  `draft`; completed → `success`, matching every other domain's own
+  "completed" tone). New centralized
+  `features/patients/mock-active-consultations-data.ts`: cons-1/pat-1
+  (Ahmed) is an in-progress draft dated on the fixed prototype "today"
+  (an active consultation is inherently a today event; the task's own
+  wireframe illustrative date was not treated as a strict requirement),
+  continuing the same "Rééducation genou" narrative thread as UI-005B's
+  own historical fixtures for this patient at a distinct time so the two
+  do not read as contradicting duplicates; cons-2/pat-4 (Youssef) is
+  already `completed`, kept on a different patient to avoid narrative
+  overlap and dedicated to exercising the read-only completed state. New
+  `features/patients/consultation-workspace-page.tsx`: important medical
+  context (allergies/history/medications) reuses UI-005A's
+  `ClinicalSummarySection` completely unmodified and strictly read-only —
+  no MedicalProfile edit affordance is duplicated here (§13/§42), the
+  existing Dossier Santé editor remains the sole source for profile
+  edits. Desktop uses a two-column layout (main form | narrow context
+  column), matching Spec #9 Screen 20's own note ("Desktop may use narrow
+  right context column for patient flags. Mobile stacks it") — the
+  context column moves above the form on mobile via source order, not
+  just CSS, so screen-reader/keyboard users encounter allergies before
+  the form exactly like sighted mobile users. **Draft behavior (§21-23):**
+  "Enregistrer le brouillon" requires nothing and never blocks; a
+  restrained "Modifications non enregistrées" indicator (warning tone,
+  never alarming) appears whenever the live form differs from the last
+  saved snapshot. **Completion (§25-29):** "Terminer la consultation"
+  first validates the reason (showing a field error, never silently
+  failing) then opens `consultation-complete-dialog.tsx`
+  (`ConsultationCompleteDialog`, a thin `ConfirmDialog` wrapper mirroring
+  `CancelConfirmDialog`/`NoShowConfirmDialog`'s own pattern, `tone=
+  "primary"` since completing is the intended outcome, not destructive);
+  confirming uses the live in-progress form values directly — a
+  completion is not required to have been draft-saved first — and stamps
+  a fixed prototype `completedAt` (the consultation's own date, never
+  `Date.now()`). Once completed, the editable form is replaced by the
+  same `ConsultationStructuredDetail` read-only view UI-005B's drawer
+  uses, the draft/complete actions disappear entirely, and no Modifier/
+  Supprimer/Réouvrir affordance exists anywhere (CLAUDE.md §24 — a
+  completed clinical record is not ordinary CRUD). **Unsaved-changes
+  navigation boundary, documented rather than engineered further (§24):**
+  the back link to Dossier Santé is a plain, unguarded `Link` — no
+  `beforeunload`/route-interceptor was added (no precedent for
+  programmatic `useRouter` navigation exists anywhere else in this
+  codebase, and the task explicitly asks not to build "a complex global
+  route blocker"); the persistent dirty-state indicator is the chosen
+  bounded "do not silently discard changes" mechanism, visible before the
+  practitioner clicks away. **Cross-route boundaries, explicitly not
+  faked (§31/§33):** completing a consultation never writes into
+  UI-005B's `mock-clinical-encounters-data.ts`, never navigates to
+  `/health`, and never touches Agenda's appointment status — introducing
+  a global store purely to fake any of that was out of scope; the
+  `toClinicalEncounter` transformation and its tests are the proof that a
+  real backend integration could do this correctly. Patient-not-found
+  (reusing the exact `patientDetail.notFoundTitle`/`backToPatients` keys
+  and pattern from `patient-detail-page.tsx`) takes precedence over
+  consultation-not-found, including when a `consultationId` resolves but
+  belongs to a different patient. Full FR/AR under a new
+  `patientDetail.consultation.*` namespace, reusing UI-005B's
+  `patientDetail.health.history.*` labels/keys everywhere the phrase is
+  identical (Motif/Observations/Évaluation/Plan/Rendez-vous associé/Voir
+  le rendez-vous) rather than duplicating them; new Arabic terminology
+  reviewed for register and consistency with UI-005A/B (e.g. "مسودة" for
+  Brouillon, "السجل السريري" from UI-005B left untouched — no competing
+  translation introduced). RTL verified (SSR `dir="rtl"`/`lang="ar"` on
+  the route). Added `frontend/src/features/patients/active-
+  consultation.test.ts` (12 tests: lookup, completion validity including
+  a whitespace-only reason, dirty-state comparison including the
+  unset-vs-empty-string equivalence and the status/completedAt exclusion,
+  and the `toClinicalEncounter` transformation field-by-field plus its
+  appointmentId-absent case), `frontend/src/features/patients/mock-
+  active-consultations-data.test.ts` (8 fixture-integrity tests: every
+  consultation references a real patient/practitioner, unique ids, at
+  least one draft and one completed fixture exist, and every completed
+  fixture transforms into a structurally valid ClinicalEncounter) and
+  `frontend/src/features/patients/consultation-workspace-page.test.tsx`
+  (24 tests: patient/consultation context, the read-only important-
+  context panel including the important-allergy badge, the draft status
+  badge, all four form fields, draft save with success feedback and
+  continued editability, the dirty-state indicator appearing/
+  disappearing, completion blocked without a reason, the confirmation
+  dialog opening/cancelling/confirming — the last of these also proving
+  completion uses live unsaved values — the completed read-only state
+  with draft/complete actions and edit/delete/reopen all absent, the
+  associated-appointment note appearing only when present, absence of
+  prescription/document/finance content, consultation-not-found for a
+  missing id and for a consultation belonging to a different patient,
+  patient-not-found precedence, loading, error, French, and Arabic/RTL).
+  All 364 frontend tests (320 carried over from UI-001 through UI-005B +
+  44 new UI-005C tests) pass on the full-suite run; typecheck, lint and
+  build all pass cleanly. One instance of the previously-documented
+  vitest-pool worker-startup flakiness occurred while running the new
+  workspace-page test file standalone during development, resolved by a
+  clean retry before the full suite was run. Backend regression (10
+  tests) unaffected — no backend files touched.
