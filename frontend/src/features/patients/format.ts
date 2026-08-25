@@ -68,3 +68,13 @@ export function getPatientFullName(patient: Pick<Patient, "firstName" | "lastNam
 export function getPatientInitials(patient: Pick<Patient, "firstName" | "lastName">): string {
   return `${patient.firstName.charAt(0)}${patient.lastName.charAt(0)}`.toUpperCase();
 }
+
+/** "1,2 MB" (UI-005D §12) — metadata display only, never derived from a real file read. */
+export function formatFileSize(sizeBytes: number, locale: Locale): string {
+  const megabytes = sizeBytes / (1024 * 1024);
+  const formatted = new Intl.NumberFormat(toIntlLocale(locale), {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(megabytes);
+  return `${formatted} MB`;
+}

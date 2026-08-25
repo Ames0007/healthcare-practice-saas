@@ -239,11 +239,15 @@ describe("PatientHealthContent", () => {
     expect(screen.queryByText(/Nouvelle consultation/)).not.toBeInTheDocument();
   });
 
-  it("shows no prescription/document UI (24)", () => {
+  it("renders the Documents and Prescriptions sections below Historique clinique (UI-005D)", () => {
+    // UI-005B/C's own boundary test used to assert the entire absence of "Prescription"/
+    // "Document" text on this tab; UI-005D now legitimately adds real Documents and
+    // Ordonnances sections (see documents-section.test.tsx/prescriptions-section.test.tsx
+    // for their own dedicated coverage), so that assertion is superseded, not weakened.
     renderContent("fr", { patientId: "pat-1", profiles: [POPULATED_PROFILE] });
 
-    expect(screen.queryByText(/Prescription/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Document/)).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Documents" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Ordonnances" })).toBeInTheDocument();
   });
 
   it("shows the loading skeleton without health content (25)", () => {

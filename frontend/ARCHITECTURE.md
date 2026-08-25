@@ -184,6 +184,29 @@ src/components/
             of its own inline copies — its existing tests pass unchanged,
             confirming the refactor is behavior-preserving) and UI-005C's
             completed-consultation view.
+            UI-005D adds `ClinicalDocument`/`ClinicalDocumentCategory` and
+            `Prescription`/`PrescriptionItem`/`PrescriptionStatus` to the
+            same `types.ts` — the last clinical models in the Patient
+            360° prototype sequence, completing Dossier Santé alongside
+            `MedicalProfile`/`ClinicalEncounter`/`ActiveConsultation`
+            above. `document-category.ts` (`DOCUMENT_CATEGORY_MAP` —
+            analysis/imaging/report/prescription/other, each with its own
+            Lucide icon, never hardcoded per card, never emoji, never a
+            per-category color treatment — a document's category is
+            informational, not a status). `PrescriptionStatus` keeps
+            `"cancelled"` for shape-fidelity with a real future backend
+            (matching the task's own two-value model sketch) without any
+            UI ever reaching it — every fixture and every prototype
+            creation only ever produces `"issued"` (the task's own §31
+            explicitly forbids building a cancellation workflow here).
+            `Prescription`'s structured `items[]` is a deliberate,
+            documented extension of Spec #4 §10.3's generic
+            `generated_documents` shape (which treats a prescription as
+            just one more `document_kind` with no item-level structure) —
+            required by this task's own explicit model, not a
+            contradiction of the domain spec; a future generated PDF
+            would still be recorded as one `generated_documents` row
+            referencing this record (§42, not implemented).
 
 src/features/
   today/    Aujourd'hui screen composition (UI-001): `types.ts` (mock
@@ -433,6 +456,67 @@ src/features/
             this codebase); a persistent "Modifications non enregistrées"
             indicator is the chosen bounded warning instead, visible
             before the practitioner navigates away.
+            **Documents & Ordonnances (UI-005D):** the last two Dossier
+            Santé sections, both below Historique clinique — never a
+            seventh Patient 360° tab (§6). `mock-clinical-documents-
+            data.ts` (pat-1/Ahmed has four documents, three cross-
+            referencing UI-005B's own `enc-1`/`enc-2`/`enc-3`
+            `ClinicalEncounter` fixtures rather than inventing
+            contradicting consultation references, plus one externally-
+            scanned `"prescription"`-category document with no
+            consultation reference — demonstrating that document
+            category exists independently of the structured
+            `Prescription` records below; the two are never auto-
+            synchronized, §42) and `clinical-documents.ts` (pure
+            filter/sort derivation, mirrors `clinical-history.ts`'s own
+            shape). `components/documents-section.tsx`
+            (`DocumentsSection`): the exact same filter-tab architecture
+            as `ClinicalHistorySection` (Tous/Analyses/Imagerie/Comptes-
+            rendus/Ordonnances/Autres, its own filtered-empty state and
+            result count), `document-upload-dialog.tsx`
+            (`DocumentUploadDialog` — a native `<input type="file">`, no
+            new FileUpload infrastructure, §18) whose `onChange` reads
+            only `file.name`/`file.type`/`file.size`; the file's contents
+            are never accessed anywhere (no `FileReader`, no Base64, no
+            `ObjectURL`, §19 — verified by a dedicated test asserting
+            every stored fixture field is a string/number/undefined,
+            never a `Blob`/`File`). No numeric file-size limit was
+            invented: Spec #5 §29 names file size as a validation concern
+            only in the abstract, with no concrete number anywhere in the
+            specifications, and this task's own §21 explicitly forbids
+            inventing production security policy without a documented
+            basis — so only the MIME allowlist
+            (`application/pdf`/`image/jpeg`/`image/png`) is enforced.
+            `document-detail-drawer.tsx` (`DocumentDetailDrawer`) is
+            read-only — "Télécharger" only ever shows a future-feature
+            Toast, never a real file access (§15); no delete anywhere
+            (§24). `mock-prescriptions-data.ts`/`prescriptions.ts`
+            (`generatePrescriptionNumber` mirrors `generatePaymentNumber`'s
+            own illustrative sequential-numbering convention, `ORD-2026-
+            ####`) and `components/prescriptions-section.tsx`
+            (`PrescriptionsSection`): newest-first history,
+            `prescription-form-dialog.tsx` (`PrescriptionFormDialog`) — a
+            dynamic medication-item list (add/remove any row, including
+            down to zero — removal is never restricted; a clear "at least
+            one medication required" error appears on submit instead,
+            §34), each item validated for medication/dosage/frequency
+            only, duration/instructions staying optional (§35). **No drug
+            database, no autocomplete, no dosage/interaction/
+            contraindication checking anywhere in this diff** — the
+            task's own mandatory §27 constraint, and the most important
+            boundary in this task. `prescription-detail-drawer.tsx`
+            (`PrescriptionDetailDrawer`) is read-only — no Modifier/
+            Supprimer anywhere; "Télécharger PDF"/"Imprimer" are
+            prototype affordances only (§40); an optional "Consultation
+            associée" section resolves the prescription's
+            `consultationId` against UI-005B's own `ClinicalEncounter`
+            fixtures, read-only, never mutating that historical record
+            (§38). A newly uploaded document and a newly created
+            prescription both live only in their own section's local
+            component state — the same "local session state, not a
+            global store" convention as every prior Dossier Santé
+            prototype interaction. This completes the Patient 360°
+            clinical frontend prototype sequence (UI-005A/B/C/D).
 
   clinical/ Bounded prototype clinical master-data catalog (UI-005A §12-14,
             Spec #2 §17.2's "search by keyword / select predefined / add

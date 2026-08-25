@@ -99,3 +99,69 @@ export interface ActiveConsultation {
   /** Fixed prototype "now" (`PATIENTS_TODAY_DATE`), never a real server timestamp (§29). */
   completedAt?: string;
 }
+
+/**
+ * Clinical-document prototype model (UI-005D §8-9, Spec #4 §10.2
+ * `patient_documents` simplified — no `files`/object-storage row, since
+ * no real file is ever stored (§19). `prescription` is a valid category
+ * for a document that arrived as a file (e.g. a scanned external
+ * prescription) — it is never auto-populated from `Prescription` records
+ * below; the two stay independent (§42).
+ */
+export type ClinicalDocumentCategory = "analysis" | "imaging" | "report" | "prescription" | "other";
+
+export interface ClinicalDocument {
+  id: string;
+  patientId: string;
+  category: ClinicalDocumentCategory;
+  title: string;
+  /** Display-only synthetic filename — no real file, no stored path (§19). */
+  fileName: string;
+  mimeType: string;
+  sizeBytes: number;
+  uploadedAt: string;
+  uploadedBy: string;
+  /** References a historical `ClinicalEncounter.id` (UI-005B) where the document originated from a consultation/session. */
+  consultationId?: string;
+  description?: string;
+}
+
+/**
+ * Structured prescription prototype model (UI-005D §25-26) — Spec #4
+ * §10.3's `generated_documents` treats a prescription as one more
+ * `document_kind` alongside invoices/receipts/certificates, with no
+ * dedicated item-level structure. This task's own explicit model requires
+ * structured medication items, so `Prescription`/`PrescriptionItem` are a
+ * deliberate, documented extension of that generic shape for this bounded
+ * prototype — not a contradiction of it (a future generated PDF would
+ * still be recorded as one `generated_documents` row referencing this
+ * record). Kept intentionally minimal: only `issued` is ever produced by
+ * this prototype (no cancellation workflow, §31); `cancelled` exists in
+ * the type for shape-fidelity with a real future backend, matching the
+ * task's own two-value sketch, without inventing UI to reach it.
+ */
+export type PrescriptionStatus = "issued" | "cancelled";
+
+export interface PrescriptionItem {
+  id: string;
+  /** Practitioner-entered free text — never suggested/validated against a drug database (§27). */
+  medication: string;
+  dosage: string;
+  frequency: string;
+  duration?: string;
+  instructions?: string;
+}
+
+export interface Prescription {
+  id: string;
+  prescriptionNumber: string;
+  patientId: string;
+  practitionerId: string;
+  practitionerName: string;
+  issuedAt: string;
+  /** References a historical `ClinicalEncounter.id` (UI-005B) when the prescription originated from a consultation. */
+  consultationId?: string;
+  items: PrescriptionItem[];
+  instructions?: string;
+  status: PrescriptionStatus;
+}

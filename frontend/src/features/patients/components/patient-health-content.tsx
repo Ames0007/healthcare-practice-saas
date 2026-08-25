@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Toast } from "@/components/ui/toast";
 import { ClinicalSummarySection } from "@/components/domain/clinical/clinical-summary-section";
-import type { ClinicalEncounter, MedicalProfile } from "@/components/domain/clinical/types";
+import type { ClinicalDocument, ClinicalEncounter, MedicalProfile, Prescription } from "@/components/domain/clinical/types";
 import { getMedicalProfilesMockData } from "@/features/patients/mock-medical-profiles-data";
 import { getMedicalProfileForPatient, isMedicalProfileEmpty } from "@/features/patients/medical-profile";
 import { formatDayMonthYear, getPatientFullName } from "@/features/patients/format";
@@ -15,6 +15,8 @@ import { getPatientsMockData } from "@/features/patients/mock-data";
 import type { Patient } from "@/features/patients/types";
 import { MedicalProfileEditDrawer } from "./medical-profile-edit-drawer";
 import { ClinicalHistorySection } from "./clinical-history-section";
+import { DocumentsSection } from "./documents-section";
+import { PrescriptionsSection } from "./prescriptions-section";
 
 export type PatientHealthState = "loading" | "loaded" | "error";
 
@@ -25,6 +27,10 @@ export interface PatientHealthContentProps {
   patients?: Patient[];
   /** Prototype seam for tests (UI-005B) — defaults to the centralized mock clinical encounters. */
   encounters?: ClinicalEncounter[];
+  /** Prototype seam for tests (UI-005D) — defaults to the centralized mock clinical documents. */
+  documents?: ClinicalDocument[];
+  /** Prototype seam for tests (UI-005D) — defaults to the centralized mock prescriptions. */
+  prescriptions?: Prescription[];
   state?: PatientHealthState;
   onRetry?: () => void;
 }
@@ -32,11 +38,13 @@ export interface PatientHealthContentProps {
 /**
  * Dossier Santé tab: the patient's persistent important medical
  * information (UI-005A — allergies, history, current medications,
- * important notes) plus, below it, the clinical-history timeline
- * (UI-005B — completed consultations/sessions, read-only). Active
- * consultation/prescriptions/documents are explicitly out of scope
- * (UI-005C/D). An edited profile is kept only in this component's own
- * local state — the centralized fixtures are never mutated, same "local
+ * important notes), the clinical-history timeline (UI-005B — completed
+ * consultations/sessions, read-only), Documents and Ordonnances (UI-005D
+ * — both below Historique clinique, never a seventh Patient 360° tab).
+ * Active consultation authoring is a separate route (UI-005C), not part
+ * of this tab. An edited profile, a newly uploaded document and a newly
+ * created prescription are all kept only in this component's own local
+ * state — the centralized fixtures are never mutated, same "local
  * session state, not a global store" convention as UI-004E's payment
  * capture (see `frontend/ARCHITECTURE.md`); no LocalStorage/IndexedDB/
  * cookie is used anywhere for this clinical data (CLAUDE.md §7/UI-005A
@@ -50,6 +58,8 @@ export function PatientHealthContent({
   profiles: providedProfiles,
   patients: providedPatients,
   encounters,
+  documents,
+  prescriptions,
   state = "loaded",
   onRetry,
 }: PatientHealthContentProps) {
@@ -80,6 +90,15 @@ export function PatientHealthContent({
             <Skeleton className="h-20 w-full" />
             <Skeleton className="h-20 w-full" />
           </div>
+          <div className="flex flex-col gap-2 border-t border-border pt-6">
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-14 w-full" />
+            <Skeleton className="h-14 w-full" />
+          </div>
+          <div className="flex flex-col gap-2 border-t border-border pt-6">
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-14 w-full" />
+          </div>
         </div>
       </div>
     );
@@ -102,6 +121,7 @@ export function PatientHealthContent({
 
   const patients = providedPatients ?? getPatientsMockData();
   const patient = patients.find((candidate) => candidate.id === patientId);
+  const practitionerId = patient?.responsiblePractitionerId ?? "";
   const practitionerName = patient?.responsiblePractitionerName ?? "";
   const patientName = patient ? getPatientFullName(patient) : "";
 
@@ -196,6 +216,16 @@ export function PatientHealthContent({
       )}
 
       <ClinicalHistorySection patientId={patientId} patientName={patientName} encounters={encounters} />
+
+      <DocumentsSection patientId={patientId} practitionerName={practitionerName} documents={documents} />
+
+      <PrescriptionsSection
+        patientId={patientId}
+        practitionerId={practitionerId}
+        practitionerName={practitionerName}
+        prescriptions={prescriptions}
+        encounters={encounters}
+      />
 
       {editDrawer}
       <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />

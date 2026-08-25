@@ -969,3 +969,137 @@ All notable changes to this project are documented in this file.
   workspace-page test file standalone during development, resolved by a
   clean retry before the full suite was run. Backend regression (10
   tests) unaffected — no backend files touched.
+- UI-005D — Dossier Santé: Clinical Documents & Prescriptions, the last
+  screen in the Patient 360° clinical prototype sequence. Both sections
+  sit inside Dossier Santé, below Historique clinique — deliberately
+  **not** a seventh Patient 360° tab (§6), preserving the existing six
+  (Aperçu/Dossier Santé/Rendez-vous/Traitements/Factures/Paiements).
+  New `ClinicalDocument`/`ClinicalDocumentCategory` and `Prescription`/
+  `PrescriptionItem`/`PrescriptionStatus` on `components/domain/clinical/
+  types.ts` (Spec #4 §10.2 `patient_documents` simplified — no
+  object-storage row, since no real file is ever stored; §10.3's
+  `generated_documents` treats a prescription as one more document kind
+  with no item structure, so `Prescription`'s own structured
+  medication-item model is a deliberate, documented extension of that
+  generic shape for this bounded prototype, matching the task's own
+  explicit model — both reconciliations are recorded directly in the
+  type definitions' own doc comments). `PrescriptionStatus` keeps
+  `"cancelled"` for shape-fidelity with a real future backend (the
+  task's own two-value sketch) without inventing any UI to reach it —
+  every fixture and every prototype creation only ever produces
+  `"issued"` (§31's own "do not implement a cancellation workflow"
+  instruction). New `components/domain/clinical/document-category.ts`
+  (`DOCUMENT_CATEGORY_MAP` — analysis/imaging/report/prescription/other,
+  each with its own Lucide icon, no emoji, no per-category color
+  treatment) and two new shared structured-detail pieces reused from
+  UI-005C's own consultation work: none needed to be added here since
+  Documents/Prescriptions have their own distinct presentation, but the
+  prescription detail view intentionally mirrors UI-005B/C's own
+  labeled-section pattern for visual consistency. New
+  `features/patients/clinical-documents.ts`/`mock-clinical-documents-
+  data.ts` (pat-1/Ahmed has four documents — three cross-referencing
+  UI-005B's own `enc-1`/`enc-2`/`enc-3` `ClinicalEncounter` fixtures
+  rather than inventing contradicting consultation references, plus one
+  externally-scanned `"prescription"`-category document with no
+  consultation reference, demonstrating that document category exists
+  independently of the structured `Prescription` records below — the two
+  are never auto-synchronized, §42; pat-2/Sara has none, "empty by
+  omission") and `features/patients/prescriptions.ts`/`mock-
+  prescriptions-data.ts` (pat-1's `ORD-2026-0018`, matching the task's
+  own §7 example exactly, cross-referenced to `enc-1`; two harmless
+  generic medications — Paracétamol/Ibuprofène — never a detailed
+  realistic regimen, §28). New `formatFileSize` in
+  `features/patients/format.ts` ("1,2 MB", `Intl.NumberFormat`-based,
+  matching `formatMad`'s own locale-aware convention). New
+  `components/documents-section.tsx` (`DocumentsSection`): lightweight
+  Tous/Analyses/Imagerie/Comptes-rendus/Ordonnances/Autres filter with
+  its own filtered-empty state and result count (mirrors
+  `ClinicalHistorySection`'s exact filter architecture), `+ Ajouter un
+  document` opens `document-upload-dialog.tsx`
+  (`DocumentUploadDialog`) — a native `<input type="file">` (§18, no new
+  FileUpload infrastructure) whose `onChange` reads only `file.name`/
+  `file.type`/`file.size`; the file's contents are never accessed, no
+  `FileReader`, no Base64, no `ObjectURL` (§19, verified by a dedicated
+  fixture-shape test asserting every stored field is a string/number/
+  undefined, never a Blob/File). Validates a selected file, an allowed
+  MIME type (`application/pdf`/`image/jpeg`/`image/png` — Spec #5 §29
+  names file-size/MIME/extension as validation concerns generally but
+  gives no concrete numeric limit, so no file-size boundary was invented
+  without basis, per this task's own explicit §21 instruction — a
+  documented, deliberate omission, not an oversight), a category and a
+  title. `document-detail-drawer.tsx` (`DocumentDetailDrawer`) is
+  read-only — "Télécharger" only ever shows a future-feature Toast
+  notice, never a real file access (§15); no "Supprimer" anywhere, a
+  historical clinical document requires governed lifecycle/audit
+  behavior (§24). New `components/prescriptions-section.tsx`
+  (`PrescriptionsSection`): history newest-first, `+ Nouvelle ordonnance`
+  opens `prescription-form-dialog.tsx` (`PrescriptionFormDialog`) — a
+  dynamic medication-item list (add/remove any row, including down to
+  zero, with a clear "at least one medication is required" error on
+  submit rather than disabling removal, §34), each item validated for
+  medication/dosage/frequency only (duration/instructions stay optional,
+  §35) — **no drug database, no autocomplete, no dosage/interaction/
+  contraindication checking anywhere in this diff (§27, the task's own
+  mandatory constraint)**. `generatePrescriptionNumber` mirrors
+  `generatePaymentNumber`'s own illustrative sequential-numbering
+  pattern (`ORD-2026-####`, real numbering is concurrency-safe and
+  server-controlled later, §37). `prescription-detail-drawer.tsx`
+  (`PrescriptionDetailDrawer`) is read-only — no Modifier/Supprimer
+  anywhere; "Télécharger PDF"/"Imprimer" are prototype affordances only,
+  never real document generation (§40); an optional "Consultation
+  associée" section resolves the prescription's `consultationId` against
+  UI-005B's own `ClinicalEncounter` fixtures without ever mutating that
+  record (§38). A newly uploaded document and a newly created
+  prescription both live only in `DocumentsSection`'s/
+  `PrescriptionsSection`'s own local state — the same "local session
+  state, not a global store" convention as every prior Dossier Santé
+  prototype interaction; the centralized fixtures are never mutated, and
+  no LocalStorage/IndexedDB/cookie is used anywhere. `PatientHealthContent`'s
+  loading skeleton was extended with two more shape-matched placeholder
+  blocks; loading/error remain the tab's one unified state (same §33
+  reasoning as UI-005B/C — no real network boundary exists between these
+  fixture reads). One UI-005B/C-era boundary test in `patient-health-
+  content.test.tsx` was updated, not weakened: it used to assert this
+  tab never rendered "Prescription"/"Document" text at all, which
+  UI-005D's own explicit scope now legitimately supersedes — replaced
+  with a positive integration check that both new section headings
+  render, with their own full dedicated coverage living in
+  `documents-section.test.tsx`/`prescriptions-section.test.tsx`. Full
+  FR/AR under new `patientDetail.health.documents.*`/`patientDetail.
+  health.prescriptions.*` namespaces (initially misnested as siblings of
+  `patientDetail.health` rather than nested inside it — the same
+  structural slip UI-005C's own `consultation` namespace made and left
+  in place; caught here via a failing test run showing raw untranslated
+  `patientDetail.health.documents.*` dot-path strings, and fixed by
+  programmatically moving both blocks inside `patientDetail.health` in
+  both locale files rather than by hand-editing raw JSON text). New
+  Arabic clinical/document terminology reviewed for register and
+  consistency with UI-005A/B/C (e.g. "المستندات" for Documents, "الوصفات
+  الطبية" for Ordonnances — no competing translation introduced for any
+  term already established). RTL verified (SSR `dir="rtl"`/`lang="ar"`
+  on the route). Added `frontend/src/features/patients/clinical-
+  documents.test.ts` (5 tests), `mock-clinical-documents-data.test.ts` (8
+  fixture-integrity tests — including that no fixture field is ever a
+  non-primitive value, proving no raw file contents are stored),
+  `prescriptions.test.ts` (10 tests — including the numbering generator
+  and both item-level and form-level validation), `mock-prescriptions-
+  data.test.ts` (7 fixture-integrity tests), `components/documents-
+  section.test.tsx` (15 tests: heading/list/metadata, category
+  filtering with a filtered-empty state, the detail drawer's full
+  metadata, the download future-feature notice, the upload form opening,
+  file-required/MIME-rejected/valid-upload-succeeds, the new document
+  appearing immediately, absence of any delete action, the empty state,
+  absence of finance content, French, Arabic/RTL) and
+  `components/prescriptions-section.test.tsx` (15 tests: heading/
+  history, the detail drawer's structured items, the associated-
+  consultation date, absence of edit/delete, the PDF/print future-feature
+  notices, the creation form opening, per-field required validation,
+  adding/removing a medication, the zero-items block, a full successful
+  creation immediately opening the new read-only prescription, the empty
+  state, absence of any drug-recommendation/interaction-checking UI,
+  French, Arabic/RTL). All 424 frontend tests (364 carried over from
+  UI-001 through UI-005C + 60 new UI-005D tests), typecheck, lint and
+  build pass on the first full-suite run; backend regression (10 tests,
+  clean on the first run) unaffected — no backend files touched. This
+  completes the Patient 360° clinical frontend prototype sequence
+  (UI-005A/B/C/D).
