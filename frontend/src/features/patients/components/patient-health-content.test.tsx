@@ -226,12 +226,17 @@ describe("PatientHealthContent", () => {
     expect(screen.queryByText(/Solde/)).not.toBeInTheDocument();
   });
 
-  it("shows no consultation history or active-consultation UI (23)", () => {
-    renderContent("fr", { patientId: "pat-1", profiles: [POPULATED_PROFILE] });
+  it("shows no consultation-creation affordance or active-consultation UI (UI-005B §37)", () => {
+    // UI-005A's own boundary test used to assert the entire absence of "Historique
+    // clinique"/"Motif" content on this tab; UI-005B now legitimately adds a
+    // read-only clinical-history timeline with exactly that content (see
+    // clinical-history-section.test.tsx), so those two assertions are superseded,
+    // not weakened. What remains genuinely out of scope is any consultation
+    // *creation* affordance (§37) — never added here.
+    renderContent("fr", { patientId: "pat-1", profiles: [POPULATED_PROFILE], encounters: [] });
 
-    expect(screen.queryByText(/Historique clinique/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Nouvelle entrée/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Motif/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Nouvelle consultation/)).not.toBeInTheDocument();
   });
 
   it("shows no prescription/document UI (24)", () => {

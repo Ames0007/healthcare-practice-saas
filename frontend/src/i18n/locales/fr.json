@@ -555,6 +555,26 @@
         "removeEntry": "Retirer {{label}}",
         "save": "Enregistrer",
         "cancel": "Annuler"
+      },
+      "history": {
+        "title": "Historique clinique",
+        "consultationLabel": "Consultation",
+        "filters": {
+          "all": "Tous",
+          "consultations": "Consultations",
+          "sessions": "Séances"
+        },
+        "resultCount": "{{count}} événements",
+        "reasonLabel": "Motif",
+        "observationsLabel": "Observations",
+        "assessmentLabel": "Évaluation",
+        "planLabel": "Plan",
+        "viewConsultation": "Voir la consultation",
+        "relatedAppointmentLabel": "Rendez-vous associé",
+        "viewAppointment": "Voir le rendez-vous",
+        "emptyTitle": "Aucun historique clinique pour ce patient.",
+        "emptyDescription": "Les consultations et séances terminées apparaîtront ici.",
+        "filteredEmpty": "Aucun élément ne correspond à ce filtre."
       }
     }
   },

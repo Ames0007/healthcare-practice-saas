@@ -7,13 +7,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Toast } from "@/components/ui/toast";
 import { ClinicalSummarySection } from "@/components/domain/clinical/clinical-summary-section";
-import type { MedicalProfile } from "@/components/domain/clinical/types";
+import type { ClinicalEncounter, MedicalProfile } from "@/components/domain/clinical/types";
 import { getMedicalProfilesMockData } from "@/features/patients/mock-medical-profiles-data";
 import { getMedicalProfileForPatient, isMedicalProfileEmpty } from "@/features/patients/medical-profile";
-import { formatDayMonthYear } from "@/features/patients/format";
+import { formatDayMonthYear, getPatientFullName } from "@/features/patients/format";
 import { getPatientsMockData } from "@/features/patients/mock-data";
 import type { Patient } from "@/features/patients/types";
 import { MedicalProfileEditDrawer } from "./medical-profile-edit-drawer";
+import { ClinicalHistorySection } from "./clinical-history-section";
 
 export type PatientHealthState = "loading" | "loaded" | "error";
 
@@ -22,25 +23,33 @@ export interface PatientHealthContentProps {
   /** Prototype seam for tests (UI-005A §13) — defaults to the centralized mock medical profiles. */
   profiles?: MedicalProfile[];
   patients?: Patient[];
+  /** Prototype seam for tests (UI-005B) — defaults to the centralized mock clinical encounters. */
+  encounters?: ClinicalEncounter[];
   state?: PatientHealthState;
   onRetry?: () => void;
 }
 
 /**
- * Dossier Santé tab (UI-005A) — the patient's persistent important medical
- * information only (allergies, history, current medications, important
- * notes). Consultation history/active consultation/prescriptions/
- * documents are explicitly out of scope (UI-005B/C/D). An edited profile
- * is kept only in this component's own local state — the centralized
- * fixtures are never mutated, same "local session state, not a global
- * store" convention as UI-004E's payment capture (see
- * `frontend/ARCHITECTURE.md`); no LocalStorage/IndexedDB/cookie is used
- * anywhere for this clinical data (CLAUDE.md §7/UI-005A §7).
+ * Dossier Santé tab: the patient's persistent important medical
+ * information (UI-005A — allergies, history, current medications,
+ * important notes) plus, below it, the clinical-history timeline
+ * (UI-005B — completed consultations/sessions, read-only). Active
+ * consultation/prescriptions/documents are explicitly out of scope
+ * (UI-005C/D). An edited profile is kept only in this component's own
+ * local state — the centralized fixtures are never mutated, same "local
+ * session state, not a global store" convention as UI-004E's payment
+ * capture (see `frontend/ARCHITECTURE.md`); no LocalStorage/IndexedDB/
+ * cookie is used anywhere for this clinical data (CLAUDE.md §7/UI-005A
+ * §7). Loading/error remain a single unified state for the whole tab
+ * (§33) — there is no real network boundary between the medical profile
+ * and the clinical history in this frontend-only prototype, so splitting
+ * them into two independent error surfaces would be artificial.
  */
 export function PatientHealthContent({
   patientId,
   profiles: providedProfiles,
   patients: providedPatients,
+  encounters,
   state = "loaded",
   onRetry,
 }: PatientHealthContentProps) {
@@ -66,6 +75,11 @@ export function PatientHealthContent({
               <Skeleton key={index} className="h-24 w-full" />
             ))}
           </div>
+          <div className="flex flex-col gap-2 border-t border-border pt-6">
+            <Skeleton className="h-5 w-40" />
+            <Skeleton className="h-20 w-full" />
+            <Skeleton className="h-20 w-full" />
+          </div>
         </div>
       </div>
     );
@@ -89,6 +103,7 @@ export function PatientHealthContent({
   const patients = providedPatients ?? getPatientsMockData();
   const patient = patients.find((candidate) => candidate.id === patientId);
   const practitionerName = patient?.responsiblePractitionerName ?? "";
+  const patientName = patient ? getPatientFullName(patient) : "";
 
   function openEdit() {
     setEditDrawerKey((key) => key + 1);
@@ -113,9 +128,20 @@ export function PatientHealthContent({
     />
   );
 
-  if (isMedicalProfileEmpty(profile)) {
-    return (
-      <div className="flex flex-col gap-6">
+  const profileEmpty = isMedicalProfileEmpty(profile);
+  const activeProfile = profile ?? undefined;
+  const allergyEntries = (activeProfile?.allergies ?? []).map((entry) => ({
+    id: entry.id,
+    label: entry.label,
+    important: entry.importance === "important",
+  }));
+  const historyEntries = (activeProfile?.medicalHistory ?? []).map((entry) => ({ id: entry.id, label: entry.label }));
+  const medicationEntries = (activeProfile?.currentMedications ?? []).map((entry) => ({ id: entry.id, label: entry.label }));
+  const noteEntries = (activeProfile?.importantNotes ?? []).map((note, index) => ({ id: `note-${index}`, label: note }));
+
+  return (
+    <div className="flex flex-col gap-6">
+      {profileEmpty ? (
         <EmptyState
           title={t("patientDetail.health.emptyAllTitle")}
           primaryAction={
@@ -124,64 +150,52 @@ export function PatientHealthContent({
             </Button>
           }
         />
-        {editDrawer}
-        <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />
-      </div>
-    );
-  }
+      ) : (
+        <>
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-text-muted">
+              {t("patientDetail.health.importantInfoTitle")}
+            </h2>
+            <Button size="sm" onClick={openEdit}>
+              {t("patientDetail.health.editButton")}
+            </Button>
+          </div>
 
-  const activeProfile = profile as MedicalProfile;
-  const allergyEntries = activeProfile.allergies.map((entry) => ({
-    id: entry.id,
-    label: entry.label,
-    important: entry.importance === "important",
-  }));
-  const historyEntries = activeProfile.medicalHistory.map((entry) => ({ id: entry.id, label: entry.label }));
-  const medicationEntries = activeProfile.currentMedications.map((entry) => ({ id: entry.id, label: entry.label }));
-  const noteEntries = activeProfile.importantNotes.map((note, index) => ({ id: `note-${index}`, label: note }));
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <ClinicalSummarySection
+              title={t("patientDetail.health.allergiesTitle")}
+              entries={allergyEntries}
+              emptyText={t("patientDetail.health.noAllergies")}
+            />
+            <ClinicalSummarySection
+              title={t("patientDetail.health.historyTitle")}
+              entries={historyEntries}
+              emptyText={t("patientDetail.health.noHistory")}
+            />
+            <ClinicalSummarySection
+              title={t("patientDetail.health.medicationsTitle")}
+              entries={medicationEntries}
+              emptyText={t("patientDetail.health.noMedications")}
+            />
+            <ClinicalSummarySection
+              title={t("patientDetail.health.notesTitle")}
+              entries={noteEntries}
+              emptyText={t("patientDetail.health.noNotes")}
+            />
+          </div>
 
-  return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-text-muted">
-          {t("patientDetail.health.importantInfoTitle")}
-        </h2>
-        <Button size="sm" onClick={openEdit}>
-          {t("patientDetail.health.editButton")}
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <ClinicalSummarySection
-          title={t("patientDetail.health.allergiesTitle")}
-          entries={allergyEntries}
-          emptyText={t("patientDetail.health.noAllergies")}
-        />
-        <ClinicalSummarySection
-          title={t("patientDetail.health.historyTitle")}
-          entries={historyEntries}
-          emptyText={t("patientDetail.health.noHistory")}
-        />
-        <ClinicalSummarySection
-          title={t("patientDetail.health.medicationsTitle")}
-          entries={medicationEntries}
-          emptyText={t("patientDetail.health.noMedications")}
-        />
-        <ClinicalSummarySection
-          title={t("patientDetail.health.notesTitle")}
-          entries={noteEntries}
-          emptyText={t("patientDetail.health.noNotes")}
-        />
-      </div>
-
-      {activeProfile.lastUpdatedAt && (
-        <p className="text-xs text-text-muted">
-          {t("patientDetail.health.lastUpdated", {
-            date: formatDayMonthYear(activeProfile.lastUpdatedAt, locale),
-            practitioner: activeProfile.lastUpdatedBy ?? "",
-          })}
-        </p>
+          {activeProfile?.lastUpdatedAt && (
+            <p className="text-xs text-text-muted">
+              {t("patientDetail.health.lastUpdated", {
+                date: formatDayMonthYear(activeProfile.lastUpdatedAt, locale),
+                practitioner: activeProfile.lastUpdatedBy ?? "",
+              })}
+            </p>
+          )}
+        </>
       )}
+
+      <ClinicalHistorySection patientId={patientId} patientName={patientName} encounters={encounters} />
 
       {editDrawer}
       <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />

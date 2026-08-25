@@ -33,3 +33,39 @@ export interface MedicalProfile {
   lastUpdatedAt?: string;
   lastUpdatedBy?: string;
 }
+
+/**
+ * Clinical-history prototype model (UI-005B §8-9, Spec #4 §9.1
+ * `clinical_encounters` simplified to this task's own bounded shape).
+ * Only the two encounter types this task needs — not a generic EHR event
+ * system (§8). All historical encounters in this bounded prototype are
+ * `completed`; no larger status registry is introduced (§16).
+ */
+export type ClinicalEncounterType = "consultation" | "session";
+
+export type ClinicalEncounterStatus = "completed";
+
+export interface ClinicalEncounter {
+  id: string;
+  patientId: string;
+  encounterType: ClinicalEncounterType;
+  /** ISO date, e.g. "2026-08-23". */
+  date: string;
+  time?: string;
+  practitionerId: string;
+  practitionerName: string;
+  /** Opaque prototype display reference (e.g. "RDV-2026-1042") — mirrors `TreatmentSession.appointmentId`; not a real cross-linked Agenda record id. */
+  appointmentId?: string;
+  status: ClinicalEncounterStatus;
+  /** Consultation-only: short motif, reused both as the timeline card preview and the read-only detail drawer's first structured section. */
+  reason?: string;
+  /** Consultation-only structured detail sections (§21) — always absent for session encounters, which stay concise (§24-25). */
+  observations?: string;
+  assessment?: string;
+  plan?: string;
+  /** Session-only: the related `TreatmentPlan` (UI-004C) this session belongs to — never duplicates its progress, only links to it (§26). */
+  treatmentPlanId?: string;
+  treatmentPlanTitle?: string;
+  sessionSequenceNumber?: number;
+  sessionTotalCount?: number;
+}

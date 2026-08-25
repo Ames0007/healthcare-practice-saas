@@ -753,3 +753,93 @@ All notable changes to this project are documented in this file.
   health-content tests + 2 UI-005A integration assertions), typecheck,
   lint and build pass; backend regression (10 tests) unaffected — no
   backend files touched.
+- UI-005B — Dossier Santé: clinical history & consultation timeline
+  (`/app/patients/[id]/health`, below UI-005A's important-information
+  cards, same tab and route — no new top-level nav item). New
+  `ClinicalEncounter` on `components/domain/clinical/types.ts` (Spec #4
+  §9.1 `clinical_encounters` simplified to `consultation`/`session`; all
+  historical encounters are `completed`, no larger status registry, §16).
+  **A purpose-built `ClinicalTimeline` rather than reusing UI-004A's
+  `PatientActivityTimeline`:** that component only renders one-line
+  translated activity strings and explicitly excludes clinical note/
+  diagnosis text, so it cannot represent structured motif/session detail
+  or the "Voir la consultation"/"Voir le traitement" interactions this
+  tab needs — the two timelines now deliberately coexist, Aperçu keeping
+  its concise cross-domain feed and Dossier Santé getting its own richer,
+  clinical-only chronology (documented in `frontend/ARCHITECTURE.md`).
+  New `features/patients/clinical-history.ts`
+  (`getEncountersForPatient`/`sortEncountersDesc`/
+  `matchesClinicalHistoryFilter`/`groupEncountersByDate`, mirroring
+  `patient-appointments.ts`'s own shape — newest-first sorting and date
+  grouping are explicit derivations, never fixture insertion order).
+  Lightweight Tous/Consultations/Séances filter (§17 — deliberately no
+  practitioner/date-range/diagnosis filtering) with a distinct
+  filtered-empty message, never the global empty-history state. New
+  `features/patients/components/consultation-detail-drawer.tsx`
+  (`ConsultationDetailDrawer`) — read-only: no Modifier/Supprimer/
+  Réouvrir anywhere, since a completed clinical record is not ordinary
+  CRUD (CLAUDE.md §24); structured Motif/Observations/Évaluation/Plan
+  sections (Spec #7 §11's own "Motif"/"Observations" wording, extended
+  with Évaluation/Plan per this task's own explicit instruction — Spec
+  #1 Table 16 already names "diagnosis/assessment" for general medicine,
+  so this is a documented current-task-instruction/specification
+  reconciliation, not an invented category), plus an optional "Rendez-
+  vous associé" section with a safe link to the Rendez-vous tab. A
+  session encounter never opens a second detail drawer — its timeline
+  card links directly to `/app/patients/{id}/treatments` ("Voir le
+  traitement", reusing the existing i18n key), reusing UI-004C's own
+  session-detail interaction instead of duplicating a second treatment-
+  session workspace (§25-26). New
+  `features/patients/mock-clinical-encounters-data.ts`: pat-1/Ahmed has
+  two completed consultations (23/18 August) plus one completed session
+  that intentionally reuses the exact date/practitioner/appointment
+  reference of the "Rééducation genou" plan's 6th completed session
+  (`mock-treatments-data.ts`) rather than inventing a contradicting
+  duplicate; pat-3/Fatima has a populated `MedicalProfile` (UI-005A) but
+  no clinical-history fixture at all, demonstrating "profile without
+  history"; pat-2/Sara has neither, demonstrating the fully empty
+  Dossier Santé (§31 — the two independent empty states are allowed to
+  coexist rather than being collapsed into one giant generic screen).
+  `PatientHealthContent`'s own "MedicalProfile empty" branch was
+  restructured from an early return into an inline conditional so the
+  clinical-history section always renders below it in both the empty and
+  populated cases; its loading skeleton was extended with a clinical-
+  history heading and two row placeholders, and loading/error remain one
+  unified state for the whole tab (§33 — no real network boundary exists
+  between the two fixture reads in this frontend-only prototype). One
+  UI-005A-era boundary test in `patient-health-content.test.tsx` was
+  updated, not weakened: it used to assert this tab never rendered
+  "Historique clinique"/"Motif" text at all, which UI-005B's own explicit
+  scope now legitimately supersedes — the assertion was narrowed to what
+  is still genuinely out of scope (no consultation-creation affordance,
+  §37), and the now-real content is covered by dedicated new tests
+  instead. Full FR/AR under a new `patientDetail.health.history.*`
+  namespace, reusing `patientDetail.treatments.viewTreatment`/
+  `sessionHeading` where the phrase is already identical rather than
+  duplicating it; new Arabic clinical terminology reviewed for register
+  (e.g. "السجل السريري" for "Historique clinique", distinct from the
+  existing "التاريخ المرضي" used for medical history/antécédents, to
+  avoid conflating the two concepts). RTL verified (SSR `dir="rtl"`/
+  `lang="ar"` on the route). Added
+  `frontend/src/features/patients/clinical-history.test.ts` (9 tests:
+  patient filtering, newest-first sorting including a same-date time
+  tie-break, non-mutation of the input array, the three-way filter, and
+  date grouping), `frontend/src/features/patients/mock-clinical-
+  encounters-data.test.ts` (9 fixture-integrity tests: every encounter
+  references a real patient/practitioner, unique ids, consultation-only
+  vs session-only fields never cross-populate, and the session
+  encounter's treatment/appointment references resolve exactly against
+  `mock-treatments-data.ts` rather than merely existing) and
+  `frontend/src/features/patients/components/clinical-history-
+  section.test.tsx` (25 tests: heading/consultation/session rendering,
+  newest-first ordering and date grouping from an out-of-order prop,
+  each filter and the filtered-empty state, the result count, opening/
+  closing the read-only drawer, each of the four structured sections,
+  patient/practitioner/date context, the associated-appointment link
+  appearing only when present, the treatment link, the absence of
+  edit/delete/reopen/prescription/document/finance content and of any
+  consultation-creation affordance, the empty-history state, French, and
+  Arabic/RTL). All 320 frontend tests (277 carried over from UI-001
+  through UI-005A + 43 new UI-005B tests), typecheck, lint and build
+  pass on the first run; backend regression (10 tests) unaffected — no
+  backend files touched.

@@ -555,6 +555,26 @@
         "removeEntry": "إزالة {{label}}",
         "save": "حفظ",
         "cancel": "إلغاء"
+      },
+      "history": {
+        "title": "السجل السريري",
+        "consultationLabel": "استشارة",
+        "filters": {
+          "all": "الكل",
+          "consultations": "الاستشارات",
+          "sessions": "الجلسات"
+        },
+        "resultCount": "{{count}} حدث",
+        "reasonLabel": "السبب",
+        "observationsLabel": "الملاحظات",
+        "assessmentLabel": "التقييم",
+        "planLabel": "الخطة",
+        "viewConsultation": "عرض الاستشارة",
+        "relatedAppointmentLabel": "الموعد المرتبط",
+        "viewAppointment": "عرض الموعد",
+        "emptyTitle": "لا يوجد سجل سريري لهذا المريض.",
+        "emptyDescription": "ستظهر هنا الاستشارات والجلسات المنتهية.",
+        "filteredEmpty": "لا يوجد عنصر يطابق هذا الفلتر."
       }
     }
   },

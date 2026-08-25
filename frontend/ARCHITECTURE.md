@@ -138,8 +138,7 @@ src/components/
             `features/patients/types.ts`'s administrative `Patient`
             (CLAUDE.md §8/§12): `types.ts` (`MedicalProfile`/
             `MedicalProfileEntry`, Spec #4 §9.3 `patient_health_flags`
-            simplified to this task's own bounded shape — no consultation/
-            encounter/amendment entities, those are UI-005B/C's domain),
+            simplified to this task's own bounded shape),
             `clinical-summary-section.tsx` (`ClinicalSummarySection`, one
             restrained card per category — allergies/history/medications/
             notes all reuse it — with an inline empty sentence rather than
@@ -147,6 +146,23 @@ src/components/
             `StatusBadge` on one entry at a time, never coloring the whole
             card) and `entry-chip.tsx` (`EntryChip`, the removable
             selected-value pill used inside the edit drawer).
+            UI-005B adds `ClinicalEncounter` to the same `types.ts` (Spec
+            #4 §9.1 `clinical_encounters` simplified — bounded to
+            `consultation`/`session`, no amendment entity; active-
+            consultation authoring is UI-005C's domain) and
+            `clinical-timeline.tsx` (`ClinicalTimeline`) — a purpose-built
+            chronology component rather than a reuse of
+            `domain/patients/patient-activity-timeline.tsx`
+            (`PatientActivityTimeline`, UI-004A): that component only
+            renders one-line translated activity strings and explicitly
+            excludes clinical note/diagnosis text, so it cannot represent
+            structured motif/session detail or the "Voir la
+            consultation"/"Voir le traitement" interactions the Historique
+            clinique section needs. Both timelines coexist deliberately —
+            Aperçu keeps its concise cross-domain activity feed
+            (appointment/payment/document/treatment/consultation, one line
+            each), while Dossier Santé gets its own richer, clinical-only
+            chronology.
 
 src/features/
   today/    Aujourd'hui screen composition (UI-001): `types.ts` (mock
@@ -328,8 +344,8 @@ src/features/
             (`getMedicalProfileForPatient`, `isMedicalProfileEmpty` — `null`
             and "every section empty" are treated identically),
             `components/patient-health-content.tsx` (the tab composition —
-            important information only, no consultation history/active
-            consultation/prescriptions/documents, those are UI-005B/C/D),
+            important information only, no active consultation/
+            prescriptions/documents, those are UI-005C/D),
             `components/medical-profile-edit-drawer.tsx` (the edit surface
             — see the `clinical/master-data.ts` note below for how its
             three category pickers reuse `Combobox`). Edits are kept only
@@ -337,6 +353,31 @@ src/features/
             local-session-state convention as UI-004E's payment capture
             immediately above, and for the same reason: no LocalStorage/
             IndexedDB/cookie ever holds this clinical data (CLAUDE.md §7).
+            **Clinical history (UI-005B):** below the important-information
+            cards, the same tab renders `components/clinical-history-
+            section.tsx` (`ClinicalHistorySection`) — `mock-clinical-
+            encounters-data.ts` (centralized synthetic `ClinicalEncounter`
+            fixtures: pat-1/Ahmed has two completed consultations plus one
+            completed treatment session that intentionally reuses the exact
+            date/practitioner/appointment reference of the "Rééducation
+            genou" plan's 6th completed session rather than inventing a
+            contradicting duplicate, Spec §12; pat-3/Fatima has a populated
+            `MedicalProfile` but no clinical-history fixture at all,
+            demonstrating "profile without history"; pat-2/Sara has neither,
+            demonstrating the fully empty Dossier Santé), `clinical-
+            history.ts` (`getEncountersForPatient`/`sortEncountersDesc`/
+            `matchesClinicalHistoryFilter`/`groupEncountersByDate` — pure
+            derivation, mirrors `patient-appointments.ts`'s own shape),
+            `components/consultation-detail-drawer.tsx` (read-only — no
+            edit/delete/reopen anywhere; a completed clinical record is not
+            ordinary CRUD, CLAUDE.md §24). A session encounter never opens
+            a second detail drawer — it links to `/app/patients/{id}/
+            treatments` instead ("Voir le traitement"), reusing UI-004C's
+            own treatment/session detail rather than duplicating it (§25-26
+            of the task). Loading/error stay a single unified state for the
+            whole Dossier Santé tab (both the medical profile and the
+            clinical history are the same frontend-only prototype fixture
+            read, so there is no real network boundary to split them on).
 
   clinical/ Bounded prototype clinical master-data catalog (UI-005A §12-14,
             Spec #2 §17.2's "search by keyword / select predefined / add
