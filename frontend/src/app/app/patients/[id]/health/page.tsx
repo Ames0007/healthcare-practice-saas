@@ -6,7 +6,7 @@ import { PatientDetailPage } from "@/features/patients/patient-detail-page";
 
 const LOADING_SIMULATION_MS = 400;
 
-/** Dossier Santé tab route — real header/tabs/content (UI-004A §24 shell, UI-005A content: important medical information only). */
+/** Dossier Santé tab route — real header/tabs/content (UI-004A §24 shell, UI-005A important medical information, UI-005B clinical-history timeline). */
 export default function PatientHealthRoutePage() {
   const { id } = useParams<{ id: string }>();
   const [ready, setReady] = useState(false);
