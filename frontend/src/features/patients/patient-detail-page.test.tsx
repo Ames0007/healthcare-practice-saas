@@ -243,4 +243,22 @@ describe("PatientDetailPage", () => {
     expect(screen.getByText("Patient introuvable")).toBeInTheDocument();
     expect(screen.queryByText("Total facturé")).not.toBeInTheDocument();
   });
+
+  it("renders real Paiements content with the header and active tab preserved (UI-004E 1/2/3)", () => {
+    renderPatientDetail("fr", { patientId: "pat-1", activeTab: "payments" });
+
+    expect(screen.getByRole("heading", { level: 1, name: "Ahmed El Mansouri" })).toBeInTheDocument();
+    const nav = screen.getByRole("navigation", { name: "Sections du patient" });
+    expect(within(nav).getByRole("link", { name: "Paiements" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByText("Total encaissé")).toBeInTheDocument();
+    expect(screen.getByText("3 000 MAD")).toBeInTheDocument();
+    expect(screen.queryByText("Cette section sera implémentée dans une prochaine étape.")).not.toBeInTheDocument();
+  });
+
+  it("keeps the not-found state for an invalid patient on the Paiements tab (UI-004E)", () => {
+    renderPatientDetail("fr", { patientId: "pat-999", activeTab: "payments" });
+
+    expect(screen.getByText("Patient introuvable")).toBeInTheDocument();
+    expect(screen.queryByText("Total encaissé")).not.toBeInTheDocument();
+  });
 });

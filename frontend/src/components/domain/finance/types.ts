@@ -58,3 +58,49 @@ export interface Invoice {
   lines: InvoiceLine[];
   installments: Installment[];
 }
+
+/**
+ * Payment/allocation/receipt prototype model (UI-004E §9-12, Spec #4 §17).
+ * V1 patient payments are cash-only (CLAUDE.md §23) — no card/online method.
+ */
+export type PaymentMethod = "cash";
+
+/**
+ * Kept minimal per UI-004E §10: a posted payment is financially historical
+ * (CLAUDE.md §24) and is never silently edited/deleted. "reversed" is a
+ * separate documented historical event, not an interactive workflow this
+ * prototype implements (UI-004E §37).
+ */
+export type PaymentStatus = "posted" | "reversed";
+
+export interface PaymentAllocation {
+  id: string;
+  paymentId: string;
+  invoiceId: string;
+  installmentId?: string;
+  amount: MoneyAmount;
+}
+
+/** Human-facing reference, e.g. "REC-2026-00382" (Spec #4 §17.3) — never the internal payment id. */
+export interface Receipt {
+  id: string;
+  receiptNumber: string;
+  paymentId: string;
+  issuedAt: string;
+}
+
+export interface Payment {
+  id: string;
+  patientId: string;
+  paymentNumber: string;
+  paymentDate: string;
+  amount: MoneyAmount;
+  method: PaymentMethod;
+  status: PaymentStatus;
+  /** One payment may in principle cover multiple invoices/installments (Spec #4 §17.2) — this prototype's capture UX always produces exactly one. */
+  allocations: PaymentAllocation[];
+  /** Absent for a reversed payment — a reversal has no valid receipt to print/download (UI-004E §35/§38). */
+  receipt?: Receipt;
+  /** Set only when `status` is "reversed" — documents why the payment no longer counts toward collected totals. */
+  reversalReason?: string;
+}

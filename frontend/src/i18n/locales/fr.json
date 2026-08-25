@@ -491,6 +491,41 @@
         "overdue": "En retard",
         "future": "À venir"
       }
+    },
+    "payments": {
+      "encaisser": "Encaisser",
+      "totalCollectedLabel": "Total encaissé",
+      "paymentCountLabel": "Nombre de paiements",
+      "lastPaymentLabel": "Dernier paiement",
+      "noLastPayment": "Aucun paiement",
+      "allocationLabel": "Affectation",
+      "downloadReceipt": "Télécharger le reçu",
+      "receiptNotice": "La génération du reçu PDF sera connectée au moteur documentaire ultérieurement.",
+      "paymentSuccess": "Paiement enregistré.",
+      "captureTitle": "Encaisser un paiement",
+      "method": {
+        "cash": "Espèces"
+      },
+      "status": {
+        "posted": "Validé",
+        "reversed": "Annulé"
+      },
+      "emptyAllTitle": "Aucun paiement pour ce patient.",
+      "emptyAllDescription": "Les encaissements du patient apparaîtront ici.",
+      "errorTitle": "Impossible de charger les paiements du patient.",
+      "errorRetry": "Réessayer",
+      "form": {
+        "balanceDueLabel": "Solde à payer",
+        "allocateToLabel": "Affecter à",
+        "installmentLabel": "Échéance",
+        "amountLabel": "Montant reçu",
+        "methodLabel": "Mode de paiement",
+        "submitLabel": "Encaisser {{amount}}",
+        "caisseNotice": "Cet encaissement sera enregistré dans la caisse.",
+        "noAllocatableInvoice": "Ce patient n'a aucune facture à encaisser.",
+        "invalidAmountError": "Montant invalide.",
+        "overpaymentError": "Le montant dépasse le solde à payer."
+      }
     }
   },
   "admin": {

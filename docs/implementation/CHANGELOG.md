@@ -534,9 +534,8 @@ All notable changes to this project are documented in this file.
   dedicated integrity-test file as the one deliberate exception to the
   `paidAmount + remainingAmount === totalAmount` invariant. "+ Nouvelle
   facture" and "Télécharger PDF"/"Imprimer" all show a future-feature
-  Toast; "Encaisser" only navigates to the still-placeholder
-  `/app/patients/{id}/payments` (UI-004E owns real collection) and never
-  renders for a paid or cancelled invoice; cancelled invoices stay
+  Toast; "Encaisser" only navigates to `/app/patients/{id}/payments`
+  and never renders for a paid or cancelled invoice; cancelled invoices stay
   visible under the "Toutes" filter. Full FR/AR under a new
   `patientDetail.invoices.*` namespace, reusing
   `patientDetail.header.collectPayment` and
@@ -565,3 +564,103 @@ All notable changes to this project are documented in this file.
   content suite + 24 UI-004D on the dedicated invoices-content suite +
   11 UI-004D fixture-integrity tests), typecheck, lint and build pass;
   backend regression (10 tests) unaffected — no backend files touched.
+- Patient Paiements/Reçus tab (UI-004E), replacing
+  `/app/patients/[id]/payments`'s UI-004A placeholder with a payment
+  history, summary and cash-collection prototype. Framed explicitly as
+  patient payment UX, not cabinet-wide Caisse accounting (UI-006's scope).
+  **Financial Source-of-Truth Rule (§7):** every posted payment's
+  allocations reconcile exactly with UI-004D's own invoice `paidAmount`
+  and paid-installment fixtures — verified by dedicated integrity tests,
+  not merely rendered text. `mock-payments-data.ts` carries one
+  deliberately reversed payment (Mehdi/pat-9, §14): it never reduced
+  `inv-3`'s balance, which is *why* that invoice still shows the full
+  2 200 MAD overdue in UI-004D's own fixtures rather than an oversight —
+  reversed payments are excluded from every collected-total/count figure
+  (`getEffectivePaidAmount`/`getPaymentSummary`) but remain visible in the
+  history list itself (CLAUDE.md §24: a posted payment is financially
+  historical, never silently edited). New domain types on the existing
+  `components/domain/finance/types.ts` (no second finance model):
+  `Payment`/`PaymentAllocation`/`Receipt`, `PaymentStatus` kept to
+  exactly `posted`/`reversed` per this task's own §10, `PaymentMethod`
+  kept to `cash` only (CLAUDE.md §23 — V1 patient payments are cash-only,
+  no card/online method anywhere in the UI). `payment-status.ts` (its own
+  small tone/label registry) and `payment-row.tsx` (`PaymentRow`, a dense
+  clickable history row mirroring `TreatmentPlanCard`'s "completed"
+  variant, not a full `Card`, per this task's own "keep it operational
+  and restrained" instruction). New `features/patients/` pieces:
+  `mock-payments-data.ts` (6 fixtures — 3 payments reconciling exactly
+  with pat-1/Ahmed's 1 500 MAD partial-invoice history down to each
+  individual 500 MAD installment, 1 payment reconciling pat-1's second
+  fully paid invoice, 1 payment reconciling pat-4/Youssef's fully paid
+  invoice, and pat-9/Mehdi's one reversed payment; pat-2/Sara
+  deliberately has none), `payments.ts` (`getPaymentSummary`,
+  `computeEffectiveRemaining`/`getAllocatableInvoices`/
+  `getPayableInstallments` — pure functions computing an effective
+  allocatable balance for the capture dialog *without* ever mutating an
+  invoice fixture, reference-number generators explicitly documented as
+  illustrative-only, not concurrency-safe production numbering, §32),
+  `payment-form-validation.ts` (whole positive-integer amount check, no
+  floating-point parsing), `components/patient-payments-content.tsx` (the
+  tab composition: neutral summary `MetricCard`s, no filter — history
+  stays short enough to scan without one, a deliberate scope-reduction
+  per this task's own §41 "not mandatory... do not create unnecessary
+  complexity"), `components/patient-payment-capture-dialog.tsx` (the
+  Encaisser prototype, reusing the shared `Dialog` drawer unmodified —
+  "do not create another modal system," §23: selecting an invoice with an
+  installment schedule locks the payment amount to that installment's
+  exact value, the simpler bounded UX this task's own §29 explicitly
+  allows instead of inventing a partial-installment lifecycle; only an
+  invoice with no installment schedule of its own accepts a free amount,
+  validated against zero/negative/non-numeric input and against
+  overpayment; includes the required informational Caisse-boundary note,
+  §46, without simulating any Caisse concept), `components/payment-
+  detail-drawer.tsx` (read-only — no edit/delete action anywhere, §37;
+  "Voir la facture" only navigates to the Factures tab, no duplicated
+  invoice drawer, §40; "Télécharger le reçu"/"Imprimer" show a
+  future-feature Toast, never generating a document, §38). **Local-
+  session state, not a global store (§33-34):** a captured payment is
+  appended only to `PatientPaymentsContent`'s own component state — the
+  UI-004D invoice fixtures are never mutated, so the Factures tab and
+  Aperçu overview remain unaffected and correct; navigating away from
+  Paiements and back resets to the seed state, the same accepted
+  prototype limitation already documented for UI-004A §7/UI-004B §9,
+  applied here to a same-route local mutation instead of a cross-route
+  read. On a successful capture the payment/receipt reference is
+  generated, the capture dialog closes, and the new payment's own detail
+  drawer opens immediately as the success/receipt surface (Spec #9 Screen
+  28's content — amount, date, allocation, receipt actions — reached this
+  way instead of inventing a third dialog type). Full FR/AR under a new
+  `patientDetail.payments.*` namespace, reusing
+  `patientDetail.invoices.installmentLabel`/`viewInvoice`/`print` and
+  `patients.form.cancel`/`close` rather than duplicating them. RTL
+  verified (SSR `dir="rtl"`/`lang="ar"` on the route), payment/receipt
+  references and amounts isolated `dir="ltr"`. Added
+  `frontend/src/features/patients/payments.test.ts` (20 pure-function
+  tests for every derivation/validation helper — chosen over only
+  DOM-testing generated numbers indirectly, since §57 explicitly asks for
+  tests proving the calculation, not merely rendered text),
+  `frontend/src/features/patients/mock-payments-data.test.ts` (12
+  fixture-integrity tests: allocation-sums-to-payment-amount, reference/
+  receipt uniqueness, allocation validity, the core payment-to-invoice
+  reconciliation, paid-installment evidence, the reversed-payment
+  exclusion, and a cross-file check against UI-004D's own
+  `getFinancialSummary`) and
+  `frontend/src/features/patients/components/patient-payments-content.test.tsx`
+  (28 tests: summary/history/method rendering, payment detail with
+  receipt/allocation/patient/invoice-link, the future-feature receipt
+  notice, no edit/delete anywhere, Encaisser opening the capture form,
+  the derived outstanding balance, payable-invoice-only allocation, the
+  default next-unpaid-installment with a locked amount, the no-
+  allocatable-invoice state, zero/negative/non-numeric/overpayment
+  rejection, a valid free-amount capture, a full successful capture with
+  the receipt opening and history/summary/balance updating locally, the
+  reversed-payment presentation, empty/loading/error states, French,
+  Arabic/RTL, and the absence of any Caisse UI or online payment method)
+  plus 2 integration assertions in `patient-detail-page.test.tsx`
+  (header/tabs preserved with Paiements active and real content, and
+  not-found still wins for an invalid patient id on this tab). All 225
+  frontend tests (163 carried over from UI-001 through UI-004D + 20
+  UI-004E `payments.ts` unit tests + 12 UI-004E fixture-integrity tests +
+  28 UI-004E payments-content tests + 2 UI-004E integration assertions),
+  typecheck, lint and build pass; backend regression (10 tests)
+  unaffected — no backend files touched.

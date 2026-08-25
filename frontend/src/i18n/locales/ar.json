@@ -491,6 +491,41 @@
         "overdue": "متأخرة",
         "future": "قادمة"
       }
+    },
+    "payments": {
+      "encaisser": "تحصيل دفعة",
+      "totalCollectedLabel": "إجمالي المحصّل",
+      "paymentCountLabel": "عدد الدفعات",
+      "lastPaymentLabel": "آخر دفعة",
+      "noLastPayment": "لا توجد دفعات",
+      "allocationLabel": "التخصيص",
+      "downloadReceipt": "تحميل الإيصال",
+      "receiptNotice": "سيتم ربط إصدار إيصال PDF بمحرك المستندات لاحقًا.",
+      "paymentSuccess": "تم تسجيل الدفعة.",
+      "captureTitle": "تحصيل دفعة",
+      "method": {
+        "cash": "نقدًا"
+      },
+      "status": {
+        "posted": "مسجّلة",
+        "reversed": "ملغاة"
+      },
+      "emptyAllTitle": "لا توجد دفعات لهذا المريض.",
+      "emptyAllDescription": "ستظهر هنا دفعات المريض.",
+      "errorTitle": "تعذّر تحميل دفعات المريض.",
+      "errorRetry": "إعادة المحاولة",
+      "form": {
+        "balanceDueLabel": "الرصيد المستحق",
+        "allocateToLabel": "تخصيص لـ",
+        "installmentLabel": "الدفعة المستحقة",
+        "amountLabel": "المبلغ المستلم",
+        "methodLabel": "طريقة الدفع",
+        "submitLabel": "تحصيل {{amount}}",
+        "caisseNotice": "سيتم تسجيل هذا التحصيل في الصندوق.",
+        "noAllocatableInvoice": "لا توجد فاتورة يمكن تحصيلها لهذا المريض.",
+        "invalidAmountError": "مبلغ غير صالح.",
+        "overpaymentError": "المبلغ يتجاوز الرصيد المستحق."
+      }
     }
   },
   "admin": {

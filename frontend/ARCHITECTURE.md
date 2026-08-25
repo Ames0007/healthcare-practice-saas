@@ -122,7 +122,14 @@ src/components/
             icon + text + tone, never color alone). No separate money
             formatter was added — `formatMad` (already re-exported by
             `features/patients/format.ts`) remains the one shared
-            formatter.
+            formatter. UI-004E adds `Payment`/`PaymentAllocation`/`Receipt`
+            to the same `types.ts` (still the one whole-MAD `MoneyAmount`,
+            no second representation), `payment-status.ts` (its own small
+            posted/reversed registry — a payment's lifecycle is not an
+            invoice's or an installment's) and `payment-row.tsx`
+            (`PaymentRow`, a dense clickable history row mirroring
+            `TreatmentPlanCard`'s "completed" variant rather than a full
+            `Card`).
 
 src/features/
   today/    Aujourd'hui screen composition (UI-001): `types.ts` (mock
@@ -265,9 +272,37 @@ src/features/
             actually have invoice fixtures get a derived balance, avoiding
             a wide refactor of the other 12. "+ Nouvelle facture" and
             "Télécharger PDF"/"Imprimer" show a future-feature notice;
-            "Encaisser" only navigates to the still-placeholder
-            `/payments` tab (UI-004E owns real collection) and never
-            renders for a paid or cancelled invoice.
+            "Encaisser" only navigates to the `/payments` tab and never
+            renders for a paid or cancelled invoice. Paiements tab
+            (UI-004E): `mock-payments-data.ts` (centralized synthetic
+            payment/allocation/receipt fixtures — every posted payment's
+            allocations reconcile exactly with UI-004D's own invoice
+            `paidAmount`/paid-installment fixtures; pat-9 carries one
+            deliberately reversed payment, which is why its invoice still
+            shows the full amount overdue rather than an oversight),
+            `payments.ts` (filter-by-patientId, `getPaymentSummary` and
+            `getEffectivePaidAmount` — both exclude reversed payments,
+            `computeEffectiveRemaining`/`getAllocatableInvoices`/
+            `getPayableInstallments` — pure functions the capture dialog
+            uses to compute an allocatable balance without mutating any
+            invoice), `components/patient-payments-content.tsx` (the tab
+            composition), `components/patient-payment-capture-dialog.tsx`
+            (the Encaisser prototype — an installment target locks the
+            amount to its exact value, no partial-installment lifecycle;
+            only an invoice with no installment schedule of its own allows
+            a free amount up to its remaining balance),
+            `components/payment-detail-drawer.tsx` (read-only — no
+            edit/delete anywhere, a posted payment is financially
+            historical per CLAUDE.md §24). **Local-session payment state
+            (UI-004E §33-34):** a captured payment is appended only to
+            `PatientPaymentsContent`'s own `localPayments` state, never
+            written back into the UI-004D invoice fixtures — invoices stay
+            the authoritative prototype balance schedule, payments are
+            historical evidence explaining them. This is the same
+            "no global store to paper over a prototype seam" principle as
+            UI-004A §7/UI-004B §9 above, applied to a same-route local
+            mutation instead of a cross-route read: navigating away from
+            Paiements and back resets to the seed state.
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,

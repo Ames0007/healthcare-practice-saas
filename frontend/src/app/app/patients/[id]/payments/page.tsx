@@ -6,7 +6,7 @@ import { PatientDetailPage } from "@/features/patients/patient-detail-page";
 
 const LOADING_SIMULATION_MS = 400;
 
-/** Paiements tab route — placeholder content, real header/tabs (UI-004A §24). UI-007 owns the real content. */
+/** Paiements tab route — real header/tabs/content (UI-004A §24 shell, UI-004E content). */
 export default function PatientPaymentsRoutePage() {
   const { id } = useParams<{ id: string }>();
   const [ready, setReady] = useState(false);
