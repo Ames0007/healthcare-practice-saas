@@ -1188,3 +1188,91 @@ All notable changes to this project are documented in this file.
   "Cabinet Finance aggregation" convention paragraph documenting the
   reuse-over-reimplementation rule for future UI-006B/C/D/E tasks to
   follow.
+- UI-006B — Global Invoices & Receivables: `/app/finance/invoices`, the
+  cabinet-wide operational invoice workspace UI-006A's own "Voir toutes
+  les factures" button now navigates to (a real `next/link`, replacing
+  the future-feature Toast notice UI-006A originally showed before this
+  screen existed — `finance.receivables.viewAllNotice` removed from both
+  locale files as dead i18n). Reuse-first per the task's own explicit
+  instruction: `InvoiceDetailDrawer` (UI-004D,
+  `features/patients/components/invoice-detail-drawer.tsx`) is shared
+  unmodified between Patient 360°'s Factures tab and this new screen —
+  inspecting it first confirmed it never actually assumed Patient 360°
+  page composition (it already took only pre-resolved props), so the
+  only change needed was one small additive `showPatientNavigation`
+  prop (default `false`) rendering "Ouvrir le patient"/"Voir les
+  factures du patient" links only when explicitly requested; Patient
+  360°'s own existing usage passes nothing and is behaviorally
+  unchanged (its full test suite re-run confirms this). "Encaisser"
+  still navigates unchanged to the existing `/app/patients/{id}/payments`
+  workflow (UI-004E) — there remains exactly one implemented
+  payment-capture prototype in the whole product, never a second one
+  here (§24/§44). New `features/finance/global-invoices.ts` builds a
+  `GlobalInvoiceRow` read model — cabinet-wide, every patient's
+  invoices, not just one — from the *existing*
+  `getInvoicesMockData()`/`getPatientsMockData()` fixtures (UI-004D/
+  UI-003A), keeping the full `Invoice` embedded on each row rather than
+  flattening total/paid/remaining onto it, so a table cell reads
+  `row.invoice.totalAmount` directly instead of risking a second, stale
+  copy. The next payable installment per invoice is derived via
+  `getPayableInstallments` (UI-004E) called with no local payments —
+  reused unmodified for a read-only cabinet view, never a payment
+  session. Operational ordering (§18) is one explicit rank per
+  `InvoiceStatus` value — overdue → issued → partially_paid → draft →
+  paid → cancelled — with earliest-relevant-due-date-first as the
+  secondary sort key (falling back to most-recently-issued-first for the
+  tiers with no meaningful due date), verified against the real fixture
+  set's exact order: inv-3, inv-1, inv-1b, inv-2, inv-1c. The five-value
+  status filter (Toutes/À payer/Partiellement payées/Payées/En retard)
+  is a second, deliberately distinct taxonomy from
+  `features/patients/finance.ts`'s own patient-scoped `InvoiceFilterGroup`
+  (which merges issued+partially_paid into one "due" bucket) — this
+  screen's own task instructions require splitting them, so this is a
+  documented, explicitly-scoped second mapping over the same
+  `InvoiceStatus`, not duplicated status logic. Search is local,
+  case-insensitive, across patient full name/patient number/invoice
+  number. The financial summary card row (Total facturé/Payé/Reste à
+  encaisser/En retard) reuses `getFinancialSummary` (UI-004D) completely
+  unmodified — called over the *filtered* result set specifically, per
+  this task's own explicit §5/§30 requirement, so cabinet totals can
+  never independently drift from the same source invoices Patient 360°
+  and the Finance dashboard already show. Desktop table
+  (`global-invoice-table.tsx`) + mobile card list
+  (`global-invoice-card-list.tsx`) mirror `PatientTable`/
+  `PatientCardList`'s exact `hidden overflow-x-auto md:block` /
+  `divide-y ... md:hidden` dual-render convention, including the same
+  `lg:table-cell` secondary-column-hiding pattern at tablet width
+  (Date/Total/Payé hidden below `lg`, since Patient/Invoice/Remaining/
+  Next installment/Status are the columns the task calls more
+  important). Search-empty ("Aucune facture ne correspond à votre
+  recherche.") and filtered-empty ("Aucune facture ne correspond à ce
+  filtre.") are two intentionally distinct states, each with its own
+  targeted clear action — the real fixture set's own "À payer" filter
+  (no invoice is ever plain "issued" with a positive balance in the
+  current data) conveniently doubles as a live demonstration of the
+  filtered-empty state without any synthetic data needed at the page
+  level. No invoice creation/editing/cancellation, no payment capture,
+  no Caisse, no expenses, no accounting terminology anywhere — verified
+  by dedicated absence tests. Added
+  `frontend/src/features/finance/global-invoices.test.ts` (14 tests:
+  operational ordering/priority against the real fixtures, patient-name/
+  number resolution, next-installment derivation including the
+  no-schedule case, search by name/number/invoice-number, all five
+  filter predicates against synthetic rows, and a direct equality check
+  against `getFinancialSummary`'s own output), `global-invoices-page.test.tsx`
+  (24 tests: header, summary integrity, table ordering/patient identity/
+  invoice reference, mobile-card dual-render proof, next-installment
+  display, search by name/number/invoice-number, each filter, the
+  À-payer/filtered-empty combination, search+filter composition, result
+  count, invoice detail opening with lines/installment schedule, the two
+  new patient-navigation links, Encaisser navigation plus absence of any
+  duplicate payment form, paid/cancelled invoices having no Encaisser,
+  search-empty with working clear action, fully-empty with no filter
+  chrome, loading, error, Arabic/RTL, and absence of invoice-creation/
+  accounting/Caisse/expense controls), and two more cases in
+  `components/app/app-sidebar.test.tsx` (Finance remains the active
+  main-sidebar section for both `/app/finance` and the new nested
+  `/app/finance/invoices`). All 500 frontend tests (461 carried over
+  through UI-006A + 39 new UI-006B tests), typecheck, lint and build
+  pass on the first full-suite run; backend regression (10 tests, clean)
+  unaffected — no backend files touched.

@@ -714,8 +714,7 @@
       "resultCount": "{{count}} factures",
       "emptyTitle": "Aucun montant à encaisser.",
       "viewInvoiceAriaLabel": "Voir la facture {{invoiceNumber}} de {{patientName}}",
-      "viewAllAction": "Voir toutes les factures",
-      "viewAllNotice": "L'écran des factures globales sera disponible ultérieurement."
+      "viewAllAction": "Voir toutes les factures"
     },
     "activity": {
       "title": "Activité récente",
@@ -733,6 +732,48 @@
     "error": {
       "title": "Impossible de charger les informations financières.",
       "retry": "Réessayer"
+    },
+    "invoices": {
+      "pageTitle": "Factures",
+      "pageDescription": "Suivez les factures et montants à encaisser du cabinet.",
+      "summary": {
+        "totalInvoiced": "Total facturé",
+        "paid": "Payé",
+        "remaining": "Reste à encaisser",
+        "overdue": "En retard"
+      },
+      "searchLabel": "Rechercher patient ou facture...",
+      "filters": {
+        "all": "Toutes",
+        "toPay": "À payer",
+        "partial": "Partiellement payées",
+        "paid": "Payées",
+        "overdue": "En retard"
+      },
+      "resultCount": "{{count}} factures",
+      "table": {
+        "invoice": "Facture",
+        "patient": "Patient",
+        "date": "Date",
+        "total": "Total",
+        "paid": "Payé",
+        "remaining": "Reste",
+        "nextInstallment": "Prochaine échéance",
+        "status": "Statut",
+        "actions": "Actions"
+      },
+      "view": "Voir",
+      "noNextInstallment": "—",
+      "openPatient": "Ouvrir le patient",
+      "patientInvoices": "Voir les factures du patient",
+      "searchEmptyTitle": "Aucune facture ne correspond à votre recherche.",
+      "clearSearch": "Effacer la recherche",
+      "filteredEmptyTitle": "Aucune facture ne correspond à ce filtre.",
+      "clearFilters": "Effacer les filtres",
+      "emptyAllTitle": "Aucune facture pour le moment.",
+      "emptyAllDescription": "Les factures du cabinet apparaîtront ici.",
+      "errorTitle": "Impossible de charger les factures.",
+      "errorRetry": "Réessayer"
     }
   },
   "admin": {

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useLocale } from "@/i18n/locale-provider";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { buttonClassNames } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { INVOICE_STATUS_MAP } from "@/components/domain/finance/invoice-status";
 import { formatDayMonth, formatMad } from "@/features/finance/format";
@@ -11,17 +11,17 @@ import type { ReceivableItem } from "@/features/finance/types";
 
 export interface ReceivablesSectionProps {
   receivables: ReceivableItem[];
-  onViewAllInvoices: () => void;
 }
 
 /**
  * Cabinet-wide "À encaisser" attention section (UI-006A §21-25). Clicking a
  * row navigates to the existing patient invoice workspace — no duplicate
- * InvoiceDetailDrawer here (§24). "Voir toutes les factures" stays a
- * future-feature notice: the real global invoice screen is UI-006B's scope
- * (§25/§51), not implemented early here.
+ * InvoiceDetailDrawer here (§24). "Voir toutes les factures" now navigates
+ * to the real global invoice workspace (UI-006B §6) instead of the
+ * future-feature notice UI-006A originally showed, since that screen now
+ * exists.
  */
-export function ReceivablesSection({ receivables, onViewAllInvoices }: ReceivablesSectionProps) {
+export function ReceivablesSection({ receivables }: ReceivablesSectionProps) {
   const { t, locale } = useLocale();
 
   return (
@@ -30,9 +30,9 @@ export function ReceivablesSection({ receivables, onViewAllInvoices }: Receivabl
         <h2 className="text-sm font-semibold uppercase tracking-wide text-text-muted">
           {t("finance.receivables.title")}
         </h2>
-        <Button type="button" variant="outline" size="sm" onClick={onViewAllInvoices}>
+        <Link href="/app/finance/invoices" className={buttonClassNames("outline", "sm")}>
           {t("finance.receivables.viewAllAction")}
-        </Button>
+        </Link>
       </div>
 
       {receivables.length === 0 ? (

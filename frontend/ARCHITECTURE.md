@@ -132,6 +132,20 @@ src/components/
             (`PaymentRow`, a dense clickable history row mirroring
             `TreatmentPlanCard`'s "completed" variant rather than a full
             `Card`).
+            `features/patients/components/invoice-detail-drawer.tsx`'s
+            `InvoiceDetailDrawer` (UI-004D) became a genuinely shared
+            component in UI-006B — reused unmodified by both Patient
+            360°'s Factures tab and Global Finance
+            (`/app/finance/invoices`) — because it only ever took
+            pre-resolved props to begin with, never assuming Patient
+            360° page composition. The one change was a small additive
+            `showPatientNavigation` prop (default `false`, so the
+            existing Patient 360° caller's behavior is byte-for-byte
+            unchanged) that renders two extra quick-navigation links for
+            the global context. This is the pattern future cabinet-level
+            screens reusing a Patient-360°-owned detail component should
+            follow: inspect first, add one additive opt-in prop, never
+            fork a second implementation.
             `domain/clinical/` (UI-005A) — the first real clinical
             prototype, deliberately separate from `domain/patients/`'s
             administrative `PatientOverview` and from
@@ -583,9 +597,34 @@ src/features/
             ReceivablesSection, RecentActivitySection,
             FinanceDashboardSkeleton). Receivables navigate to the
             existing `/app/patients/{id}/invoices` route instead of a
-            duplicate detail drawer (§24); "Voir toutes les factures"
-            stays a future-feature Toast notice — the real global invoice
-            screen is UI-006B's own scope, not implemented early.
+            duplicate detail drawer (§24); "Voir toutes les factures" now
+            navigates to `/app/finance/invoices` (UI-006B — it was a
+            future-feature Toast notice until that screen existed).
+            UI-006B adds `global-invoices.ts` and
+            `global-invoices-page.tsx` alongside the dashboard code
+            above, for `/app/finance/invoices` — the cabinet-wide
+            operational invoice workspace, distinct from both the
+            dashboard's compact Receivables list and Patient 360°'s own
+            Factures tab. `buildGlobalInvoiceRows` resolves every cabinet
+            invoice (not just one patient's) into a `GlobalInvoiceRow`
+            that keeps the full `Invoice` embedded rather than
+            flattening total/paid/remaining onto the row — the same
+            "derive, never duplicate" discipline as `aggregations.ts`
+            above. Its own five-value status filter
+            (`GlobalInvoiceFilterGroup`) is a second, deliberately
+            distinct taxonomy from `features/patients/finance.ts`'s own
+            patient-scoped `InvoiceFilterGroup` (documented in both
+            files) — the task's own instructions required splitting
+            issued/partially_paid into two separate filters here, so
+            reusing the patient-scoped one outright was not an option;
+            reproducing its underlying `InvoiceStatus` switch instead of
+            a same-shaped copy was.
+            `GlobalInvoiceTable`/`GlobalInvoiceCardList` mirror
+            `features/patients/components/patient-table.tsx`'s/
+            `patient-card-list.tsx`'s exact `hidden overflow-x-auto
+            md:block` / `divide-y ... md:hidden` dual-render convention
+            — the established responsive pattern for any tabular data in
+            this codebase, not reinvented here.
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,

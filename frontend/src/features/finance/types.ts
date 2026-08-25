@@ -1,4 +1,4 @@
-import type { ExpenseCategory, InvoiceStatus, MoneyAmount } from "@/components/domain/finance/types";
+import type { ExpenseCategory, Installment, Invoice, InvoiceStatus, MoneyAmount } from "@/components/domain/finance/types";
 
 export type FinancePeriod = "today" | "week" | "month";
 
@@ -47,4 +47,33 @@ export interface FinanceKpis {
   disbursed: MoneyAmount;
   /** Prototype operational cash position: opening position + period collected − period disbursed (UI-006A §18/§40). */
   cashPosition: MoneyAmount;
+}
+
+/**
+ * Global Finance invoice-status filter taxonomy (UI-006B §13-14) —
+ * deliberately distinct from `features/patients/finance.ts`'s own
+ * `InvoiceFilterGroup` (which merges issued+partially_paid into one "due"
+ * bucket for the patient-scoped Factures tab). This screen's own task
+ * instructions require splitting those into two separate filters, so this
+ * is a second, explicitly-scoped mapping over the same `InvoiceStatus` —
+ * not duplicated status logic, just a different screen's own taxonomy.
+ */
+export type GlobalInvoiceFilterGroup = "all" | "toPay" | "partial" | "paid" | "overdue";
+
+/**
+ * Cabinet-wide invoice row (UI-006B §8), resolved to display-ready patient
+ * identity plus the next payable installment. Deliberately keeps the full
+ * `Invoice` embedded rather than flattening total/paid/remaining onto the
+ * row — a table cell reads `row.invoice.totalAmount` etc. directly, so
+ * there is never a second, possibly-stale copy of those figures.
+ */
+export interface GlobalInvoiceRow {
+  invoice: Invoice;
+  patientId: string;
+  patientName: string;
+  patientNumber: string;
+  /** The next not-yet-paid installment for this invoice, when it has a staged schedule (UI-006B §27-28). */
+  nextInstallment: Installment | null;
+  /** Lower = more operationally urgent (UI-006B §18) — one rank per `InvoiceStatus` value. */
+  operationalPriority: number;
 }

@@ -111,13 +111,12 @@ describe("FinanceDashboard", () => {
     expect(overdueRow).toHaveAttribute("href", "/app/patients/pat-9/invoices");
   });
 
-  it("'Voir toutes les factures' shows a future-feature notice, not a real UI-006B screen", () => {
+  it("'Voir toutes les factures' navigates to the real global invoice workspace (UI-006B)", () => {
     renderDashboard("fr");
 
-    fireEvent.click(screen.getByRole("button", { name: "Voir toutes les factures" }));
-
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "L'écran des factures globales sera disponible ultérieurement.",
+    expect(screen.getByRole("link", { name: "Voir toutes les factures" })).toHaveAttribute(
+      "href",
+      "/app/finance/invoices",
     );
   });
 

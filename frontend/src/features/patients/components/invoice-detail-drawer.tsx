@@ -18,16 +18,37 @@ export interface InvoiceDetailDrawerProps {
   open: boolean;
   onClose: () => void;
   onFutureFeature: (message: string) => void;
+  /**
+   * Global Finance only (UI-006B §21-23) — renders "Ouvrir le patient"/
+   * "Voir les factures du patient" quick-navigation links. Omitted by
+   * Patient 360°'s own Factures tab (`patient-invoices-content.tsx`),
+   * where the user is already on that patient's page, so those links
+   * would be redundant; defaulting to `false` keeps that usage's existing
+   * behavior byte-for-byte unchanged.
+   */
+  showPatientNavigation?: boolean;
 }
 
 /**
  * Invoice detail (Spec #9 Screens 25-26/29, UI-004D §24-27). Reuses the
  * shared `Dialog` drawer unmodified — no accounting journal, no payment
- * form; "Encaisser" only navigates to the still-placeholder Payments tab
- * (UI-004E owns real collection), and "Télécharger PDF"/"Imprimer" only
- * surface a future-feature notice (§35), never generating a document.
+ * form; "Encaisser" only navigates to the existing Payments tab (UI-004E
+ * owns real collection), and "Télécharger PDF"/"Imprimer" only surface a
+ * future-feature notice (§35), never generating a document. Shared
+ * unmodified between Patient 360°'s Factures tab and Global Finance
+ * (UI-006B §21) — this component never assumed Patient 360° page
+ * composition to begin with (only pre-resolved props), so the only change
+ * needed was the additive `showPatientNavigation` prop above.
  */
-export function InvoiceDetailDrawer({ invoice, patientId, patientName, open, onClose, onFutureFeature }: InvoiceDetailDrawerProps) {
+export function InvoiceDetailDrawer({
+  invoice,
+  patientId,
+  patientName,
+  open,
+  onClose,
+  onFutureFeature,
+  showPatientNavigation = false,
+}: InvoiceDetailDrawerProps) {
   const { t, locale } = useLocale();
 
   if (!invoice) {
@@ -66,6 +87,22 @@ export function InvoiceDetailDrawer({ invoice, patientId, patientName, open, onC
             >
               {t("patientDetail.treatments.viewTreatment")}
             </Link>
+          )}
+          {showPatientNavigation && (
+            <div className="mt-2 flex flex-wrap gap-4">
+              <Link
+                href={`/app/patients/${patientId}`}
+                className="text-sm font-medium text-primary underline-offset-2 hover:underline"
+              >
+                {t("finance.invoices.openPatient")}
+              </Link>
+              <Link
+                href={`/app/patients/${patientId}/invoices`}
+                className="text-sm font-medium text-primary underline-offset-2 hover:underline"
+              >
+                {t("finance.invoices.patientInvoices")}
+              </Link>
+            </div>
           )}
         </div>
 

@@ -714,8 +714,7 @@
       "resultCount": "{{count}} فاتورة",
       "emptyTitle": "لا يوجد مبلغ قيد التحصيل.",
       "viewInvoiceAriaLabel": "عرض الفاتورة {{invoiceNumber}} الخاصة بـ {{patientName}}",
-      "viewAllAction": "عرض جميع الفواتير",
-      "viewAllNotice": "ستتوفر شاشة الفواتير الشاملة لاحقًا."
+      "viewAllAction": "عرض جميع الفواتير"
     },
     "activity": {
       "title": "النشاط الأخير",
@@ -733,6 +732,48 @@
     "error": {
       "title": "تعذّر تحميل المعلومات المالية.",
       "retry": "إعادة المحاولة"
+    },
+    "invoices": {
+      "pageTitle": "الفواتير",
+      "pageDescription": "تابع فواتير ومبالغ التحصيل الخاصة بالعيادة.",
+      "summary": {
+        "totalInvoiced": "إجمالي الفواتير",
+        "paid": "المدفوع",
+        "remaining": "قيد التحصيل",
+        "overdue": "متأخر"
+      },
+      "searchLabel": "البحث عن مريض أو فاتورة...",
+      "filters": {
+        "all": "الكل",
+        "toPay": "للدفع",
+        "partial": "مدفوعة جزئيًا",
+        "paid": "مدفوعة",
+        "overdue": "متأخرة"
+      },
+      "resultCount": "{{count}} فاتورة",
+      "table": {
+        "invoice": "الفاتورة",
+        "patient": "المريض",
+        "date": "التاريخ",
+        "total": "الإجمالي",
+        "paid": "المدفوع",
+        "remaining": "المتبقي",
+        "nextInstallment": "الدفعة القادمة",
+        "status": "الحالة",
+        "actions": "إجراءات"
+      },
+      "view": "عرض",
+      "noNextInstallment": "—",
+      "openPatient": "فتح ملف المريض",
+      "patientInvoices": "عرض فواتير المريض",
+      "searchEmptyTitle": "لا توجد فاتورة تطابق بحثك.",
+      "clearSearch": "مسح البحث",
+      "filteredEmptyTitle": "لا توجد فاتورة تطابق هذا المرشح.",
+      "clearFilters": "مسح المرشحات",
+      "emptyAllTitle": "لا توجد فواتير حاليًا.",
+      "emptyAllDescription": "ستظهر هنا فواتير العيادة.",
+      "errorTitle": "تعذّر تحميل الفواتير.",
+      "errorRetry": "إعادة المحاولة"
     }
   },
   "admin": {

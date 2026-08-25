@@ -5,7 +5,6 @@ import { useLocale } from "@/i18n/locale-provider";
 import { PageHeader } from "@/components/app/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
-import { Toast } from "@/components/ui/toast";
 import type { CabinetExpense, Invoice, Payment } from "@/components/domain/finance/types";
 import { getInvoicesMockData } from "@/features/patients/mock-invoices-data";
 import { getPaymentsMockData } from "@/features/patients/mock-payments-data";
@@ -57,7 +56,6 @@ export function FinanceDashboard({
 }: FinanceDashboardProps) {
   const { t } = useLocale();
   const [period, setPeriod] = useState<FinancePeriod>(DEFAULT_PERIOD);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   if (state === "loading") {
     return <FinanceDashboardSkeleton />;
@@ -96,14 +94,9 @@ export function FinanceDashboard({
 
       <KpiSummary kpis={kpis} />
 
-      <ReceivablesSection
-        receivables={receivables}
-        onViewAllInvoices={() => setToastMessage(t("finance.receivables.viewAllNotice"))}
-      />
+      <ReceivablesSection receivables={receivables} />
 
       <RecentActivitySection activity={activity} />
-
-      <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />
     </div>
   );
 }
