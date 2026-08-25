@@ -32,6 +32,17 @@ export function formatDayMonthTime(next: PatientNextAppointment, locale: Locale)
   return `${formatDayMonth(next.date, locale)} · ${next.time}`;
 }
 
+/** "23 août 2026" — day + month name + year (Dossier Santé's "Dernière mise à jour" style, UI-005A §24). */
+export function formatDayMonthYear(isoDate: string, locale: Locale): string {
+  const date = new Date(`${isoDate}T00:00:00`);
+  return new Intl.DateTimeFormat(toIntlLocale(locale), {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    calendar: "gregory",
+  }).format(date);
+}
+
 /**
  * Plain integer arithmetic on the ISO string parts — no `Date` object
  * timezone parsing involved, so there is no UTC/local mismatch to guard

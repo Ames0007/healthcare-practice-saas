@@ -94,12 +94,22 @@ describe("PatientDetailPage", () => {
     expect(within(nav).getByRole("link", { name: "Dossier Santé" })).not.toHaveAttribute("aria-current");
   });
 
-  it("keeps the header and tabs visible on a future-placeholder tab (12)", () => {
+  it("renders real Dossier Santé content with the header and active tab preserved (UI-005A 1/2/3, replaces the former placeholder assertion 12)", () => {
     renderPatientDetail("fr", { patientId: "pat-1", activeTab: "health" });
 
     expect(screen.getByRole("heading", { level: 1, name: "Ahmed El Mansouri" })).toBeInTheDocument();
-    expect(screen.getByRole("navigation", { name: "Sections du patient" })).toBeInTheDocument();
-    expect(screen.getByText("Cette section sera implémentée dans UI-005.")).toBeInTheDocument();
+    const nav = screen.getByRole("navigation", { name: "Sections du patient" });
+    expect(within(nav).getByRole("link", { name: "Dossier Santé" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByText("Informations importantes")).toBeInTheDocument();
+    expect(screen.getByText("Pénicilline")).toBeInTheDocument();
+    expect(screen.queryByText("Cette section sera implémentée dans une prochaine étape.")).not.toBeInTheDocument();
+  });
+
+  it("keeps the not-found state for an invalid patient on the Dossier Santé tab (UI-005A)", () => {
+    renderPatientDetail("fr", { patientId: "pat-999", activeTab: "health" });
+
+    expect(screen.getByText("Patient introuvable")).toBeInTheDocument();
+    expect(screen.queryByText("Informations importantes")).not.toBeInTheDocument();
   });
 
   it("renders the recent-activity timeline without leaking clinical detail (13/14)", () => {

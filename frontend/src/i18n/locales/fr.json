@@ -526,6 +526,36 @@
         "invalidAmountError": "Montant invalide.",
         "overpaymentError": "Le montant dépasse le solde à payer."
       }
+    },
+    "health": {
+      "editButton": "Modifier",
+      "importantInfoTitle": "Informations importantes",
+      "allergiesTitle": "Allergies",
+      "historyTitle": "Antécédents",
+      "medicationsTitle": "Traitements en cours",
+      "notesTitle": "Notes importantes",
+      "importantLabel": "Important",
+      "lastUpdated": "Dernière mise à jour {{date}} · {{practitioner}}",
+      "noAllergies": "Aucune allergie renseignée.",
+      "noHistory": "Aucun antécédent renseigné.",
+      "noMedications": "Aucun traitement en cours renseigné.",
+      "noNotes": "Aucune note importante renseignée.",
+      "emptyAllTitle": "Aucune information médicale importante renseignée.",
+      "emptyAllAction": "Compléter le dossier santé",
+      "errorTitle": "Impossible de charger le dossier santé.",
+      "errorRetry": "Réessayer",
+      "updateSuccess": "Dossier santé mis à jour.",
+      "editTitle": "Modifier le dossier santé",
+      "form": {
+        "searchPlaceholder": "Rechercher ou ajouter...",
+        "addCustomEntry": "+ Ajouter une valeur personnalisée",
+        "noSuggestions": "Aucune suggestion.",
+        "notesLabel": "Notes importantes",
+        "notesPlaceholder": "Précaution particulière avant intervention.",
+        "removeEntry": "Retirer {{label}}",
+        "save": "Enregistrer",
+        "cancel": "Annuler"
+      }
     }
   },
   "admin": {

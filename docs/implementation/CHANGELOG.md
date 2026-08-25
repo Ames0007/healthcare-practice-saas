@@ -664,3 +664,92 @@ All notable changes to this project are documented in this file.
   28 UI-004E payments-content tests + 2 UI-004E integration assertions),
   typecheck, lint and build pass; backend regression (10 tests)
   unaffected — no backend files touched.
+- Dossier Santé: important medical information (UI-005A), replacing
+  `/app/patients/[id]/health`'s UI-004A placeholder with the first real
+  clinical prototype — the patient's persistent allergies/medical
+  history/current medications/important notes only. Explicitly not
+  consultation history, active consultation, prescriptions or clinical
+  documents (UI-005B/C/D's scope). **Administrative/clinical separation
+  (§8):** a new `MedicalProfile`/`MedicalProfileEntry` model in
+  `components/domain/clinical/types.ts`, deliberately never added onto
+  the existing administrative `Patient` interface (CLAUDE.md §8/§12) —
+  verified by a dedicated diff grep, not just by convention. **Master-
+  data architecture (§11-14):** `features/clinical/master-data.ts`
+  provides a small synthetic bounded FR/AR catalog (6 allergies, 6
+  history items, 5 medications) with case- and accent-insensitive search
+  (NFD Unicode normalization, no fuzzy/AI matching) — practitioners
+  search and select rather than typing every term from scratch, with a
+  controlled custom-entry escape hatch that never writes back into the
+  shared catalog. **Reusing `Combobox` for multi-select (§27):** rather
+  than building a second autocomplete system, each of the edit drawer's
+  three category pickers is a `Combobox` whose own committed `value` is
+  always kept `null` — a selection is immediately appended to a local
+  chip list and the field clears for the next search. The only change to
+  the shared primitive itself is that `onCreate` now receives the
+  current query text (small and backward-compatible: the sole existing
+  caller, Agenda's quick-create-patient action, already ignores extra
+  arguments). Already-selected items are filtered out of the next
+  search's suggestions, which is what prevents a duplicate predefined
+  selection (§50) without extra bookkeeping; typing an exact match of an
+  existing master-data label resolves to that predefined item instead of
+  creating a shadow custom duplicate. New domain layer
+  `components/domain/clinical/`: `types.ts`, `clinical-summary-
+  section.tsx` (`ClinicalSummarySection` — one restrained card per
+  category, an inline empty sentence rather than a per-category
+  `EmptyState`, and a small "Important" `StatusBadge` on one allergy
+  entry at a time, never coloring the whole card, §18-19) and
+  `entry-chip.tsx` (`EntryChip`, the removable selected-value pill).
+  Added `components/ui/textarea.tsx` (mirrors `Input`'s label/error
+  pattern — the design system's own component vocabulary already names
+  `Textarea`, and Dossier Santé's important-notes field is its first
+  real use). New `features/patients/` pieces: `mock-medical-profiles-
+  data.ts` (pat-1/Ahmed fully populated including one "important"
+  Pénicilline allergy; pat-3/Fatima partially populated — some history,
+  no allergies/medications; pat-2/Sara has no fixture at all — the same
+  "empty by omission" convention as UI-004D/E), `medical-profile.ts`
+  (`getMedicalProfileForPatient`, `isMedicalProfileEmpty` — `null` and
+  "every section empty" treated identically), `components/patient-
+  health-content.tsx` (the tab composition) and `components/medical-
+  profile-edit-drawer.tsx` (reuses the shared `Dialog` drawer
+  unmodified). **Local-session state (§7/UI-004E's same convention):** a
+  saved edit is kept only in `PatientHealthContent`'s own component
+  state — no LocalStorage/IndexedDB/cookie anywhere holds this clinical
+  data, and the centralized fixtures are never mutated. Also added
+  `formatDayMonthYear` to `features/patients/format.ts` ("23 août 2026"
+  — the one existing date formatter, `formatDayMonth`, deliberately omits
+  the year). Since Dossier Santé was the last remaining placeholder tab,
+  the now-permanently-unreachable "future-placeholder" integration test
+  for it was replaced with a real-content assertion, matching every
+  other tab's own precedent; `PatientTabPlaceholder`'s fallback branch
+  and its `FUTURE_TASK_BY_TAB` map are left in place (now empty) as
+  harmless, precedent-consistent scaffolding for any future tab, not
+  deleted. Full FR/AR under a new `patientDetail.health.*` namespace, all
+  Arabic clinical terminology reviewed for register (e.g. "الحساسيات" for
+  allergies, not a literal transliteration). RTL verified (SSR
+  `dir="rtl"`/`lang="ar"` on the route). Added
+  `frontend/src/features/clinical/master-data.test.ts` (18 tests:
+  predefined search per category, case/accent-insensitivity, an
+  abbreviation search term, category scoping, catalog stability across
+  calls, and locale-resolved labels),
+  `frontend/src/features/patients/medical-profile.test.ts` (6 tests),
+  `frontend/src/features/patients/mock-medical-profiles-data.test.ts` (7
+  fixture-integrity tests — Patient A/B/C shape, no duplicate labels
+  within a category, and every `masterDataId` resolving to a real
+  catalog item of the matching category) and
+  `frontend/src/features/patients/components/patient-health-content.test.tsx`
+  (25 tests: all four summary sections, the important-allergy badge, an
+  individual empty section, the fully-empty state, opening the edit
+  drawer with entries prefilled as removable chips, searching each
+  category, adding a predefined entry, adding a custom entry, removing
+  an entry, duplicate-selection prevention, save updating the local
+  profile with a success toast, cancel discarding a draft, the absence
+  of any finance/consultation-history/prescription/document content,
+  loading, error, French, and Arabic/RTL) plus 2 integration assertions
+  in `patient-detail-page.test.tsx` (header/tabs preserved with Dossier
+  Santé active and real content, and not-found still wins for an invalid
+  patient id on this tab). All 277 frontend tests (225 carried over from
+  UI-001 through UI-004E + 18 UI-005A master-data tests + 6 UI-005A
+  medical-profile tests + 7 UI-005A fixture-integrity tests + 25 UI-005A
+  health-content tests + 2 UI-005A integration assertions), typecheck,
+  lint and build pass; backend regression (10 tests) unaffected — no
+  backend files touched.

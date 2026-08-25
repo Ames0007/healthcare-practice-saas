@@ -58,13 +58,15 @@ them here — that is a later task (see `CLAUDE.md` §9-10).
 
 ```text
 src/components/
-  ui/       Generic primitives: Button, Input, Select, Combobox, Card,
-            StatusBadge, Skeleton, EmptyState, MetricCard, AttentionItem,
-            Dialog (one focus-trapped, portal-rendered implementation
-            backing drawer/modal/alert variants — see UI-002), ConfirmDialog,
-            Toast (single-slot, not a global provider), Avatar
-            (initials-fallback, no photo support), Pagination (compact
-            prev/next, no numbered list — see UI-003A), Tabs (real
+  ui/       Generic primitives: Button, Input, Textarea (mirrors Input's
+            label/error/describedby pattern, added UI-005A for Dossier
+            Santé's notes field), Select, Combobox, Card, StatusBadge,
+            Skeleton, EmptyState, MetricCard, AttentionItem, Dialog (one
+            focus-trapped, portal-rendered implementation backing drawer/
+            modal/alert variants — see UI-002), ConfirmDialog, Toast
+            (single-slot, not a global provider), Avatar (initials-
+            fallback, no photo support), Pagination (compact prev/next, no
+            numbered list — see UI-003A), Tabs (real
             `<nav>`/`aria-current="page"` navigation for URL-addressable
             sections — not the ARIA `tablist` pattern, which is reserved
             for JS-only panel switching with no URL change, see UI-004A).
@@ -130,6 +132,21 @@ src/components/
             (`PaymentRow`, a dense clickable history row mirroring
             `TreatmentPlanCard`'s "completed" variant rather than a full
             `Card`).
+            `domain/clinical/` (UI-005A) — the first real clinical
+            prototype, deliberately separate from `domain/patients/`'s
+            administrative `PatientOverview` and from
+            `features/patients/types.ts`'s administrative `Patient`
+            (CLAUDE.md §8/§12): `types.ts` (`MedicalProfile`/
+            `MedicalProfileEntry`, Spec #4 §9.3 `patient_health_flags`
+            simplified to this task's own bounded shape — no consultation/
+            encounter/amendment entities, those are UI-005B/C's domain),
+            `clinical-summary-section.tsx` (`ClinicalSummarySection`, one
+            restrained card per category — allergies/history/medications/
+            notes all reuse it — with an inline empty sentence rather than
+            a full `EmptyState` per category, and a small "Important"
+            `StatusBadge` on one entry at a time, never coloring the whole
+            card) and `entry-chip.tsx` (`EntryChip`, the removable
+            selected-value pill used inside the edit drawer).
 
 src/features/
   today/    Aujourd'hui screen composition (UI-001): `types.ts` (mock
@@ -302,7 +319,51 @@ src/features/
             "no global store to paper over a prototype seam" principle as
             UI-004A §7/UI-004B §9 above, applied to a same-route local
             mutation instead of a cross-route read: navigating away from
-            Paiements and back resets to the seed state.
+            Paiements and back resets to the seed state. Dossier Santé tab
+            (UI-005A): `mock-medical-profiles-data.ts` (centralized
+            synthetic profile fixtures — pat-1/Ahmed fully populated
+            including one "important" allergy, pat-3/Fatima partially
+            populated — some history, no allergies/medications, pat-2/Sara
+            has no fixture at all), `medical-profile.ts`
+            (`getMedicalProfileForPatient`, `isMedicalProfileEmpty` — `null`
+            and "every section empty" are treated identically),
+            `components/patient-health-content.tsx` (the tab composition —
+            important information only, no consultation history/active
+            consultation/prescriptions/documents, those are UI-005B/C/D),
+            `components/medical-profile-edit-drawer.tsx` (the edit surface
+            — see the `clinical/master-data.ts` note below for how its
+            three category pickers reuse `Combobox`). Edits are kept only
+            in `PatientHealthContent`'s own local state — the same
+            local-session-state convention as UI-004E's payment capture
+            immediately above, and for the same reason: no LocalStorage/
+            IndexedDB/cookie ever holds this clinical data (CLAUDE.md §7).
+
+  clinical/ Bounded prototype clinical master-data catalog (UI-005A §12-14,
+            Spec #2 §17.2's "search by keyword / select predefined / add
+            custom" form philosophy) — not a database-backed master-data
+            management module. `master-data.ts`: `getClinicalMasterData()`
+            (6 allergies / 6 history items / 5 medications, FR+AR labels),
+            `searchClinicalMasterData` (case- and accent-insensitive via
+            NFD normalization — no fuzzy/AI matching), `getMasterDataLabel`
+            (locale-resolved display label). **Multi-select via a
+            single-select primitive:** each of the edit drawer's three
+            category pickers is a `Combobox` (`components/ui/combobox.tsx`)
+            whose own committed `value` is always kept `null` by the
+            caller — a selection is immediately appended to a local chip
+            list and the field clears for the next search, instead of the
+            combobox holding one committed value. This reuses `Combobox`
+            entirely unmodified for the search/select/keyboard-navigation
+            mechanics; the only change to the shared primitive itself is
+            that `onCreate` now receives the current query text (a small,
+            backward-compatible extension — the one pre-existing caller,
+            Agenda's quick-create-patient action, ignores the argument),
+            which is what lets a caller create a custom entry from
+            whatever the practitioner actually typed (§15) without a
+            second, separate multi-select autocomplete system (§27).
+            Already-selected master-data items are filtered out of the
+            next search's suggestion list by the caller, which is also
+            what prevents a duplicate predefined selection (§50) — no
+            extra bookkeeping inside `Combobox` itself.
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,

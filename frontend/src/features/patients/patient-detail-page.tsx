@@ -16,6 +16,7 @@ import { getPatientFinancialSummary } from "./finance";
 import { formatDayMonthTime, formatMad, getPatientFullName, getPatientInitials, computeAge } from "./format";
 import { getTodayIso } from "./patient-form-validation";
 import { PatientOverviewContent } from "./components/patient-overview-content";
+import { PatientHealthContent } from "./components/patient-health-content";
 import { PatientAppointmentsContent } from "./components/patient-appointments-content";
 import { PatientTreatmentsContent } from "./components/patient-treatments-content";
 import { PatientInvoicesContent } from "./components/patient-invoices-content";
@@ -146,6 +147,8 @@ export function PatientDetailPage({
 
       {activeTab === "overview" ? (
         <PatientOverviewContent overview={overview} nextAppointment={nextAppointment} balance={balance} />
+      ) : activeTab === "health" ? (
+        <PatientHealthContent patientId={patientId} patients={patients} />
       ) : activeTab === "appointments" ? (
         <PatientAppointmentsContent patientId={patientId} />
       ) : activeTab === "treatments" ? (

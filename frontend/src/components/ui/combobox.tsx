@@ -19,7 +19,8 @@ export interface ComboboxProps {
   error?: string;
   required?: boolean;
   createLabel?: string;
-  onCreate?: () => void;
+  /** Receives the current search text so the caller can create a custom entry from it (UI-005A §15) — the existing quick-create-patient caller ignores the argument. */
+  onCreate?: (query: string) => void;
 }
 
 /**
@@ -84,8 +85,10 @@ export function Combobox({
       if (activeIndex >= 0 && activeIndex < filtered.length) {
         selectItem(filtered[activeIndex]);
       } else if (onCreate && activeIndex === filtered.length) {
-        onCreate();
+        onCreate(query ?? "");
+        setQuery(null);
         setOpen(false);
+        setActiveIndex(-1);
       }
     } else if (event.key === "Escape") {
       setOpen(false);
@@ -165,8 +168,10 @@ export function Combobox({
                 aria-selected={false}
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={() => {
-                  onCreate();
+                  onCreate(query ?? "");
+                  setQuery(null);
                   setOpen(false);
+                  setActiveIndex(-1);
                 }}
                 className={cn(
                   "cursor-pointer border-t border-border px-3 py-2 text-sm font-medium text-primary",

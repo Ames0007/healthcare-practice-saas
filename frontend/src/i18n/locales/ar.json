@@ -526,6 +526,36 @@
         "invalidAmountError": "مبلغ غير صالح.",
         "overpaymentError": "المبلغ يتجاوز الرصيد المستحق."
       }
+    },
+    "health": {
+      "editButton": "تعديل",
+      "importantInfoTitle": "المعلومات المهمة",
+      "allergiesTitle": "الحساسيات",
+      "historyTitle": "التاريخ المرضي",
+      "medicationsTitle": "العلاجات الحالية",
+      "notesTitle": "ملاحظات مهمة",
+      "importantLabel": "مهم",
+      "lastUpdated": "آخر تحديث {{date}} · {{practitioner}}",
+      "noAllergies": "لا توجد حساسية مسجلة.",
+      "noHistory": "لا يوجد تاريخ مرضي مسجل.",
+      "noMedications": "لا يوجد علاج حالي مسجل.",
+      "noNotes": "لا توجد ملاحظات مهمة.",
+      "emptyAllTitle": "لا توجد معلومات طبية مهمة مسجلة.",
+      "emptyAllAction": "إكمال الملف الصحي",
+      "errorTitle": "تعذّر تحميل الملف الصحي.",
+      "errorRetry": "إعادة المحاولة",
+      "updateSuccess": "تم تحديث الملف الصحي.",
+      "editTitle": "تعديل الملف الصحي",
+      "form": {
+        "searchPlaceholder": "البحث أو الإضافة...",
+        "addCustomEntry": "+ إضافة قيمة مخصصة",
+        "noSuggestions": "لا توجد اقتراحات.",
+        "notesLabel": "ملاحظات مهمة",
+        "notesPlaceholder": "احتياط خاص قبل التدخل.",
+        "removeEntry": "إزالة {{label}}",
+        "save": "حفظ",
+        "cancel": "إلغاء"
+      }
     }
   },
   "admin": {
