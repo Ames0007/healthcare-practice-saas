@@ -442,6 +442,55 @@
         "cancelled": "ملغاة",
         "noShow": "غياب"
       }
+    },
+    "invoices": {
+      "newInvoice": "+ فاتورة جديدة",
+      "newInvoiceNotice": "سيتم ربط إنشاء الفاتورة بمسار العمل التجاري لاحقًا.",
+      "totalInvoicedLabel": "إجمالي الفواتير",
+      "paidLabel": "المدفوع",
+      "remainingLabel": "الرصيد المتبقي",
+      "overdueLabel": "متأخر",
+      "resultCount": "{{count}} فاتورة",
+      "viewInvoice": "عرض الفاتورة",
+      "issuedOn": "صدرت في {{date}}",
+      "patientLabel": "المريض",
+      "descriptionHeader": "الوصف",
+      "quantityHeader": "الكمية",
+      "totalHeader": "الإجمالي",
+      "totalRowLabel": "الإجمالي",
+      "remainingRowLabel": "المتبقي",
+      "installmentScheduleTitle": "جدول الدفعات",
+      "installmentScheduleTotal": "الإجمالي: {{total}}",
+      "installmentLabel": "الدفعة {{n}}",
+      "downPaymentCaption": "دفعة أولى — مدفوعة عند الإصدار",
+      "downloadPdf": "تحميل PDF",
+      "print": "طباعة",
+      "documentNotice": "سيتم ربط إصدار PDF بمحرك المستندات لاحقًا.",
+      "emptyAllTitle": "لا توجد فواتير لهذا المريض.",
+      "emptyAllDescription": "ستظهر هنا فواتير المريض.",
+      "emptyFilteredTitle": "لا توجد فاتورة تطابق هذا المرشح.",
+      "errorTitle": "تعذّر تحميل فواتير المريض.",
+      "errorRetry": "إعادة المحاولة",
+      "filters": {
+        "all": "الكل",
+        "due": "مستحقة",
+        "paid": "مدفوعة",
+        "overdue": "متأخرة"
+      },
+      "status": {
+        "draft": "مسودة",
+        "issued": "صادرة",
+        "partiallyPaid": "مدفوعة جزئيًا",
+        "paid": "مدفوعة",
+        "overdue": "متأخرة",
+        "cancelled": "ملغاة"
+      },
+      "installmentStatus": {
+        "paid": "مدفوعة",
+        "due": "مستحقة",
+        "overdue": "متأخرة",
+        "future": "قادمة"
+      }
     }
   },
   "admin": {

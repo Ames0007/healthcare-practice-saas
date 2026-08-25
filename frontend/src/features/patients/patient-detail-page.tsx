@@ -11,11 +11,14 @@ import { PatientHeader } from "@/components/domain/patients/patient-header";
 import type { PatientTabKey, PatientOverview } from "@/components/domain/patients/types";
 import { getPatientsMockData } from "./mock-data";
 import { getPatientOverview } from "./mock-overview-data";
+import { getInvoicesMockData } from "./mock-invoices-data";
+import { getPatientFinancialSummary } from "./finance";
 import { formatDayMonthTime, formatMad, getPatientFullName, getPatientInitials, computeAge } from "./format";
 import { getTodayIso } from "./patient-form-validation";
 import { PatientOverviewContent } from "./components/patient-overview-content";
 import { PatientAppointmentsContent } from "./components/patient-appointments-content";
 import { PatientTreatmentsContent } from "./components/patient-treatments-content";
+import { PatientInvoicesContent } from "./components/patient-invoices-content";
 import { PatientTabPlaceholder } from "./components/patient-tab-placeholder";
 import { PatientDetailSkeleton } from "./components/patient-detail-skeleton";
 import type { Patient } from "./types";
@@ -104,7 +107,9 @@ export function PatientDetailPage({
   const nextAppointment = patient.nextAppointment
     ? { label: formatDayMonthTime(patient.nextAppointment, locale), service: patient.nextAppointment.service ?? null }
     : null;
-  const balance = patient.outstandingBalance > 0 ? { label: formatMad(patient.outstandingBalance, locale) } : null;
+  const financialSummary = getPatientFinancialSummary(getInvoicesMockData(), patientId);
+  const outstandingBalance = financialSummary?.outstandingBalance ?? patient.outstandingBalance;
+  const balance = outstandingBalance > 0 ? { label: formatMad(outstandingBalance, locale) } : null;
 
   function showFutureNotice() {
     setToastMessage(t("patientDetail.header.futureFeatureNotice"));
@@ -144,6 +149,8 @@ export function PatientDetailPage({
         <PatientAppointmentsContent patientId={patientId} />
       ) : activeTab === "treatments" ? (
         <PatientTreatmentsContent patientId={patientId} patients={patients} />
+      ) : activeTab === "invoices" ? (
+        <PatientInvoicesContent patientId={patientId} patients={patients} />
       ) : (
         <PatientTabPlaceholder tab={activeTab} />
       )}

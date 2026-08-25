@@ -7,8 +7,7 @@ import type { PatientTabKey } from "@/components/domain/patients/types";
 /** Non-Aperçu tabs during UI-004A (§24) — the future task, when known, is cited explicitly (mirrors UI-002's "Ouvrir consultation" placeholder). */
 const FUTURE_TASK_BY_TAB: Partial<Record<PatientTabKey, string>> = {
   health: "UI-005",
-  invoices: "UI-007",
-  payments: "UI-007",
+  payments: "UI-004E",
 };
 
 export interface PatientTabPlaceholderProps {

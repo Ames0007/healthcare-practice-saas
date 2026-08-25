@@ -484,3 +484,84 @@ All notable changes to this project are documented in this file.
   on the dedicated treatments-content suite), typecheck, lint and build
   pass; backend regression (10 tests) unaffected — no backend files
   touched.
+- Patient Factures/Installments tab (UI-004D), replacing
+  `/app/patients/[id]/invoices`'s UI-004A placeholder with an invoice and
+  staged-payment workspace. **Money representation (§8-9):** whole MAD
+  units (never fractional/floating-point), deliberately matching
+  `Patient.outstandingBalance`/`formatMad`'s pre-existing convention
+  rather than introducing a separate minor-units (×100) model — this
+  task's own instructions explicitly allow "another safe deterministic
+  money representation consistent with existing frontend architecture,"
+  and every amount in every wireframe across this whole product is a
+  whole MAD number, so ordinary integer arithmetic is already float-free.
+  Reuses `formatMad` as the one shared formatter rather than adding a
+  second one. New domain layer `components/domain/finance/`: `types.ts`
+  (`Invoice`/`InvoiceLine`/`Installment`, Spec #4 §15-16's backend model
+  simplified to this task's own status lists), `invoice-status.ts` and
+  `installment-status.ts` (two separate small registries — an
+  installment can legitimately be "overdue" inside a still-
+  "partially_paid" invoice), `invoice-card.tsx` (`InvoiceCard`) and
+  `installment-row.tsx` (`InstallmentRow`, icon + text + tone, never
+  color alone). New `features/patients/` pieces: `mock-invoices-data.ts`
+  (centralized synthetic fixtures — pat-1/Ahmed carries three invoices:
+  the partial one with the full six-installment schedule using Spec #9
+  Screen 29's own numbers exactly, a second fully paid one, and a
+  cancelled one, whose non-cancelled totals aggregate to precisely this
+  task's own §17 wireframe summary, 4 500/3 000/1 500 MAD; pat-4/Youssef
+  is fully paid; pat-9/Mehdi has one overdue invoice/installment;
+  pat-2/Sara has none at all), `finance.ts` (filter-by-patientId, the
+  four-group filter, `getFinancialSummary` — deliberately excluding
+  cancelled invoices from the aggregate, since a voided invoice was never
+  really "facturé" — `findNextInstallment`, and
+  `getPatientFinancialSummary`), `components/patient-invoices-content.tsx`
+  (the tab composition — neutral typography-led `MetricCard`s for the
+  summary, per §19's explicit "no giant green/red cards" instruction),
+  `components/invoice-detail-drawer.tsx` (reuses the shared `Dialog`
+  drawer unmodified; looks its linked treatment plan up by
+  `treatmentPlanId` from UI-004C's own fixtures rather than duplicating
+  a title, CLAUDE.md §12). **Overview/header consistency (§15-16):**
+  `getPatientFinancialSummary` returns `null` for any patient with no
+  invoice fixtures here, so `PatientDetailPage`'s header balance and
+  `mock-overview-data.ts`'s next-installment fall back to the existing
+  per-patient values unchanged for the other 12 seed patients — only the
+  4 patients this task actually gave invoices to have their balance
+  derived, avoiding the wide refactor the task explicitly warned against;
+  verified by keeping every existing UI-004A overview/header assertion
+  green plus two new explicit consistency tests. A genuine fixture-design
+  finding surfaced by a failing integrity test: a cancelled invoice's
+  `remainingAmount` is legitimately 0 regardless of its `totalAmount` (a
+  voided invoice owes nothing) — documented in both the fixture and the
+  dedicated integrity-test file as the one deliberate exception to the
+  `paidAmount + remainingAmount === totalAmount` invariant. "+ Nouvelle
+  facture" and "Télécharger PDF"/"Imprimer" all show a future-feature
+  Toast; "Encaisser" only navigates to the still-placeholder
+  `/app/patients/{id}/payments` (UI-004E owns real collection) and never
+  renders for a paid or cancelled invoice; cancelled invoices stay
+  visible under the "Toutes" filter. Full FR/AR under a new
+  `patientDetail.invoices.*` namespace, reusing
+  `patientDetail.header.collectPayment` and
+  `patientDetail.treatments.viewTreatment` rather than duplicating them.
+  RTL verified, invoice numbers/dates/amounts isolated `dir="ltr"` per
+  the established pattern. Added
+  `frontend/src/features/patients/mock-invoices-data.test.ts` (11 fixture-
+  integrity tests — installment-sum/paid-sum/total invariants, the
+  cancelled-invoice exception, and the exact 4 500/3 000/1 500 aggregate)
+  and
+  `frontend/src/features/patients/components/patient-invoices-content.test.tsx`
+  (24 tests: the financial summary, newest-first ordering, partial/paid/
+  overdue/cancelled presentation, all four filters, opening the drawer
+  with lines/totals/the installment schedule and its paid/due/future/
+  overdue statuses, the down-payment caption, no-Encaisser-on-a-paid-
+  invoice, Encaisser navigating rather than collecting, the PDF/print
+  future notice, the treatment link, both empty states, loading, error,
+  French, Arabic/RTL, and the new-invoice future notice) plus 4
+  integration assertions in `patient-detail-page.test.tsx` (header/tabs
+  preserved with Factures active, the header-balance consistency check,
+  the overview-next-installment consistency check, and not-found still
+  wins for an invalid patient id on this tab). All 163 frontend tests
+  (13 UI-001 + 20 UI-002 + 30 UI-003A/B + 26 in the shared
+  `patient-detail-page.test.tsx` file + 22 UI-004B on the dedicated
+  appointments-content suite + 17 UI-004C on the dedicated treatments-
+  content suite + 24 UI-004D on the dedicated invoices-content suite +
+  11 UI-004D fixture-integrity tests), typecheck, lint and build pass;
+  backend regression (10 tests) unaffected — no backend files touched.

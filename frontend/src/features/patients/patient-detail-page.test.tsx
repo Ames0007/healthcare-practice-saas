@@ -213,4 +213,34 @@ describe("PatientDetailPage", () => {
     expect(screen.getByText("Patient introuvable")).toBeInTheDocument();
     expect(screen.queryByText("Traitement actif")).not.toBeInTheDocument();
   });
+
+  it("renders real Factures content with the header and active tab preserved (UI-004D 1/2/3)", () => {
+    renderPatientDetail("fr", { patientId: "pat-1", activeTab: "invoices" });
+
+    expect(screen.getByRole("heading", { level: 1, name: "Ahmed El Mansouri" })).toBeInTheDocument();
+    const nav = screen.getByRole("navigation", { name: "Sections du patient" });
+    expect(within(nav).getByRole("link", { name: "Factures" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByText("Total facturé")).toBeInTheDocument();
+    expect(screen.queryByText("Cette section sera implémentée dans une prochaine étape.")).not.toBeInTheDocument();
+  });
+
+  it("keeps the header balance consistent with the centralized invoice fixtures (UI-004D §15-16/39)", () => {
+    renderPatientDetail("fr", { patientId: "pat-1", activeTab: "invoices" });
+
+    expect(screen.getAllByText("1 500 MAD").length).toBeGreaterThan(0);
+  });
+
+  it("keeps the overview next-installment consistent with the centralized invoice fixtures (UI-004D §15-16/40)", () => {
+    renderPatientDetail("fr", { patientId: "pat-1", activeTab: "overview" });
+
+    expect(screen.getByText("1 septembre")).toBeInTheDocument();
+    expect(screen.getAllByText("500 MAD").length).toBeGreaterThan(0);
+  });
+
+  it("keeps the not-found state for an invalid patient on the Factures tab (UI-004D 35)", () => {
+    renderPatientDetail("fr", { patientId: "pat-999", activeTab: "invoices" });
+
+    expect(screen.getByText("Patient introuvable")).toBeInTheDocument();
+    expect(screen.queryByText("Total facturé")).not.toBeInTheDocument();
+  });
 });

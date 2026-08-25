@@ -108,6 +108,21 @@ src/components/
             (`TreatmentPlanCard`, an "active"/"completed" `variant` plus
             `actions`/`onSelect` — deliberately mirrors
             `appointment-card.tsx`'s own API for consistency).
+            `domain/finance/` (UI-004D) — `types.ts` (`Invoice`/
+            `InvoiceLine`/`Installment`; money is a plain whole-MAD
+            `number` — never a separate minor-units/×100 representation —
+            matching `Patient.outstandingBalance`/`formatMad`'s existing
+            convention exactly, since no wireframe in this product ever
+            shows centimes; introducing a second money model would force
+            a wide refactor this task's own instructions explicitly warn
+            against), `invoice-status.ts`/`installment-status.ts` (two
+            separate small registries, same reasoning as
+            `treatment-status.ts`/`session-status.ts`), `invoice-card.tsx`
+            (`InvoiceCard`) and `installment-row.tsx` (`InstallmentRow` —
+            icon + text + tone, never color alone). No separate money
+            formatter was added — `formatMad` (already re-exported by
+            `features/patients/format.ts`) remains the one shared
+            formatter.
 
 src/features/
   today/    Aujourd'hui screen composition (UI-001): `types.ts` (mock
@@ -227,8 +242,32 @@ src/features/
             can never disagree. "+ Nouveau traitement" and a completed
             session's "Voir la consultation" both show a future-feature
             notice rather than a real workflow; "Voir la facturation" is a
-            real link to the still-placeholder `/invoices` tab, with no
-            finance figures anywhere in the drawer.
+            real link to the `/invoices` tab, with no finance figures
+            anywhere in the treatment drawer. Factures/Installments tab
+            (UI-004D): `mock-invoices-data.ts` (centralized synthetic
+            invoice fixtures — pat-1's partial invoice carries the full
+            six-installment staged-payment schedule plus a paid and a
+            cancelled invoice, pat-4 is fully paid, pat-9 has one overdue
+            invoice, pat-2 has none), `finance.ts` (filter-by-patientId,
+            the four-group filter, `getFinancialSummary` — excludes
+            cancelled invoices from the aggregate — `findNextInstallment`,
+            `getPatientFinancialSummary`), `components/patient-invoices-content.tsx`
+            (the tab composition), `components/invoice-detail-drawer.tsx`
+            (one `Dialog` instance, unmodified drawer width; looks its
+            linked `TreatmentPlan` up by id from UI-004C's own fixtures
+            rather than duplicating a title). **Overview/header
+            consistency (UI-004D §15-16):** `getPatientFinancialSummary`
+            returns `null` for any patient with no invoice fixtures, so
+            `PatientDetailPage`'s header balance and
+            `mock-overview-data.ts`'s next-installment fall back to the
+            existing per-patient values unchanged for every seed patient
+            this task didn't add invoices for — only the 4 patients that
+            actually have invoice fixtures get a derived balance, avoiding
+            a wide refactor of the other 12. "+ Nouvelle facture" and
+            "Télécharger PDF"/"Imprimer" show a future-feature notice;
+            "Encaisser" only navigates to the still-placeholder
+            `/payments` tab (UI-004E owns real collection) and never
+            renders for a paid or cancelled invoice.
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,

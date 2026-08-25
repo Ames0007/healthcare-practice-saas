@@ -442,6 +442,55 @@
         "cancelled": "Annulée",
         "noShow": "Absence"
       }
+    },
+    "invoices": {
+      "newInvoice": "+ Nouvelle facture",
+      "newInvoiceNotice": "La création d'une facture sera connectée au workflow métier ultérieurement.",
+      "totalInvoicedLabel": "Total facturé",
+      "paidLabel": "Payé",
+      "remainingLabel": "Reste à payer",
+      "overdueLabel": "En retard",
+      "resultCount": "{{count}} factures",
+      "viewInvoice": "Voir la facture",
+      "issuedOn": "Émise le {{date}}",
+      "patientLabel": "Patient",
+      "descriptionHeader": "Description",
+      "quantityHeader": "Qté",
+      "totalHeader": "Total",
+      "totalRowLabel": "Total",
+      "remainingRowLabel": "Reste",
+      "installmentScheduleTitle": "Échéancier",
+      "installmentScheduleTotal": "Total : {{total}}",
+      "installmentLabel": "Échéance {{n}}",
+      "downPaymentCaption": "Acompte — payé à l'émission",
+      "downloadPdf": "Télécharger PDF",
+      "print": "Imprimer",
+      "documentNotice": "La génération PDF sera connectée au moteur documentaire ultérieurement.",
+      "emptyAllTitle": "Aucune facture pour ce patient.",
+      "emptyAllDescription": "Les factures du patient apparaîtront ici.",
+      "emptyFilteredTitle": "Aucune facture ne correspond à ce filtre.",
+      "errorTitle": "Impossible de charger les factures du patient.",
+      "errorRetry": "Réessayer",
+      "filters": {
+        "all": "Toutes",
+        "due": "À payer",
+        "paid": "Payées",
+        "overdue": "En retard"
+      },
+      "status": {
+        "draft": "Brouillon",
+        "issued": "Émise",
+        "partiallyPaid": "Partiellement payée",
+        "paid": "Payée",
+        "overdue": "En retard",
+        "cancelled": "Annulée"
+      },
+      "installmentStatus": {
+        "paid": "Payée",
+        "due": "À payer",
+        "overdue": "En retard",
+        "future": "À venir"
+      }
     }
   },
   "admin": {
