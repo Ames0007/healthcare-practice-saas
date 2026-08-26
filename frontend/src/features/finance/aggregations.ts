@@ -38,16 +38,6 @@ function isWithinRange(dateIso: string, range: PeriodRange): boolean {
 }
 
 /**
- * Constant synthetic seed (UI-006A §12/§40), matching Spec #9 Screen 30's
- * own illustrative "Solde initial" value (500 MAD) rather than an invented
- * number. Reused unchanged across all three period views since this
- * dashboard does not implement real Caisse session boundaries (UI-006C/E
- * own opening/closing) — a documented prototype projection only (§41), not
- * a running real balance.
- */
-export const OPENING_CASH_POSITION: MoneyAmount = 500;
-
-/**
  * Effective posted cash payments within the period (UI-006A §18/§37).
  * Reuses `getEffectivePaidAmount`'s exact reversed-payment-exclusion rule
  * (UI-004E) unmodified after filtering to the period — never a second,
@@ -79,24 +69,16 @@ export function computeDisbursed(expenses: CabinetExpense[], range: PeriodRange)
 }
 
 /**
- * Generic cash-flow balance primitive (UI-006C §43 refactor) shared by the
- * Finance dashboard's Position Caisse below and Caisse's own theoretical
- * balance (`features/caisse/calculations.ts`) — opening + incoming −
- * outgoing. The two callers deliberately keep distinct semantics: this
- * dashboard's "opening" is the constant `OPENING_CASH_POSITION` reused
- * across all three period views (a documented projection, §41), while
- * Caisse's "opening" is the real amount entered when today's specific
- * `CashSession` was opened. Extracting the shared arithmetic here avoids
- * two copies of the same one-line formula without pretending the two
- * "opening" values mean the same thing.
+ * Generic cash-flow balance primitive (UI-006C §43 refactor): opening +
+ * incoming − outgoing. Used by Caisse's own theoretical balance
+ * (`features/caisse/calculations.ts`); the Finance dashboard no longer has
+ * its own "Position caisse" projection (UI-006X removed it — the dashboard
+ * now shows Caisse's own real `CashSession` state instead of approximating
+ * it, see `DashboardCaisseSection`), so this primitive has exactly one
+ * caller left.
  */
 export function computeCashBalance(opening: MoneyAmount, incoming: MoneyAmount, outgoing: MoneyAmount): MoneyAmount {
   return opening + incoming - outgoing;
-}
-
-/** Prototype cash-position formula (UI-006A §40): opening position + period collections − period disbursements. */
-export function computeCashPosition(collected: MoneyAmount, disbursed: MoneyAmount): MoneyAmount {
-  return computeCashBalance(OPENING_CASH_POSITION, collected, disbursed);
 }
 
 export function computeFinanceKpis(
@@ -109,7 +91,7 @@ export function computeFinanceKpis(
   const disbursed = computeDisbursed(expenses, range);
   const { receivable, overdue } = computeReceivableAndOverdue(invoices);
 
-  return { collected, receivable, overdue, disbursed, cashPosition: computeCashPosition(collected, disbursed) };
+  return { collected, receivable, overdue, disbursed };
 }
 
 /** Operational priority (UI-006A §22): overdue first, then currently due, then any other outstanding status. */

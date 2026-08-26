@@ -597,9 +597,9 @@ src/features/
             never independently drift from Patient 360°'s own numbers.
             À encaisser/En retard are deliberately not period-scoped
             (current balances, not a period activity flow) while
-            Encaissé/Décaissements/Position caisse do recompute per
-            period — documented directly in `aggregations.ts`, not left
-            implicit. `getPeriodRange` resolves Aujourd'hui/Cette
+            Encaissé/Décaissements do recompute per period — documented
+            directly in `aggregations.ts`, not left implicit.
+            `getPeriodRange` resolves Aujourd'hui/Cette
             semaine/Ce mois against the same fixed `MOCK_BUSINESS_DATE`
             convention as Aujourd'hui/Agenda, reusing Agenda's own
             `getWeekStart` (`features/agenda/format.ts`) for the week
@@ -609,20 +609,65 @@ src/features/
             domain/finance/types.ts`, alongside the existing Invoice/
             Payment) — it exists solely to give the Décaissements KPI/
             activity something real to aggregate; no expense-entry UI
-            reads or writes it (UI-006D's own scope). Cash position is a
-            documented prototype-only formula (opening 500 MAD, matching
-            Spec #9 Screen 30's own illustrative "Solde initial" — +
-            period collected − period disbursed), never a real Caisse
-            session result (UI-006C/E own that). `finance-dashboard.tsx`
+            reads or writes it (UI-006D's own scope). `finance-dashboard.tsx`
             (loading/loaded/error states, mirroring every other
             top-level screen's own `state` prop convention) composes
-            `components/` (PeriodSelector, KpiSummary,
-            ReceivablesSection, RecentActivitySection,
-            FinanceDashboardSkeleton). Receivables navigate to the
-            existing `/app/patients/{id}/invoices` route instead of a
-            duplicate detail drawer (§24); "Voir toutes les factures" now
-            navigates to `/app/finance/invoices` (UI-006B — it was a
-            future-feature Toast notice until that screen existed).
+            `components/` (FinanceNav, PeriodSelector, KpiSummary,
+            DashboardCaisseSection, ReceivablesSection,
+            RecentActivitySection, FinanceDashboardSkeleton). Receivables
+            navigate to the existing `/app/patients/{id}/invoices` route
+            instead of a duplicate detail drawer (§24); "Voir toutes les
+            factures" now navigates to `/app/finance/invoices` (UI-006B —
+            it was a future-feature Toast notice until that screen
+            existed).
+            UI-006X removed the dashboard's own "Position caisse"
+            projection entirely (it was a documented prototype-only
+            formula — opening 500 MAD + period collected − period
+            disbursed, never a real Caisse session result) once a real
+            one existed to show instead: `DashboardCaisseSection` reuses
+            `getDefaultOpenSessionMockData`/`buildCashMovements`/
+            `computeIncomingTotal`/`computeOutgoingTotal`/
+            `computeTheoreticalBalance`/`CaisseSummary` verbatim from
+            `features/caisse/` (below) — never a second cash-position
+            formula. `computeCashPosition`/`OPENING_CASH_POSITION` were
+            removed from `aggregations.ts` along with it (and
+            `cashPosition` from `FinanceKpis`); `computeCashBalance` (the
+            actually-shared arithmetic) stays, now with exactly one
+            caller — Caisse's own `computeTheoreticalBalance`.
+            `ReceivablesSection`'s heading became "À traiter" with an
+            overdue-vs-to-collect summary line computed by
+            filtering/summing the already-built `receivables` array in
+            the component itself — not a new total, not rebuilt priority
+            logic. `RecentActivitySection` rows became real navigation
+            (payment → the patient's own Paiements route, expense →
+            `/app/finance/expenses`), mirroring `CaisseMovementList`'s own
+            navigable-row convention exactly.
+            `features/finance/components/finance-nav.tsx` (`FinanceNav`,
+            UI-006X) is the shared Finance workspace section nav —
+            Vue d'ensemble/Factures/Caisse/Décaissements, integrated
+            identically into all four Finance routes right after each
+            page's own `PageHeader`. It is a thin wrapper around the
+            existing generic `Tabs` primitive (Spec #8 §48, already
+            backing Patient 360°'s own tab bar) rather than a new nav
+            component — real `<Link>`s, `aria-current`, mobile
+            horizontal-scroll and RTL-safe logical-property spacing all
+            came from `Tabs` unmodified. Active-state resolution
+            (`resolveActiveSection`) is exact/path-aware: `/app/finance`
+            matches only the literal route via equality, everything else
+            via `startsWith` on its own sub-path — never a blanket
+            `startsWith("/app/finance")` that would keep "Vue d'ensemble"
+            active on every nested route. Only four of Spec #9 Screen
+            24's own six wireframed tabs are included (Échéances/
+            Encaissements have no route yet — including them would link
+            to nothing); this is the task's own explicit instruction
+            taking priority over the wireframe (CLAUDE.md §1). Does not
+            appear in the main sidebar (`lib/nav-config.ts`) — Finance
+            stays one sidebar module; `FinanceNav` is purely the
+            workspace's own internal chrome, reused across
+            `features/finance/`'s and `features/caisse/`'s own page
+            components (the same cross-feature-directory import pattern
+            already established by UI-006C/D reusing `features/finance/
+            format.ts`/`mock-expenses-data.ts`).
             UI-006B adds `global-invoices.ts` and
             `global-invoices-page.tsx` alongside the dashboard code
             above, for `/app/finance/invoices` — the cabinet-wide

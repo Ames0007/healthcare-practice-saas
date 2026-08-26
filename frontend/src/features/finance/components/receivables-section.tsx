@@ -13,16 +13,29 @@ export interface ReceivablesSectionProps {
   receivables: ReceivableItem[];
 }
 
+/** Overdue-vs-to-collect split (UI-006X §23), derived from the already-computed `receivables` read model — never a new total. */
+function summarizeAttention(receivables: ReceivableItem[]) {
+  const overdue = receivables.filter((item) => item.status === "overdue");
+  const toCollect = receivables.filter((item) => item.status !== "overdue");
+  return {
+    overdueCount: overdue.length,
+    overdueTotal: overdue.reduce((sum, item) => sum + item.remainingAmount, 0),
+    toCollectCount: toCollect.length,
+    toCollectTotal: toCollect.reduce((sum, item) => sum + item.remainingAmount, 0),
+  };
+}
+
 /**
- * Cabinet-wide "À encaisser" attention section (UI-006A §21-25). Clicking a
+ * Cabinet-wide "À traiter" attention section (UI-006A §21-25, reframed by
+ * UI-006X §23 with an overdue-vs-to-collect summary line derived from the
+ * same `receivables` read model — not a new financial total). Clicking a
  * row navigates to the existing patient invoice workspace — no duplicate
- * InvoiceDetailDrawer here (§24). "Voir toutes les factures" now navigates
- * to the real global invoice workspace (UI-006B §6) instead of the
- * future-feature notice UI-006A originally showed, since that screen now
- * exists.
+ * InvoiceDetailDrawer here (§24). "Voir toutes les factures" navigates to
+ * the real global invoice workspace (UI-006B §6).
  */
 export function ReceivablesSection({ receivables }: ReceivablesSectionProps) {
   const { t, locale } = useLocale();
+  const { overdueCount, overdueTotal, toCollectCount, toCollectTotal } = summarizeAttention(receivables);
 
   return (
     <section className="flex flex-col gap-3">
@@ -34,6 +47,23 @@ export function ReceivablesSection({ receivables }: ReceivablesSectionProps) {
           {t("finance.receivables.viewAllAction")}
         </Link>
       </div>
+
+      {receivables.length > 0 && (
+        <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-text-secondary">
+          <p>
+            {t("finance.receivables.overdueCount", { count: overdueCount })}{" "}
+            <span className="font-medium text-text" dir="ltr">
+              {formatMad(overdueTotal, locale)}
+            </span>
+          </p>
+          <p>
+            {t("finance.receivables.toCollectCount", { count: toCollectCount })}{" "}
+            <span className="font-medium text-text" dir="ltr">
+              {formatMad(toCollectTotal, locale)}
+            </span>
+          </p>
+        </div>
+      )}
 
       {receivables.length === 0 ? (
         <p className="text-sm text-text-muted">{t("finance.receivables.emptyTitle")}</p>

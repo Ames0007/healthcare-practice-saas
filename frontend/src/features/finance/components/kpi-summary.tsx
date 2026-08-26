@@ -10,16 +10,19 @@ export interface KpiSummaryProps {
 }
 
 /**
- * KPI row (UI-006A §17/§19-20): five neutral MetricCards, emphasis carried
- * by typography color only, never a giant colored block (Spec #10 §22).
- * `grid-cols-2 sm:grid-cols-3` intentionally wraps 5 cards into a 3+2
- * layout rather than forcing five cramped columns (§20).
+ * Core financial health KPIs (UI-006A §17/§19-20, re-hierarchized by
+ * UI-006X §17): four neutral MetricCards, emphasis carried by typography
+ * color only, never a giant colored block (Spec #10 §22). "Position
+ * caisse" was removed here — the dashboard's own `DashboardCaisseSection`
+ * now shows Caisse's real `CashSession` state instead of approximating it
+ * (UI-006X §18-19), so this row stays a period-scoped financial-health
+ * summary, a separate concept from Caisse's own operational state (§22).
  */
 export function KpiSummary({ kpis }: KpiSummaryProps) {
   const { t, locale } = useLocale();
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
       <MetricCard label={t("finance.kpis.collected")} value={formatMad(kpis.collected, locale)} />
       <MetricCard label={t("finance.kpis.receivable")} value={formatMad(kpis.receivable, locale)} />
       <MetricCard
@@ -28,11 +31,6 @@ export function KpiSummary({ kpis }: KpiSummaryProps) {
         emphasis={kpis.overdue > 0 ? "danger" : "neutral"}
       />
       <MetricCard label={t("finance.kpis.disbursed")} value={formatMad(kpis.disbursed, locale)} />
-      <MetricCard
-        label={t("finance.kpis.cashPosition")}
-        value={formatMad(kpis.cashPosition, locale)}
-        supportingText={t("finance.cashPositionNote")}
-      />
     </div>
   );
 }

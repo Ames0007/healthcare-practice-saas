@@ -701,17 +701,25 @@
       "month": "Ce mois",
       "groupLabel": "Période"
     },
+    "nav": {
+      "navigationLabel": "Navigation Finance",
+      "overview": "Vue d'ensemble"
+    },
+    "dashboard": {
+      "caisseTitle": "Caisse aujourd'hui",
+      "caisseClosedNote": "La caisse n'est pas ouverte."
+    },
     "kpis": {
       "collected": "Encaissé",
       "receivable": "À encaisser",
       "overdue": "En retard",
-      "disbursed": "Décaissements",
-      "cashPosition": "Position caisse"
+      "disbursed": "Décaissements"
     },
-    "cashPositionNote": "Projection prototype — pas une clôture de caisse réelle.",
     "receivables": {
-      "title": "À encaisser",
+      "title": "À traiter",
       "resultCount": "{{count}} factures",
+      "overdueCount": "{{count}} factures en retard",
+      "toCollectCount": "{{count}} factures à encaisser",
       "emptyTitle": "Aucun montant à encaisser.",
       "viewInvoiceAriaLabel": "Voir la facture {{invoiceNumber}} de {{patientName}}",
       "viewAllAction": "Voir toutes les factures"
@@ -721,7 +729,8 @@
       "emptyTitle": "Aucune activité financière pour cette période.",
       "emptyDescription": "Les encaissements et décaissements du cabinet apparaîtront ici.",
       "payment": "Encaissement",
-      "expense": "Décaissement"
+      "expense": "Décaissement",
+      "viewExpenseAriaLabel": "Voir les décaissements"
     },
     "expenseCategory": {
       "supplies": "Fournitures",

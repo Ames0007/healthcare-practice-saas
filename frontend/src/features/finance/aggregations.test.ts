@@ -8,13 +8,11 @@ import { getExpensesMockData } from "./mock-expenses-data";
 import {
   buildReceivables,
   buildRecentActivity,
-  computeCashPosition,
   computeCollected,
   computeDisbursed,
   computeFinanceKpis,
   computeReceivableAndOverdue,
   getPeriodRange,
-  OPENING_CASH_POSITION,
 } from "./aggregations";
 
 const BUSINESS_DATE = "2026-08-23"; // Sunday — mirrors `MOCK_BUSINESS_DATE` (features/today/mock-data.ts)
@@ -126,15 +124,8 @@ describe("computeDisbursed", () => {
   });
 });
 
-describe("computeCashPosition", () => {
-  it("applies opening position + collected − disbursed", () => {
-    expect(computeCashPosition(1500, 900)).toBe(OPENING_CASH_POSITION + 1500 - 900);
-    expect(OPENING_CASH_POSITION).toBe(500); // matches Spec #9 Screen 30's own illustrative "Solde initial"
-  });
-});
-
 describe("computeFinanceKpis", () => {
-  it("assembles all five KPIs consistently for the month period", () => {
+  it("assembles all four KPIs consistently for the month period", () => {
     const invoices = getInvoicesMockData();
     const payments = getPaymentsMockData();
     const expenses = getExpensesMockData();
@@ -145,7 +136,6 @@ describe("computeFinanceKpis", () => {
       receivable: 3700,
       overdue: 2200,
       disbursed: 900,
-      cashPosition: 1100,
     });
   });
 });

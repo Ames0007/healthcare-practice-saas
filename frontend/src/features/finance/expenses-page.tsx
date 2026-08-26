@@ -18,6 +18,7 @@ import {
   sortExpensesNewestFirst,
   type NewExpenseInput,
 } from "./expenses";
+import { FinanceNav } from "./components/finance-nav";
 import { ExpenseSummary } from "./components/expense-summary";
 import { ExpenseHistoryList } from "./components/expense-history-list";
 import { NewExpenseDialog } from "./components/new-expense-dialog";
@@ -138,6 +139,8 @@ export function ExpensesPage({ expenses: providedExpenses, initialSession, state
           </Link>
         }
       />
+
+      <FinanceNav />
 
       {!isCaisseOpen && (
         <Card variant="alert" className="flex flex-wrap items-center justify-between gap-3">

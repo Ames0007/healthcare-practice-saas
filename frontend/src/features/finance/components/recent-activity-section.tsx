@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useLocale } from "@/i18n/locale-provider";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -15,7 +16,10 @@ export interface RecentActivitySectionProps {
  * Cabinet-wide "Activité récente" (UI-006A §29-32) — never color/sign alone
  * (§32): every row pairs a textual type label ("Encaissement"/
  * "Décaissement") with the amount, in neutral typography (§19), never
- * green/red.
+ * green/red. UI-006X §29 adds real navigation: a payment row goes to the
+ * existing patient Paiements route, an expense row to
+ * `/app/finance/expenses` — no second detail system, mirroring
+ * `CaisseMovementList`'s own exact navigable-row pattern (UI-006C).
  */
 export function RecentActivitySection({ activity }: RecentActivitySectionProps) {
   const { t, locale } = useLocale();
@@ -33,9 +37,26 @@ export function RecentActivitySection({ activity }: RecentActivitySectionProps) 
         />
       ) : (
         <ul className="flex flex-col gap-2">
-          {activity.map((item) => (
-            <li key={item.id}>
-              <Card className="flex flex-wrap items-center justify-between gap-3">
+          {activity.map((item) => {
+            const href =
+              item.type === "payment" && item.patientId
+                ? `/app/patients/${item.patientId}/payments`
+                : item.type === "expense"
+                  ? "/app/finance/expenses"
+                  : undefined;
+            const ariaLabel =
+              item.type === "payment"
+                ? t("finance.caisse.movements.viewPaymentAriaLabel", { patientName: item.label })
+                : t("finance.activity.viewExpenseAriaLabel");
+
+            const card = (
+              <Card
+                className={
+                  href
+                    ? "flex flex-wrap items-center justify-between gap-3 transition-colors hover:bg-surface-subtle"
+                    : "flex flex-wrap items-center justify-between gap-3"
+                }
+              >
                 <div className="min-w-0">
                   <p className="text-xs font-medium uppercase tracking-wide text-text-muted">
                     {t(`finance.activity.${item.type}`)}
@@ -52,8 +73,20 @@ export function RecentActivitySection({ activity }: RecentActivitySectionProps) 
                   {formatMad(item.amount, locale)}
                 </span>
               </Card>
-            </li>
-          ))}
+            );
+
+            return (
+              <li key={item.id}>
+                {href ? (
+                  <Link href={href} aria-label={ariaLabel} className="block">
+                    {card}
+                  </Link>
+                ) : (
+                  card
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
     </section>

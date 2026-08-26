@@ -72,6 +72,16 @@ describe("ExpensesPage", () => {
     expect(screen.getAllByText("150 MAD")).toHaveLength(2);
   });
 
+  it("renders FinanceNav with Décaissements marked active", () => {
+    renderPage("fr", { initialSession: OPEN_SESSION });
+
+    // "Décaissements" appears twice: the FinanceNav tab and the section heading —
+    // only the nav tab (a link) carries aria-current.
+    expect(screen.getByRole("link", { name: "Décaissements" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Vue d'ensemble" })).toHaveAttribute("href", "/app/finance");
+    expect(screen.getByRole("link", { name: "Caisse" })).not.toHaveAttribute("aria-current");
+  });
+
   it("renders the existing today's expense history with category/description/amount", () => {
     renderPage("fr", { initialSession: OPEN_SESSION });
 

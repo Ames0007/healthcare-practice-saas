@@ -4,7 +4,7 @@ import { getEffectivePaidAmount } from "@/features/patients/payments";
 import { getPaymentsMockData } from "@/features/patients/mock-payments-data";
 import { getExpensesMockData } from "@/features/finance/mock-expenses-data";
 import { getPatientsMockData } from "@/features/patients/mock-data";
-import { computeCashPosition, OPENING_CASH_POSITION } from "@/features/finance/aggregations";
+import { computeCashBalance } from "@/features/finance/aggregations";
 import {
   buildCashMovements,
   computeIncomingTotal,
@@ -187,13 +187,11 @@ describe("computeTheoreticalBalance", () => {
     expect(computeTheoreticalBalance(0, 0, 0)).toBe(0);
   });
 
-  it("shares the exact same underlying formula as the Finance dashboard's Position Caisse (UI-006A §43 consistency)", () => {
-    const collected = 1500;
-    const disbursed = 900;
-
-    expect(computeTheoreticalBalance(OPENING_CASH_POSITION, collected, disbursed)).toBe(
-      computeCashPosition(collected, disbursed),
-    );
+  it("is the same shared primitive as `computeCashBalance` (UI-006C §43) — no duplicate formula", () => {
+    // UI-006X removed the Finance dashboard's own "Position caisse" projection (the formula's
+    // other former caller) in favor of showing this real Caisse state directly, so
+    // `computeCashBalance` now has exactly one caller left — this one.
+    expect(computeTheoreticalBalance(500, 1500, 900)).toBe(computeCashBalance(500, 1500, 900));
   });
 });
 

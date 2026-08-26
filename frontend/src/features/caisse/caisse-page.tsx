@@ -13,6 +13,7 @@ import { getPaymentsMockData } from "@/features/patients/mock-payments-data";
 import { getExpensesMockData } from "@/features/finance/mock-expenses-data";
 import { getPatientsMockData } from "@/features/patients/mock-data";
 import type { Patient } from "@/features/patients/types";
+import { FinanceNav } from "@/features/finance/components/finance-nav";
 import { buildCashMovements, computeIncomingTotal, computeOutgoingTotal, computeTheoreticalBalance } from "./calculations";
 import { DEFAULT_OPENING_BALANCE, getDefaultOpenSessionMockData, MOCK_BUSINESS_DATE, OPENED_BY_NAME, SESSION_OPENED_AT } from "./mock-data";
 import { ClosedCaissePanel } from "./components/closed-caisse-panel";
@@ -113,6 +114,8 @@ export function CaissePage({
         title={t("finance.caisse.pageTitle")}
         secondaryAction={<StatusBadge tone={statusMeta.tone}>{t(statusMeta.translationKey)}</StatusBadge>}
       />
+
+      <FinanceNav />
 
       {!isOpen ? (
         <ClosedCaissePanel defaultOpeningBalance={DEFAULT_OPENING_BALANCE} onOpen={handleOpen} />

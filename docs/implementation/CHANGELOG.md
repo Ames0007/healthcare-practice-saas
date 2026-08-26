@@ -1450,3 +1450,111 @@ All notable changes to this project are documented in this file.
   43 new UI-006D tests), typecheck, lint and build pass on the first
   full-suite run; backend regression (10 tests, clean) unaffected — no
   backend files touched.
+- UI-006X — Finance Workspace Alignment & Navigation: a corrective UX/IA
+  task — no new business functionality — bringing `/app/finance` and its
+  three siblings into one coherent workspace now that UI-006B/C/D all
+  exist. New `features/finance/components/finance-nav.tsx` (`FinanceNav`)
+  reuses the existing generic `Tabs` primitive (Spec #8 §48 — the same
+  real-navigation component already backing Patient 360°'s own tab bar)
+  rather than inventing a new nav pattern: real `<Link>`s, `aria-current`,
+  horizontal-scroll-on-mobile and logical-property (RTL-safe) spacing all
+  came for free. Four items — Vue d'ensemble/Factures/Caisse/
+  Décaissements — deliberately fewer than Spec #9 Screen 24's own
+  six-tab wireframe (Aperçu/Factures/Échéances/Encaissements/Caisse/
+  Décaissements): Échéances and Encaissements have no real route yet, so
+  including them would link to nothing; the task's own explicit
+  four-item list (§8) takes priority per CLAUDE.md §1. Active-state
+  matching is exact/path-aware (`resolveActiveSection`, keyed off
+  `usePathname()`): `/app/finance` matches only the literal route, never
+  every nested Finance path via a naive `startsWith` (the exact bug this
+  task's own §9 warns against — `AppSidebar`'s own main-nav matching
+  already gets this right for the whole Finance module, this fixes the
+  equivalent problem one level down, inside it). Integrated identically
+  into all four Finance pages, positioned right after `PageHeader` in
+  every one. The main sidebar (`lib/nav-config.ts`, `AppSidebar`) is
+  completely untouched — Finance remains exactly one sidebar module, its
+  children living only inside `FinanceNav`.
+  Dashboard recomposition: `KpiSummary` drops the "Position caisse" card
+  — that whole prototype-projection concept is gone, not just hidden.
+  `computeCashPosition`/`OPENING_CASH_POSITION` are removed from
+  `features/finance/aggregations.ts` and `cashPosition` from the
+  `FinanceKpis` type; `computeCashBalance` (the actually-shared
+  arithmetic primitive) stays untouched, now with exactly one caller
+  left — Caisse's own `computeTheoreticalBalance`
+  (`features/caisse/calculations.ts`). New `DashboardCaisseSection`
+  replaces the removed card with Caisse's real operational state,
+  reusing `getDefaultOpenSessionMockData`/`buildCashMovements`/
+  `computeIncomingTotal`/`computeOutgoingTotal`/
+  `computeTheoreticalBalance`/`CaisseSummary` verbatim from
+  `features/caisse/` (UI-006C) — never a second cash-position formula,
+  per the task's own explicit §20/§24 requirement. Open state shows the
+  real 4-metric `CaisseSummary` plus "Ouverte à HH:MM par {name}" and a
+  "Voir la caisse" link (reusing UI-006D's own exact string, not a
+  duplicate); closed state shows "La caisse n'est pas ouverte." (a new,
+  deliberately distinct string from Caisse's own
+  `closedDescription` — that one is an instruction to open it, this one
+  is a status statement) plus the same link. `finance-dashboard.tsx`'s
+  own local `BUSINESS_DATE = "2026-08-23"` literal — a pre-existing,
+  UI-006A-era duplicate of the canonical business-date constant — is
+  replaced with the real `MOCK_BUSINESS_DATE` import from
+  `features/caisse/mock-data.ts`, required for correctness now that the
+  dashboard's own Caisse section must query movements for the exact same
+  business date as the `CashSession` it displays (previously harmless
+  since nothing cross-checked the two; now genuinely load-bearing).
+  `ReceivablesSection`'s heading changes "À encaisser" → "À traiter"
+  with a new overdue-count/total + to-collect-count/total summary line,
+  computed by filtering/summing the *already-built* `receivables` array
+  in the component itself (`summarizeAttention`) — not a new financial
+  total, not a rebuilt priority rule. `RecentActivitySection` rows are
+  now real navigation: a payment row links to the existing
+  `/app/patients/{id}/payments`, an expense row to
+  `/app/finance/expenses` — mirroring `CaisseMovementList`'s own
+  navigable-row convention (UI-006C) exactly, including reusing its
+  `finance.caisse.movements.viewPaymentAriaLabel` key rather than adding
+  a duplicate. Invoices/Caisse/Expenses pages are otherwise untouched —
+  each gained exactly one line, `<FinanceNav />` after its own
+  `PageHeader`.
+  i18n: added `finance.nav.*` (navigationLabel, overview — the other
+  three tab labels reuse `finance.invoices/caisse/expenses.pageTitle`
+  verbatim, no duplicate strings), `finance.dashboard.*` (caisseTitle,
+  caisseClosedNote), `finance.receivables.overdueCount`/`toCollectCount`,
+  `finance.activity.viewExpenseAriaLabel`; removed the now-dead
+  `finance.kpis.cashPosition`/`finance.cashPositionNote` keys (FR+AR).
+  Arabic reuses the exact same "المصروفات" plural already established
+  for `finance.kpis.disbursed`/`finance.caisse.summary.outgoing` for
+  "Décaissements" tab consistency, and "نظرة عامة" verbatim from
+  `patientDetail.tabs.overview` for "Vue d'ensemble" — no competing
+  terminology introduced.
+  Added `features/finance/components/finance-nav.test.tsx` (6 tests: all
+  four items/hrefs, exact-route overview active state, each of the other
+  three routes' own active state, Arabic). Rewrote
+  `finance-dashboard.test.tsx` around the new composition (still 16
+  tests: header+nav+period default, four KPIs with the projection gone,
+  period-switch recomputation, real open-Caisse summary matching
+  UI-006C's own derivation, closed-Caisse note, À traiter summary line
+  and ordering/navigation, recent-activity navigation, empty/loading/
+  error, Arabic/RTL, forbidden-controls). Updated
+  `aggregations.test.ts` (removed the `computeCashPosition`/
+  `OPENING_CASH_POSITION` describe block and `cashPosition` from the
+  `computeFinanceKpis` expectation — the underlying concept was removed,
+  not just its test) and `features/caisse/calculations.test.ts` (the
+  UI-006A/UI-006C formula-consistency proof now compares
+  `computeTheoreticalBalance` directly against `computeCashBalance`,
+  since `computeCashPosition` no longer exists to compare against — the
+  "no duplicate formula" property still holds and is still tested, just
+  against the one primitive that's actually still shared). Added one
+  FinanceNav-active-state test each to `global-invoices-page.test.tsx`,
+  `caisse-page.test.tsx` and `expenses-page.test.tsx` — their own
+  existing 59 tests all passed unmodified on the first run after adding
+  `<FinanceNav />` (no text-collision fixes were needed there; the
+  dashboard's own rewrite needed several, documented inline as `getAllByText`
+  scoping, matching this session's established collision-handling
+  convention). Total 586 frontend tests (575 carried over through
+  UI-006D + 11 net new), typecheck, lint and build pass on the first
+  full-suite run; backend regression (10 tests, clean) unaffected — no
+  backend files touched. Rendered visual QA: DOM/SSR-level only (curl
+  against the running dev server — 200 on all four routes, `dir="rtl"`/
+  `lang="ar"` present, obsolete "Position caisse"/"Projection prototype"
+  wording confirmed absent) — no browser-automation/screenshot tool was
+  available in this environment, so true pixel-level rendered QA was not
+  performed; the dev server was left running for manual browser review.

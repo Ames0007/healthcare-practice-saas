@@ -45,8 +45,6 @@ export interface FinanceKpis {
   overdue: MoneyAmount;
   /** Valid synthetic cabinet expenses during the selected period (UI-006A §18). */
   disbursed: MoneyAmount;
-  /** Prototype operational cash position: opening position + period collected − period disbursed (UI-006A §18/§40). */
-  cashPosition: MoneyAmount;
 }
 
 /**

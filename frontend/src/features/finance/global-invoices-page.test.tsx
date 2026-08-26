@@ -43,6 +43,14 @@ describe("GlobalInvoicesPage", () => {
     expect(screen.getByText("Suivez les factures et montants à encaisser du cabinet.")).toBeInTheDocument();
   });
 
+  it("renders FinanceNav with Factures marked active", () => {
+    renderPage("fr");
+
+    expect(screen.getByRole("link", { name: "Factures" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Vue d'ensemble" })).toHaveAttribute("href", "/app/finance");
+    expect(screen.getByRole("link", { name: "Caisse" })).not.toHaveAttribute("aria-current");
+  });
+
   it("renders the financial summary for the filtered result set, reconciling with the real invoice fixtures", () => {
     renderPage("fr");
 

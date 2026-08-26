@@ -37,6 +37,14 @@ describe("CaissePage", () => {
     expect(screen.getByRole("heading", { level: 1, name: "Caisse" })).toBeInTheDocument();
   });
 
+  it("renders FinanceNav with Caisse marked active", () => {
+    renderPage("fr");
+
+    expect(screen.getByRole("link", { name: "Caisse" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Vue d'ensemble" })).toHaveAttribute("href", "/app/finance");
+    expect(screen.getByRole("link", { name: "Décaissements" })).not.toHaveAttribute("aria-current");
+  });
+
   it("renders CLOSED with an opening-balance input and no movements/summary", () => {
     renderPage("fr", { initialSession: null });
 

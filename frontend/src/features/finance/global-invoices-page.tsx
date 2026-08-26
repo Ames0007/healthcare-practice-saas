@@ -15,6 +15,7 @@ import { InvoiceDetailDrawer } from "@/features/patients/components/invoice-deta
 import type { Patient } from "@/features/patients/types";
 import { buildGlobalInvoiceRows, matchesGlobalInvoiceFilter, matchesGlobalInvoiceSearch } from "./global-invoices";
 import type { GlobalInvoiceFilterGroup } from "./types";
+import { FinanceNav } from "./components/finance-nav";
 import { GlobalInvoiceSummary } from "./components/global-invoice-summary";
 import { GlobalInvoiceFilters } from "./components/global-invoice-filters";
 import { GlobalInvoiceTable } from "./components/global-invoice-table";
@@ -80,6 +81,7 @@ export function GlobalInvoicesPage({
     return (
       <div className="flex flex-col gap-6">
         <PageHeader title={t("finance.invoices.pageTitle")} description={t("finance.invoices.pageDescription")} />
+        <FinanceNav />
         <EmptyState
           title={t("finance.invoices.emptyAllTitle")}
           description={t("finance.invoices.emptyAllDescription")}
@@ -107,6 +109,8 @@ export function GlobalInvoicesPage({
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title={t("finance.invoices.pageTitle")} description={t("finance.invoices.pageDescription")} />
+
+      <FinanceNav />
 
       <GlobalInvoiceSummary summary={summary} />
 

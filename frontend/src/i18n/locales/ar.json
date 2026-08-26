@@ -701,17 +701,25 @@
       "month": "هذا الشهر",
       "groupLabel": "الفترة"
     },
+    "nav": {
+      "navigationLabel": "أقسام المالية",
+      "overview": "نظرة عامة"
+    },
+    "dashboard": {
+      "caisseTitle": "الصندوق اليوم",
+      "caisseClosedNote": "الصندوق غير مفتوح."
+    },
     "kpis": {
       "collected": "المُحصَّل",
       "receivable": "قيد التحصيل",
       "overdue": "متأخر",
-      "disbursed": "المصروفات",
-      "cashPosition": "وضعية الصندوق"
+      "disbursed": "المصروفات"
     },
-    "cashPositionNote": "توقّع تجريبي لواجهة العرض، وليس نتيجة إغلاق صندوق فعلي.",
     "receivables": {
-      "title": "قيد التحصيل",
+      "title": "للمتابعة",
       "resultCount": "{{count}} فاتورة",
+      "overdueCount": "{{count}} فاتورة متأخرة",
+      "toCollectCount": "{{count}} فاتورة قيد التحصيل",
       "emptyTitle": "لا يوجد مبلغ قيد التحصيل.",
       "viewInvoiceAriaLabel": "عرض الفاتورة {{invoiceNumber}} الخاصة بـ {{patientName}}",
       "viewAllAction": "عرض جميع الفواتير"
@@ -721,7 +729,8 @@
       "emptyTitle": "لا يوجد نشاط مالي لهذه الفترة.",
       "emptyDescription": "ستظهر هنا عمليات التحصيل والمصروفات الخاصة بالعيادة.",
       "payment": "تحصيل",
-      "expense": "مصروف"
+      "expense": "مصروف",
+      "viewExpenseAriaLabel": "عرض المصروفات"
     },
     "expenseCategory": {
       "supplies": "لوازم",
