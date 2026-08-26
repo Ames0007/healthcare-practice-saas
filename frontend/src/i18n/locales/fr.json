@@ -923,6 +923,26 @@
       "active": "Actif",
       "inactive": "Inactif"
     },
+    "contractType": {
+      "permanent": "CDI",
+      "fixedTerm": "CDD",
+      "partTime": "Temps partiel",
+      "internship": "Stage",
+      "other": "Autre"
+    },
+    "contractStatus": {
+      "active": "Actif",
+      "ended": "Terminé"
+    },
+    "weekday": {
+      "monday": "Lundi",
+      "tuesday": "Mardi",
+      "wednesday": "Mercredi",
+      "thursday": "Jeudi",
+      "friday": "Vendredi",
+      "saturday": "Samedi",
+      "sunday": "Dimanche"
+    },
     "form": {
       "createTitle": "Nouveau membre",
       "editTitle": "Modifier le membre",
@@ -958,7 +978,56 @@
     "workTitle": "Travail",
     "roleLabel": "Rôle",
     "statusLabel": "Statut",
-    "edit": "Modifier"
+    "edit": "Modifier",
+    "tabs": {
+      "navigationLabel": "Sections de l'employé",
+      "profile": "Profil",
+      "contract": "Contrat",
+      "schedule": "Planning"
+    },
+    "contract": {
+      "title": "Contrat de travail",
+      "typeLabel": "Type",
+      "jobTitleLabel": "Poste",
+      "endDateLabel": "Date de fin",
+      "endDateHelp": "Laisser vide pour un contrat à durée indéterminée.",
+      "noEndDate": "Sans date de fin",
+      "weeklyHoursLabel": "Durée hebdomadaire",
+      "weeklyHoursValue": "{{hours}} h / semaine",
+      "notesLabel": "Notes",
+      "empty": {
+        "title": "Aucun contrat enregistré.",
+        "description": "Aucune information contractuelle n'est disponible pour ce membre."
+      },
+      "toast": {
+        "updated": "Contrat modifié."
+      },
+      "form": {
+        "title": "Modifier le contrat",
+        "contractNumberLabel": "Numéro de contrat : {{number}}",
+        "endDateError": "La date de fin doit être postérieure à la date de début.",
+        "weeklyHoursError": "Durée hebdomadaire invalide."
+      }
+    },
+    "schedule": {
+      "title": "Planning hebdomadaire",
+      "weeklyTotal": "{{hours}} h planifiées / semaine",
+      "rest": "Repos",
+      "toast": {
+        "updated": "Planning modifié."
+      },
+      "form": {
+        "title": "Modifier le planning",
+        "rest": "Repos",
+        "worked": "Travaillé",
+        "addInterval": "+ Ajouter une plage",
+        "removeInterval": "Retirer",
+        "intervalError": "Plage horaire invalide.",
+        "overlapError": "Cette plage doit commencer après la fin de la précédente.",
+        "startLabelForSlot": "Début — {{day}} {{slot}}",
+        "endLabelForSlot": "Fin — {{day}} {{slot}}"
+      }
+    }
   },
   "admin": {
     "brand": "Platform Admin",

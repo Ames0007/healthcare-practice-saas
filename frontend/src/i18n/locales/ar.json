@@ -923,6 +923,26 @@
       "active": "نشط",
       "inactive": "غير نشط"
     },
+    "contractType": {
+      "permanent": "عقد غير محدد المدة",
+      "fixedTerm": "عقد محدد المدة",
+      "partTime": "دوام جزئي",
+      "internship": "تدريب",
+      "other": "آخر"
+    },
+    "contractStatus": {
+      "active": "نشط",
+      "ended": "منتهٍ"
+    },
+    "weekday": {
+      "monday": "الاثنين",
+      "tuesday": "الثلاثاء",
+      "wednesday": "الأربعاء",
+      "thursday": "الخميس",
+      "friday": "الجمعة",
+      "saturday": "السبت",
+      "sunday": "الأحد"
+    },
     "form": {
       "createTitle": "عضو جديد",
       "editTitle": "تعديل بيانات العضو",
@@ -958,7 +978,56 @@
     "workTitle": "العمل",
     "roleLabel": "الدور",
     "statusLabel": "الحالة",
-    "edit": "تعديل"
+    "edit": "تعديل",
+    "tabs": {
+      "navigationLabel": "أقسام الموظف",
+      "profile": "الملف الشخصي",
+      "contract": "العقد",
+      "schedule": "الجدول الأسبوعي"
+    },
+    "contract": {
+      "title": "عقد العمل",
+      "typeLabel": "النوع",
+      "jobTitleLabel": "المنصب",
+      "endDateLabel": "تاريخ الانتهاء",
+      "endDateHelp": "اتركه فارغًا لعقد غير محدد المدة.",
+      "noEndDate": "بدون تاريخ انتهاء",
+      "weeklyHoursLabel": "المدة الأسبوعية",
+      "weeklyHoursValue": "{{hours}} س / أسبوع",
+      "notesLabel": "ملاحظات",
+      "empty": {
+        "title": "لا يوجد عقد مسجل.",
+        "description": "لا تتوفر معلومات تعاقدية لهذا العضو."
+      },
+      "toast": {
+        "updated": "تم تعديل العقد."
+      },
+      "form": {
+        "title": "تعديل العقد",
+        "contractNumberLabel": "رقم العقد: {{number}}",
+        "endDateError": "يجب أن يكون تاريخ الانتهاء بعد تاريخ البدء.",
+        "weeklyHoursError": "مدة أسبوعية غير صالحة."
+      }
+    },
+    "schedule": {
+      "title": "الجدول الأسبوعي",
+      "weeklyTotal": "{{hours}} س مخططة / أسبوع",
+      "rest": "راحة",
+      "toast": {
+        "updated": "تم تعديل الجدول."
+      },
+      "form": {
+        "title": "تعديل الجدول الأسبوعي",
+        "rest": "راحة",
+        "worked": "يوم عمل",
+        "addInterval": "+ إضافة فترة",
+        "removeInterval": "إزالة",
+        "intervalError": "فترة زمنية غير صالحة.",
+        "overlapError": "يجب أن تبدأ هذه الفترة بعد نهاية الفترة السابقة.",
+        "startLabelForSlot": "البداية — {{day}} {{slot}}",
+        "endLabelForSlot": "النهاية — {{day}} {{slot}}"
+      }
+    }
   },
   "admin": {
     "brand": "إدارة المنصة",

@@ -7,8 +7,8 @@ import { TeamMemberDetailPage } from "@/features/team/team-member-detail-page";
 /** Manual-review-only prototype loading simulation — there is no real fetch yet (mirrors UI-004A). */
 const LOADING_SIMULATION_MS = 400;
 
-/** Employee profile — Profil tab (UI-007A/UI-007B), replacing the catch-all placeholder for nested Équipe routes. */
-export default function EquipeMemberRoutePage() {
+/** Employee profile — Planning tab (UI-007B). */
+export default function EquipeMemberScheduleRoutePage() {
   const { id } = useParams<{ id: string }>();
   const [ready, setReady] = useState(false);
 
@@ -17,5 +17,5 @@ export default function EquipeMemberRoutePage() {
     return () => clearTimeout(timer);
   }, []);
 
-  return <TeamMemberDetailPage memberId={id} activeTab="profile" state={ready ? "loaded" : "loading"} />;
+  return <TeamMemberDetailPage memberId={id} activeTab="schedule" state={ready ? "loaded" : "loading"} />;
 }

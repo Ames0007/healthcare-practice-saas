@@ -1736,3 +1736,132 @@ All notable changes to this project are documented in this file.
   against the running dev server — `/app/equipe` and `/app/equipe/[id]`
   both 200, `dir="rtl"` present for the Arabic variant) — no
   browser-automation/screenshot tool was available in this environment.
+- UI-007B — Employment Contracts, Roles & Work Schedules: evolves
+  UI-007A's single-tab employee profile into an Employee 360° workspace.
+  `TeamMemberHeader` (identity/status card) is extracted unchanged out
+  of UI-007A's own former single-body `TeamMemberDetailPage` — a pure,
+  behavior-preserving refactor (the existing UI-007A test suite for the
+  Profil tab passes byte-for-byte unmodified, proving zero regression).
+  New `TeamMemberNav` renders Profil/Contrat/Planning as real per-member
+  links with `aria-current` — mirrors `PatientDetailPage`'s own
+  explicit-`activeTab`-prop `Tabs` usage rather than `FinanceNav`'s
+  `usePathname`-prefix-matching pattern, since `FinanceNav`'s approach
+  only works for non-parameterized routes and this nav sits under a
+  per-member `[id]`. Présence/Congés/Paie/Commissions (Screen 34's later
+  tabs) are not shown at all — no route exists for them yet, and the
+  task's own §7 explicit default is "otherwise show only currently
+  implemented items," not disabled placeholders.
+  `TeamMemberDetailPage` itself became a thin shell: header + nav, then
+  one of three sibling content components switched on `activeTab` —
+  `TeamMemberProfileContent` (UI-007A's own body, moved verbatim),
+  `TeamMemberContractContent` and `TeamMemberScheduleContent` (both
+  new). Two new domain routes: `/app/equipe/[id]/contract`,
+  `/app/equipe/[id]/schedule`.
+  `TeamMember` (UI-007A) is untouched — not one field added to it (§10).
+  Two new, deliberately separate domain types instead
+  (`components/domain/team/types.ts`): `EmploymentContract`
+  (id/teamMemberId/contractNumber?/contractType/status/startDate/
+  endDate?/jobTitle/weeklyHours?/notes?) and its two small enums.
+  `ContractType` ("permanent"/"fixed_term"/"part_time"/"internship"/
+  "other") — the domain-data spec only defines a free-text
+  `employees.employment_type` column, no enum, so the task's own
+  explicit suggested list is authoritative (CLAUDE.md §1); labeled
+  "CDI"/"CDD" in French for permanent/fixed_term — the standard
+  Francophone terms for those two contract shapes, not an invented
+  Moroccan-specific legal category. `ContractStatus` stays to two
+  values ("active"/"ended") — no `future`/`suspended`, nothing in scope
+  requires them. Both get their own registry (`contract-type.ts`,
+  `contract-status.ts`) mirroring `expense-category.ts`/`cash-session-
+  status.ts`'s exact pattern; `ContractType`'s registry carries no
+  `StatusTone` at all — a contract type is not a status (§13).
+  `contractNumber` follows the task's own explicit §16 example format
+  verbatim ("CTR-2025-0003", assigned to Meryem Bakkali/EMP-0003 in the
+  fixtures, mirroring the task's own worked example person) — read-only
+  once created, never part of the edit form's own shape. No
+  remuneration field anywhere (§20) — `EmploymentContract` has no
+  salary/rate/bonus/deduction property, grep- and test-confirmed
+  (`mock-contracts-data.test.ts` asserts the properties don't exist on
+  any fixture; `team-member-detail-page.test.tsx` asserts no
+  "salaire"/"rémunération" text renders on the Contrat tab).
+  `WorkInterval` mirrors Spec #4 §20.1's `employee_work_schedules` 1:1
+  — one row per interval, several rows sharing the same `weekday`
+  models a split shift, satisfying "multiple work intervals per day"
+  (§7) without a separate list field; `active` is kept for shape-
+  fidelity with the spec column but no UI in this task ever toggles it
+  (same "kept but never reached by the UI" precedent as
+  `PrescriptionStatus`'s `"cancelled"`, UI-005D) — an interval simply
+  not existing already means "not working that day." `Weekday` is
+  deliberately its own small abstract enum, not reused/derived from
+  Agenda's date-based `formatWeekdayShort` (`features/agenda/format.ts`)
+  — that formatter needs a concrete ISO date, and manufacturing a fake
+  "reference week" purely to borrow day-name labels would be exactly
+  the unwanted appointment-scheduling coupling the task's own §4
+  explicitly warns against; a small standalone `team.weekday.*`
+  translation set (FR/AR, 7 keys each) was added instead.
+  `features/team/contracts.ts`: `getCurrentContract` — active first,
+  else the most recently started historical contract, else `null` (§22,
+  no contract-versioning UI); `isValidContractDateRange`/
+  `isValidWeeklyHours` (0 < hours ≤ 60, optional). `features/team/
+  schedule.ts`: `groupIntervalsByWeekday`/`computeWeeklyScheduledHours`
+  (reuses `parseTimeToMinutes` from `features/agenda/format.ts` — a
+  genuinely generic time-of-day primitive, not appointment-specific, so
+  reusing it does not create the coupling §4 warns against) /
+  `isValidWorkInterval`/`intervalsAreSequential` (no same-day overlap) /
+  `buildInitialWorkWeekFormValues` + `buildIntervalsFromWorkWeekFormValues`
+  (a round-trip pair: current intervals -> bounded per-weekday edit
+  form state -> a full replacement interval set on submit — the editor
+  is never a per-interval CRUD surface).
+  7 centralized contract fixtures (`mock-contracts-data.ts`, every
+  `teamMemberId` integrity-tested against real `TeamMember`s) cover all
+  four required scenarios (§21 A-D): active open-ended (team-1/2/3/4),
+  active fixed-end (team-5/8 — a fixed-term and an internship, both
+  with a real future end date), ended historical (team-6), no contract
+  at all (team-7 — reusing UI-007A's own "deliberately unlinked"
+  outlier rather than introducing a new fixture just for this state).
+  Work-interval fixtures (`mock-schedule-data.ts`) give team-1/2 (the
+  two practitioners) a realistic split shift — morning + afternoon
+  across a lunch break, plus a shorter Saturday morning — demonstrating
+  §7 on a genuinely plausible cabinet pattern; team-3/4/5/8 each get a
+  single interval per weekday (the simple case); team-6/7 deliberately
+  have no intervals at all (the "no schedule" empty state, doubling as
+  the same two members who already have no/ended contracts, rather than
+  adding yet another fixture just to prove an empty state). Every
+  scheduled member's own `computeWeeklyScheduledHours` output matches
+  their own current contract's `weeklyHours` exactly — a dedicated
+  integrity test (`mock-schedule-data.test.ts`) proves this rather than
+  leaving it to accidental agreement between two independently-authored
+  fixture files.
+  Contract edit (`ContractFormDialog`) is edit-only — no "create a new
+  contract" flow, matching the task's own §8 "contract edit prototype"
+  (singular, editing the current one) rather than authoring contract
+  history; mirrors `TeamMemberFormDialog`'s drawer/validate/submit
+  shape. Work-schedule edit (`WorkScheduleFormDialog`) is a bounded
+  per-weekday editor — a "Travaillé"/"Repos" `Select` per day (reusing
+  the existing `Select` primitive rather than introducing a new
+  Checkbox component the codebase doesn't have yet), and when worked,
+  up to 2 time-range intervals with "+ Ajouter une plage"/"Retirer",
+  validated for individual validity and same-day non-overlap. Submit
+  always replaces the member's *entire* interval set, mirroring
+  `CashCountDialog`'s own "one validated result object" shape (UI-006E)
+  rather than field-by-field mutation.
+  Every edit (Profil/Contrat/Planning) remains this page's own local
+  state only — the same documented prototype limitation UI-007A's own
+  profile edit and `PatientDetailPage` already have (UI-004A §7); no
+  change here reaches `/app/equipe`'s own directory array.
+  Test-collision fixes worth recording: `getByText("Réceptionniste")`
+  was ambiguous once the Contrat tab renders both the header's own role
+  label and the contract's own "Poste" value with the identical string
+  — fixed via `{ selector: "dd" }`. A per-weekday form row could not be
+  scoped via `.closest(".rounded-md")` because the `Select` primitive's
+  own `<select>` element carries that exact utility class too (border-
+  radius styling) and matched itself first — fixed via `.closest("div.p-3")`
+  instead, a class token the `Select` never carries.
+  All 706 frontend tests (646 carried over through UI-007A + 60 net
+  new — 34 across 4 new pure-function/fixture-integrity files covering
+  contracts.ts/schedule.ts/mock-contracts-data.ts/mock-schedule-data.ts,
+  plus 26 new cases folded into `team-member-detail-page.test.tsx`'s own
+  navigation/Contrat/Planning describe blocks), typecheck, lint and
+  build pass on
+  the first full-suite run after fixing the collisions above; backend
+  regression (10 tests, 26 assertions, clean) unaffected — no backend
+  files touched.

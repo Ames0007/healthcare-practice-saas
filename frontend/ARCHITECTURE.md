@@ -277,6 +277,33 @@ src/components/
             suspended/on-leave states are deliberately not part of
             `TeamMemberStatus`'s literal union, since UI-007D owns leave
             state (§13).
+            UI-007B adds two new, deliberately separate types to the same
+            `types.ts` — `TeamMember` itself gained no new field (§10).
+            `EmploymentContract` (id/teamMemberId/contractNumber?/
+            contractType/status/startDate/endDate?/jobTitle/
+            weeklyHours?/notes?) — no remuneration field anywhere (§20),
+            grep- and test-confirmed. `ContractType` ("permanent"/
+            "fixed_term"/"part_time"/"internship"/"other") is this
+            task's own explicit vocabulary — the domain-data spec only
+            defines a free-text `employees.employment_type` column, no
+            enum. `ContractStatus` stays to "active"/"ended". Both get
+            their own registry (`contract-type.ts`/`contract-status.ts`)
+            mirroring `team-role.ts`/`team-member-status.ts`'s own
+            split — `ContractType`'s registry carries no `StatusTone` at
+            all (a contract type is not a status, §13), mirroring how
+            `team-role.ts` itself carries none. `WorkInterval` mirrors
+            Spec #4 §20.1's `employee_work_schedules` 1:1 — one row per
+            interval, several rows sharing a `weekday` model a split
+            shift (§7), no separate list field; `active` is kept for
+            shape-fidelity with the spec column but no UI ever toggles
+            it (same precedent as `PrescriptionStatus`'s `"cancelled"`,
+            UI-005D). `Weekday` is its own small abstract 7-value enum,
+            deliberately not derived from Agenda's date-based
+            `formatWeekdayShort` (`features/agenda/format.ts`) — that
+            needs a concrete ISO date, and manufacturing a fake
+            "reference week" purely to borrow day-name labels would be
+            exactly the appointment-scheduling coupling the task's own
+            §4 warns against.
 
 src/features/
   today/    Aujourd'hui screen composition (UI-001): `types.ts` (mock
@@ -854,15 +881,68 @@ src/features/
             (task §16), proven by a dedicated fixture-integrity test
             (`mock-data.test.ts`) rather than left to accidental
             agreement.
-            `team-member-detail-page.tsx` (Spec #9 Screen 34) renders
-            only the "Profil" surface this task scopes — no tab bar,
-            since Planning/Congés/Paie/Documents/Permissions are Screen
-            34's own later tabs, owned by UI-007B through UI-007F. It
-            reuses the exact same `TeamMemberFormDialog` for its own
-            "Modifier" action, but edits made there update only this
-            page's own local state, not `/app/equipe`'s array — the same
-            documented prototype limitation `PatientDetailPage` already
-            has relative to `/app/patients` (UI-004A §7), not a new one.
+            `team-member-detail-page.tsx` (Spec #9 Screen 34) rendered
+            only the "Profil" surface in UI-007A — no tab bar. UI-007B
+            evolves it into the Employee 360° shell: header (extracted,
+            unchanged, into `team-member-header.tsx`) + `team-member-
+            nav.tsx`'s `TeamMemberNav` (Profil/Contrat/Planning, real
+            per-member links + `aria-current`, mirroring
+            `PatientDetailPage`'s own explicit-`activeTab`-prop `Tabs`
+            usage rather than `FinanceNav`'s `usePathname`-prefix
+            pattern — that pattern only works for non-parameterized
+            routes, and this nav sits under a per-member `[id]`) + one
+            of three sibling content components switched on `activeTab`.
+            Présence/Congés/Paie/Commissions (Screen 34's later tabs)
+            are not shown at all — no route exists yet, and the task's
+            own §7 default is "otherwise show only currently implemented
+            items," not disabled placeholders. Two new nested routes:
+            `/app/equipe/[id]/contract`, `/app/equipe/[id]/schedule`.
+            `team-member-profile-content.tsx` is UI-007A's own former
+            body, moved verbatim (the pre-existing UI-007A test suite
+            passes byte-for-byte unmodified — a behavior-preserving
+            refactor, not a rewrite) — still reuses the same
+            `TeamMemberFormDialog` for its own "Modifier" action, edits
+            still page-local only (UI-004A §7's documented limitation).
+            `team-member-contract-content.tsx` — read-only contract
+            summary (or a restrained empty state for a member with none,
+            §21D, no "create a contract" action) + bounded edit via
+            `contract-form-dialog.tsx`'s `ContractFormDialog`
+            (edit-only, mirrors `TeamMemberFormDialog`'s shape).
+            `features/team/contracts.ts`'s `getCurrentContract` prefers
+            the active contract, falling back to the most recently
+            started historical one, then `null` (§22 — no contract-
+            versioning UI). `mock-contracts-data.ts` (7 fixtures) covers
+            all four required scenarios (§21 A-D), teamMemberId
+            integrity-tested.
+            `team-member-schedule-content.tsx` — a read-only weekly grid
+            (`Repos` for a day with no intervals; comma-joined times for
+            a split-shift day) + bounded edit via `work-schedule-form-
+            dialog.tsx`'s `WorkScheduleFormDialog` — a "Travaillé"/
+            "Repos" `Select` per weekday (reusing the existing `Select`
+            rather than introducing a Checkbox primitive the codebase
+            doesn't have), up to 2 time intervals when worked, validated
+            for individual validity and same-day non-overlap. Submit
+            always replaces the member's *entire* interval set for that
+            weekday's own model — never a per-interval CRUD surface,
+            mirroring `CashCountDialog`'s own "one validated result
+            object" shape (UI-006E). `features/team/schedule.ts` reuses
+            `parseTimeToMinutes` from `features/agenda/format.ts` (a
+            genuinely generic time-of-day primitive, not appointment-
+            specific) for `computeWeeklyScheduledHours`/
+            `isValidWorkInterval`/`intervalsAreSequential`, plus a
+            round-trip pair (`buildInitialWorkWeekFormValues` /
+            `buildIntervalsFromWorkWeekFormValues`) between the current
+            interval list and the editor's own bounded per-weekday form
+            state. `mock-schedule-data.ts` gives the two practitioners
+            (team-1/2) a realistic split shift (morning + afternoon
+            across a lunch break, plus a shorter Saturday) demonstrating
+            §7; four other members get one interval per weekday; two
+            deliberately have no schedule at all (the same two members
+            who already have no/ended contracts, rather than a new
+            fixture just for that state) — every scheduled member's own
+            `computeWeeklyScheduledHours` matches their own contract's
+            `weeklyHours` exactly, integrity-tested rather than left to
+            accidental agreement between the two fixture files.
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,
