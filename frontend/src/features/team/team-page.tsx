@@ -1,10 +1,11 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { useLocale } from "@/i18n/locale-provider";
 import { PageHeader } from "@/components/app/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Button } from "@/components/ui/button";
+import { Button, buttonClassNames } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Toast } from "@/components/ui/toast";
 import type { TeamMember, TeamMemberFormValues, TeamRole, TeamRoleFilter, TeamStatusFilter } from "@/components/domain/team/types";
@@ -166,6 +167,11 @@ export function TeamPage({ members: providedMembers, state = "loaded", onRetry }
           <Button type="button" onClick={openCreateForm}>
             {t("team.newMember")}
           </Button>
+        }
+        secondaryAction={
+          <Link href="/app/equipe/attendance" className={buttonClassNames("outline", "md")}>
+            {t("team.attendanceLink")}
+          </Link>
         }
       />
 

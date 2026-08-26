@@ -402,3 +402,332 @@ describe("TeamMemberDetailPage — Planning tab (UI-007B §5-7)", () => {
     expect(container.querySelector('[dir="rtl"]')).toBeInTheDocument();
   });
 });
+
+function todayCard(label = "Aujourd'hui") {
+  return screen.getByText(label).closest(".rounded-lg")! as HTMLElement;
+}
+
+describe("TeamMemberDetailPage — Présence tab (UI-007CDEF Gate 1)", () => {
+  it("shows planning/arrival/departure/worked-time for an on-time completed day", () => {
+    renderDetail("fr", { memberId: "team-3", activeTab: "attendance", businessDate: "2026-08-17" });
+
+    expect(screen.getByText("08:00–16:00")).toBeInTheDocument();
+    expect(screen.getByText("08:00")).toBeInTheDocument();
+    expect(screen.getByText("16:00")).toBeInTheDocument();
+    expect(screen.getByText("8 h")).toBeInTheDocument();
+    expect(within(todayCard()).getByText("Terminé")).toBeInTheDocument();
+  });
+
+  it("shows lateness (retard minutes) for a late-then-completed day — the status badge reflects the day's completed lifecycle stage, lateness stays visible as its own figure", () => {
+    renderDetail("fr", { memberId: "team-3", activeTab: "attendance", businessDate: "2026-08-18" });
+
+    expect(within(todayCard()).getByText("Terminé")).toBeInTheDocument();
+    expect(screen.getByText("12 min")).toBeInTheDocument();
+  });
+
+  it("shows overtime for an overtime day", () => {
+    renderDetail("fr", { memberId: "team-3", activeTab: "attendance", businessDate: "2026-08-20" });
+
+    expect(screen.getByText("35 min")).toBeInTheDocument();
+  });
+
+  it("shows the absent state for a past work day with no record at all (§24)", () => {
+    renderDetail("fr", { memberId: "team-3", activeTab: "attendance", businessDate: "2026-08-21" });
+
+    expect(screen.getByText("Absent")).toBeInTheDocument();
+  });
+
+  it("shows a rest day with no expected/arrival/departure fields and no actions", () => {
+    renderDetail("fr", { memberId: "team-3", activeTab: "attendance", businessDate: "2026-08-22" }); // Saturday, team-3 does not work Saturdays
+
+    expect(screen.getAllByText("Repos").length).toBeGreaterThan(0);
+    expect(screen.queryByRole("button", { name: "Enregistrer l'arrivée" })).not.toBeInTheDocument();
+  });
+
+  it("checks in and then checks out, updating the display deterministically (never Date.now(), §16)", () => {
+    renderDetail("fr", { memberId: "team-3", activeTab: "attendance", businessDate: "2026-08-24" }); // a future Monday relative to MOCK_BUSINESS_DATE — genuinely not-yet-checked-in
+
+    expect(screen.getByText("Non pointé")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Enregistrer l'arrivée" }));
+
+    expect(screen.getByText("09:15", { selector: "dd" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Enregistrer le départ" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Enregistrer l'arrivée" })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Enregistrer le départ" }));
+
+    expect(screen.getAllByText("09:15", { selector: "dd" })).toHaveLength(2);
+    expect(screen.queryByRole("button", { name: "Enregistrer le départ" })).not.toBeInTheDocument();
+  });
+
+  it("renders a restrained recent history list excluding the day currently shown", () => {
+    renderDetail("fr", { memberId: "team-3", activeTab: "attendance", businessDate: "2026-08-20" });
+
+    const history = screen.getByText("Historique récent").closest(".rounded-lg")! as HTMLElement;
+    expect(within(history).getByText("18 août 2026")).toBeInTheDocument(); // the late day shows up in the history
+    expect(within(history).queryByText("20 août 2026")).not.toBeInTheDocument(); // today's own date is excluded
+  });
+
+  it("renders Arabic content with RTL active", () => {
+    const { container } = renderDetail("ar", { memberId: "team-3", activeTab: "attendance", businessDate: "2026-08-18" });
+
+    expect(within(todayCard("اليوم")).getByText("منتهٍ")).toBeInTheDocument();
+    expect(container.querySelector('[dir="rtl"]')).toBeInTheDocument();
+  });
+});
+
+describe("TeamMemberDetailPage — Gate 1 <-> Gate 2 integration (§33-34)", () => {
+  it("shows 'En congé' instead of the normal check-in prompt on a date covered by an approved request", () => {
+    renderDetail("fr", { memberId: "team-3", activeTab: "attendance", businessDate: "2026-08-25" });
+
+    expect(screen.getByText("En congé")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Enregistrer l'arrivée" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Non pointé")).not.toBeInTheDocument();
+  });
+
+  it("a pending request covering a date does NOT excuse it — the normal not-checked-in/absent handling still applies (§34)", () => {
+    // lr-1 (team-3) is pending for 2026-09-04..05 — a date with no attendance record and no approved leave.
+    renderDetail("fr", { memberId: "team-3", activeTab: "attendance", businessDate: "2026-09-04" });
+
+    expect(screen.queryByText("En congé")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Enregistrer l'arrivée" })).toBeInTheDocument();
+  });
+});
+
+describe("TeamMemberDetailPage — Congés tab (UI-007CDEF Gate 2)", () => {
+  it("shows the balance summary and every one of the member's own requests", () => {
+    renderDetail("fr", { memberId: "team-3", activeTab: "leave" });
+
+    expect(screen.getByText("18")).toBeInTheDocument(); // available
+    expect(screen.getByText("4")).toBeInTheDocument(); // used
+    expect(screen.getByText("2", { selector: "dd" })).toBeInTheDocument(); // pending (from lr-1's own 2-day duration)
+
+    expect(screen.getByText("Congé annuel")).toBeInTheDocument();
+    expect(screen.getByText("En attente")).toBeInTheDocument();
+    expect(screen.getByText("Approuvé")).toBeInTheDocument();
+    expect(screen.getByText("Refusé")).toBeInTheDocument();
+  });
+
+  it("shows the empty state and no balance card for a member with no leave data at all", () => {
+    renderDetail("fr", { memberId: "team-4", activeTab: "leave" });
+
+    expect(screen.getByText("Aucune demande de congé pour le moment.")).toBeInTheDocument();
+    expect(screen.queryByText("Solde de congés")).not.toBeInTheDocument();
+  });
+
+  it("creates a new pending request with a computed duration", () => {
+    renderDetail("fr", { memberId: "team-4", activeTab: "leave" });
+
+    fireEvent.click(screen.getByRole("button", { name: "+ Demander un congé" }));
+    fireEvent.change(screen.getByLabelText("Date de début *"), { target: { value: "2026-10-01" } });
+    fireEvent.change(screen.getByLabelText("Date de fin *"), { target: { value: "2026-10-03" } });
+    fireEvent.click(screen.getByRole("button", { name: "Envoyer la demande" }));
+
+    expect(screen.getByText("Demande de congé envoyée.")).toBeInTheDocument();
+    expect(screen.getByText("3 jours")).toBeInTheDocument();
+    expect(screen.getByText("En attente")).toBeInTheDocument();
+  });
+
+  it("rejects an end date before the start date", () => {
+    renderDetail("fr", { memberId: "team-4", activeTab: "leave" });
+
+    fireEvent.click(screen.getByRole("button", { name: "+ Demander un congé" }));
+    fireEvent.change(screen.getByLabelText("Date de début *"), { target: { value: "2026-10-05" } });
+    fireEvent.change(screen.getByLabelText("Date de fin *"), { target: { value: "2026-10-01" } });
+    fireEvent.click(screen.getByRole("button", { name: "Envoyer la demande" }));
+
+    expect(screen.getByText("La date de fin doit être postérieure ou égale à la date de début.")).toBeInTheDocument();
+  });
+
+  it("approves a pending request, moving its duration from available to used", () => {
+    renderDetail("fr", { memberId: "team-3", activeTab: "leave" });
+
+    fireEvent.click(screen.getByRole("button", { name: "Approuver" }));
+    fireEvent.click(within(screen.getByRole("alertdialog")).getByRole("button", { name: "Approuver" }));
+
+    expect(screen.getByText("Congé approuvé.")).toBeInTheDocument();
+    expect(screen.getByText("16")).toBeInTheDocument(); // available: 18 - 2
+    expect(screen.getByText("6")).toBeInTheDocument(); // used: 4 + 2
+    expect(screen.getAllByText("Approuvé").length).toBe(2); // lr-1 now approved, alongside lr-2
+  });
+
+  it("requires a reason to reject, and rejecting never touches the balance", () => {
+    renderDetail("fr", { memberId: "team-3", activeTab: "leave" });
+
+    fireEvent.click(screen.getByRole("button", { name: "Refuser" }));
+    const dialog = screen.getByRole("alertdialog");
+    expect(within(dialog).getByRole("button", { name: "Refuser" })).toBeDisabled();
+
+    fireEvent.change(within(dialog).getByLabelText("Motif du refus *"), { target: { value: "Effectif insuffisant." } });
+    expect(within(dialog).getByRole("button", { name: "Refuser" })).not.toBeDisabled();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Refuser" }));
+
+    expect(screen.getByText("Congé refusé.")).toBeInTheDocument();
+    expect(screen.getByText("18")).toBeInTheDocument(); // available unchanged
+    expect(screen.getByText("4")).toBeInTheDocument(); // used unchanged
+  });
+
+  it("cancelling the new-request dialog does not create a request", () => {
+    renderDetail("fr", { memberId: "team-4", activeTab: "leave" });
+
+    fireEvent.click(screen.getByRole("button", { name: "+ Demander un congé" }));
+    fireEvent.click(screen.getByRole("button", { name: "Annuler" }));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.getByText("Aucune demande de congé pour le moment.")).toBeInTheDocument();
+  });
+
+  it("renders Arabic content with RTL active", () => {
+    const { container } = renderDetail("ar", { memberId: "team-3", activeTab: "leave" });
+
+    expect(screen.getByText("إجازة سنوية")).toBeInTheDocument();
+    expect(screen.getByText("قيد الانتظار")).toBeInTheDocument();
+    expect(container.querySelector('[dir="rtl"]')).toBeInTheDocument();
+  });
+});
+
+describe("TeamMemberDetailPage — Paie tab (UI-007CDEF Gate 3)", () => {
+  it("defaults to the most recent period and shows the correct formula for a receptionist (no commission)", () => {
+    renderDetail("fr", { memberId: "team-3", activeTab: "payroll" });
+
+    expect(screen.getByRole("combobox", { name: "Période" })).toHaveValue("pp-2026-08");
+    expect(screen.getByText("5 000 MAD")).toBeInTheDocument(); // base
+    expect(screen.getByText("35 min")).toBeInTheDocument(); // overtime duration only, never money
+    expect(screen.getByText("-200 MAD")).toBeInTheDocument(); // deductions
+    expect(screen.getByText("5 100 MAD")).toBeInTheDocument(); // net: 5000 + 300 - 200
+    expect(screen.getByText("Brouillon")).toBeInTheDocument();
+    expect(screen.getByText("Non payé")).toBeInTheDocument();
+  });
+
+  it("shows the commission line for a practitioner", () => {
+    renderDetail("fr", { memberId: "team-1", activeTab: "payroll" });
+
+    expect(screen.getByText("8 300 MAD")).toBeInTheDocument(); // net: 8000 + 300 commission
+  });
+
+  it("switching to the finalized period shows the read-only notice and no edit actions", () => {
+    renderDetail("fr", { memberId: "team-3", activeTab: "payroll" });
+
+    fireEvent.change(screen.getByRole("combobox", { name: "Période" }), { target: { value: "pp-2026-07" } });
+
+    expect(screen.getByText("Cette période est finalisée et ne peut plus être modifiée.")).toBeInTheDocument();
+    expect(screen.getByText("Finalisé")).toBeInTheDocument();
+    expect(screen.getByText("Payé")).toBeInTheDocument();
+    expect(screen.getByText("5 300 MAD")).toBeInTheDocument(); // matches this task's own §47 worked example
+    expect(screen.queryByRole("button", { name: "+ Ajouter une prime" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "+ Ajouter une déduction" })).not.toBeInTheDocument();
+  });
+
+  it("adds a bonus on the current draft period and recomputes the net", () => {
+    renderDetail("fr", { memberId: "team-3", activeTab: "payroll" });
+
+    fireEvent.click(screen.getByRole("button", { name: "+ Ajouter une prime" }));
+    fireEvent.change(screen.getByLabelText("Libellé"), { target: { value: "Prime exceptionnelle" } });
+    fireEvent.change(screen.getByLabelText("Montant"), { target: { value: "150" } });
+    fireEvent.click(screen.getByRole("button", { name: "Ajouter" }));
+
+    expect(screen.getByText("Prime ajoutée.")).toBeInTheDocument();
+    expect(screen.getByText("5 250 MAD")).toBeInTheDocument(); // net: 5000 + 450 - 200
+  });
+
+  it("adds a deduction on the current draft period and recomputes the net", () => {
+    renderDetail("fr", { memberId: "team-3", activeTab: "payroll" });
+
+    fireEvent.click(screen.getByRole("button", { name: "+ Ajouter une déduction" }));
+    fireEvent.change(screen.getByLabelText("Libellé"), { target: { value: "Retard répété" } });
+    fireEvent.change(screen.getByLabelText("Montant"), { target: { value: "50" } });
+    fireEvent.click(screen.getByRole("button", { name: "Ajouter" }));
+
+    expect(screen.getByText("Déduction ajoutée.")).toBeInTheDocument();
+    expect(screen.getByText("5 050 MAD")).toBeInTheDocument(); // net: 5000 + 300 - 250
+  });
+
+  it("opens the read-only payslip and shows the future-feature notice for the download action, never a real file", () => {
+    renderDetail("fr", { memberId: "team-3", activeTab: "payroll" });
+
+    fireEvent.click(screen.getByRole("button", { name: "Voir le bulletin" }));
+
+    expect(screen.getByRole("heading", { level: 2, name: "Bulletin de paie" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Télécharger le bulletin" }));
+
+    expect(screen.getByText("La génération du bulletin PDF sera connectée au moteur documentaire ultérieurement.")).toBeInTheDocument();
+  });
+
+  it("shows the empty state for a member with no payroll entry in any period", () => {
+    renderDetail("fr", { memberId: "team-4", activeTab: "payroll" });
+
+    expect(screen.getByText("Aucune fiche de paie pour cette période.")).toBeInTheDocument();
+    expect(screen.queryByText("NET À PAYER")).not.toBeInTheDocument();
+  });
+
+  it("renders Arabic content with RTL active", () => {
+    const { container } = renderDetail("ar", { memberId: "team-3", activeTab: "payroll" });
+
+    expect(screen.getByText("الصافي المستحق")).toBeInTheDocument();
+    expect(container.querySelector('[dir="rtl"]')).toBeInTheDocument();
+  });
+});
+
+describe("TeamMemberDetailPage — Employee 360 navigation (UI-007CDEF §8/§52/§62)", () => {
+  it("shows Commissions only for a practitioner with a real practitionerId link", () => {
+    renderDetail("fr", { memberId: "team-1", activeTab: "profile" });
+    const nav = screen.getByRole("navigation", { name: "Sections de l'employé" });
+    expect(within(nav).getByRole("link", { name: "Commissions" })).toBeInTheDocument();
+  });
+
+  it("hides Commissions for a non-practitioner", () => {
+    renderDetail("fr", { memberId: "team-3", activeTab: "profile" });
+    const nav = screen.getByRole("navigation", { name: "Sections de l'employé" });
+    expect(within(nav).queryByRole("link", { name: "Commissions" })).not.toBeInTheDocument();
+  });
+
+  it("hides Commissions for a practitioner-role member with no practitionerId link (Othmane Zouiten)", () => {
+    renderDetail("fr", { memberId: "team-7", activeTab: "profile" });
+    const nav = screen.getByRole("navigation", { name: "Sections de l'employé" });
+    expect(within(nav).queryByRole("link", { name: "Commissions" })).not.toBeInTheDocument();
+  });
+});
+
+describe("TeamMemberDetailPage — Commissions tab (UI-007CDEF Gate 4)", () => {
+  it("shows a not-applicable state for a non-practitioner accessing the route directly (§62)", () => {
+    renderDetail("fr", { memberId: "team-3", activeTab: "commissions" });
+    expect(screen.getByText("Commissions non applicables")).toBeInTheDocument();
+  });
+
+  it("shows a not-applicable state for a practitioner with no practitionerId link (§56/§62)", () => {
+    renderDetail("fr", { memberId: "team-7", activeTab: "commissions" });
+    expect(screen.getByText("Commissions non applicables")).toBeInTheDocument();
+  });
+
+  it("always displays the calculation basis and matches the real derived eligible base/commission for the default period", () => {
+    renderDetail("fr", { memberId: "team-1", activeTab: "commissions" });
+
+    expect(screen.getByText("Montants encaissés", { exact: false })).toBeInTheDocument();
+    expect(screen.getByText("1 500 MAD")).toBeInTheDocument();
+    expect(screen.getByText("20%")).toBeInTheDocument();
+    expect(screen.getByText("300 MAD")).toBeInTheDocument();
+  });
+
+  it("lists commissionable activity rows with only patient identity, date, service and amount — never clinical data", () => {
+    renderDetail("fr", { memberId: "team-1", activeTab: "commissions" });
+
+    expect(screen.getAllByText("Ahmed El Mansouri").length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Traitement de r/).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/allergie|diagnostic|antecedent/i)).not.toBeInTheDocument();
+  });
+
+  it("switching period recomputes the eligible base and detail from real data, never a duplicated hardcoded figure", () => {
+    renderDetail("fr", { memberId: "team-1", activeTab: "commissions" });
+
+    fireEvent.change(screen.getByRole("combobox", { name: "Période" }), { target: { value: "pp-2026-07" } });
+
+    expect(screen.getByText("Consultation initiale", { exact: false })).toBeInTheDocument();
+  });
+
+  it("renders Arabic content with RTL active", () => {
+    const { container } = renderDetail("ar", { memberId: "team-1", activeTab: "commissions" });
+
+    expect(screen.getByText("العمولة المحتسبة")).toBeInTheDocument();
+    expect(container.querySelector('[dir="rtl"]')).toBeInTheDocument();
+  });
+});

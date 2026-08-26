@@ -259,3 +259,83 @@ avoid reinventing UUID handling per model.
 ### Date
 
 2026-08-23
+
+---
+
+## ADR-005 — UI-007CDEF Attendance (check-in/check-out): frontend prototype ahead of the approved backend scope
+
+### Status
+
+Accepted
+
+### Decision
+
+Implement a local, non-persisted, frontend-only check-in/check-out
+prototype for UI-007CDEF's Gate 1 (Attendance), exactly as this task's
+own explicit instructions (§16-18) require — while recording here that
+this deliberately runs ahead of two independent statements in the
+approved specifications that clock-in/out is *not* part of the V1
+product design:
+
+- Spec #4 §20 (`domain-data-architecture.md`), directly under
+  `employee_work_schedules`: *"No clock-in/out entity is required in
+  V1."*
+- Spec #3 §39 (`business-workflows.md`, WF-36 — Configure staff
+  schedule/shifts), its own explicit closing line: *"No clock-in/out
+  tracking."*
+
+Both statements are about the *approved backend/workflow scope*, not
+about whether a frontend prototype screen may exist. Nothing this task
+adds creates a backend entity, an API endpoint, or persisted data of
+any kind — `AttendanceRecord` exists only as in-memory React state,
+reset on navigation/refresh (CLAUDE.md §1 priority order also places
+the current task's own explicit instructions above the specifications
+for exactly this kind of situation).
+
+### Context
+
+CLAUDE.md §1 requires recording, not silently resolving, a material
+contradiction between current task instructions and the approved
+specifications when it could affect correctness, security, data
+integrity or product behavior. This one does not touch any of those —
+it is a non-persisted UI affordance with no backend counterpart
+anywhere in this repository (consistent with every other UI-00X task
+in this session, all of which are frontend-only prototypes) — but the
+scope disagreement is real and worth a durable record for whoever
+scopes the eventual backend Team/Attendance module, so this decision
+is not silently lost once the frontend code itself no longer states it
+inline.
+
+### Alternatives
+
+1.  Stop the entire UI-007CDEF task and request clarification before
+    implementing Gate 1 — rejected: the task's own instructions are
+    extremely detailed and explicit about this exact feature (89
+    numbered sections, four acceptance-criteria checklists), strongly
+    suggesting deliberate intent to prototype ahead of the backend
+    spec, not an oversight; and the deviation carries no
+    correctness/security/data-integrity risk since nothing is
+    persisted or transmitted.
+2.  Silently implement it without recording the tension — rejected:
+    CLAUDE.md §1 explicitly forbids silently resolving a material
+    specification contradiction.
+3.  **Chosen:** implement as instructed, record this ADR, and label the
+    feature clearly in code/docs as a frontend-only prototype with no
+    backend counterpart yet.
+
+### Consequences
+
+- A future backend HR/Attendance module must independently decide
+  whether to introduce a real `attendance_records`-style entity (or
+  continue relying on schedule-only planning, as the specs currently
+  describe) — this ADR does not itself approve that backend entity.
+- `AttendanceRecord` (`components/domain/team/types.ts`) carries an
+  explicit doc-comment cross-reference to this ADR.
+- If the specifications are later updated to formally exclude
+  clock-in/out from the product entirely, this frontend prototype
+  screen would need to be removed or re-scoped — tracked here rather
+  than only in a code comment that could be lost in a future refactor.
+
+### Date
+
+2026-08-26

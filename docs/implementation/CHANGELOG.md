@@ -1865,3 +1865,165 @@ All notable changes to this project are documented in this file.
   the first full-suite run after fixing the collisions above; backend
   regression (10 tests, 26 assertions, clean) unaffected — no backend
   files touched.
+- UI-007CDEF — Complete HR Operations Prototype: Attendance, Leave,
+  Payroll and Practitioner Commissions, executed as four sequential
+  gates against one shared fixture universe — no contradictory
+  duplicate mock data anywhere, verified by a dedicated
+  `cross-hr-integrity.test.ts` that walks the full required chain
+  (Contract → Schedule → Attendance → Payroll overtime, Leave →
+  Attendance, Finance activity → Commission → Payroll) end to end for
+  one real member (Dr. Benali).
+
+  **Gate 1 — Attendance.** `AttendanceRecord`/`AttendanceStatus`
+  (`components/domain/team/types.ts`) is a deliberate frontend-only
+  prototype running ahead of the approved backend scope — recorded as
+  `docs/implementation/DECISIONS.md` ADR-005 rather than silently
+  resolved, since Spec #4 §20 ("No clock-in/out entity is required in
+  V1") and Spec #3 §39/WF-36 ("No clock-in/out tracking") both describe
+  the *backend* scope, not whether a non-persisted prototype screen may
+  exist; nothing here creates a backend entity, API call, or persisted
+  data. Only raw `checkIn?`/`checkOut?` are stored on the record —
+  status, worked/late/early-departure/overtime minutes are always
+  *derived* by `features/team/attendance.ts`'s pure functions against
+  that member's own real `WorkInterval`s for the matching weekday
+  (`getExpectedIntervalsForDate`), never a second hardcoded schedule.
+  `computeWorkedMinutes` is gap-aware: for a split-shift day it
+  subtracts only the *unpaid gap between* the two expected intervals
+  from the raw check-in/check-out span, so it never naively computes
+  "final minus first" and silently counts a lunch break as worked time
+  (the task's own explicit warning, proven by a dedicated test showing
+  the gap-aware result differs from the naive one). `resolveAttendanceStatus`
+  returns `null` for a rest day (excluded from every count, never
+  "not checked in") and distinguishes `not_checked_in` (today, no
+  check-in yet) from `absent` (a past work day with none at all) via an
+  `isPastDate` flag — approved leave is applied by the *caller* as
+  contextual presentation ("En congé"), never folded into this enum
+  (§13/§33). The cabinet workspace (`team-attendance-page.tsx`, at
+  `/app/equipe/attendance`, reached from the Équipe directory's own
+  header rather than a new sidebar entry, §66) buckets each member into
+  exactly one of PRÉSENTS/EN RETARD/ABSENTS/NON POINTÉS
+  (`resolveCabinetBucket`) — a late-then-completed day stays "En
+  retard," never flips back to a generic "present," so the per-row
+  badge never contradicts the summary counts above it. On its live
+  default (`MOCK_BUSINESS_DATE`, a Sunday) it correctly shows a rest
+  day for the entire cabinet — verified, honest behavior, not an
+  omission — while a `businessDate` prop seam demonstrates every real
+  state in tests. The per-employee Présence tab adds deterministic
+  check-in/check-out actions (`MOCK_NOW_TIME`, reused from
+  `features/agenda/mock-data.ts`, never `Date.now()`) and a restrained
+  recent-history list. Fixtures (`mock-attendance-data.ts`) give
+  Dr. Benali (split shift) and Meryem Bakkali (single interval) one
+  on-time, one late, one early-departure and one overtime day each,
+  plus one deliberate gap each proving the absent state — covering
+  every real `AttendanceStatus` for both schedule shapes.
+
+  **Gate 2 — Leave.** `LeaveRequest`/`LeaveBalance` with a bounded
+  `LeaveType` (annual/sick/unpaid/other — this task's own explicit
+  list, since the domain spec defines no leave-type enum) and
+  `LeaveRequestStatus` (pending/approved/rejected, narrowed from Spec
+  #4 §20.2's five-value backend ENUM). `computeLeaveDurationDays` is an
+  inclusive calendar-day count with no invented weekend/holiday
+  exclusion, matching the task's own "26-28 août = 3 jours" example
+  exactly (verified by a direct test). The Congés tab combines Screen
+  36's own staff ("Mes congés") and owner (Approve/Reject) views into
+  one per-employee surface, since this prototype has no real
+  multi-viewpoint role switching yet — documented as a deliberate
+  consolidation, not a missing feature. `LeaveDecisionDialog` wraps the
+  existing `ConfirmDialog` (mirrors `CloseConfirmDialog`, UI-006E) for
+  both actions; a rejection reason is required, an approval needs none.
+  `applyApprovedLeaveToBalance` moves the request's own duration from
+  `available` to `used` only on approval (§35) — pending and rejected
+  requests never touch either figure, each proven by a dedicated test.
+  `doesApprovedLeaveCoverDate` is the Gate 1↔2 integration point: only
+  a request with `status === "approved"` re-labels what would otherwise
+  render as an unexplained absence/not-checked-in state as "En congé"
+  (§33); a pending request covering the exact same date is proven, by a
+  dedicated test, to leave the normal handling untouched (§34).
+  Fixtures (`mock-leave-data.ts`) give Meryem Bakkali one request of
+  each status — her approved one deliberately covers 2026-08-25, a date
+  proven (by a fixture-integrity test) to be genuinely distinct from
+  every Gate 1 attendance fixture date, so wiring leave into attendance
+  never silently changed an already-tested Gate 1 result. Nawal Chaoui
+  deliberately has none at all (empty-state demo).
+
+  **Gate 3 — Payroll.** `PayrollPeriod`/`PayrollEntry`/`PayrollAdjustment`
+  — an explicitly cabinet-*operational* payroll prototype; no statutory
+  Moroccan tax/CNSS/AMO/IR line exists anywhere, grep- and
+  test-confirmed (Spec #3 §42/WF-39 itself: "Statutory Moroccan
+  payroll/tax/social compliance is not claimed without separate
+  specification"). `PayrollPeriodStatus` is bounded to draft/finalized
+  (narrower than Spec #4 §21.1's three-value backend ENUM — this task's
+  own explicit two-value list takes priority, the same precedent
+  UI-006E already set for `CashSessionStatus`); `PayrollEntryStatus`
+  (unpaid/paid) is a distinct concept governing disbursement, not
+  editability. `baseAmount` is a synthetic *payroll-specific*
+  configuration value — never retroactively added to
+  `EmploymentContract`, which UI-007B deliberately kept salary-free
+  (§40). `overtimeMinutes` is duration-only and reconciles exactly
+  against Gate 1's own real attendance overtime for the same
+  member/period (`computePeriodOvertimeMinutes`, proven by a dedicated
+  integrity test) — no monetary overtime rate/multiplier is invented
+  anywhere, so `computeGrossPayable` never includes overtime money
+  (proven by a test showing gross is unchanged regardless of
+  `overtimeMinutes`). Bonuses/deductions are bounded adjustment lists,
+  addable only while the period is `draft` — a `finalized` period shows
+  a read-only notice and exposes no edit/delete action of any kind
+  (§50). A read-only `PayslipDialog`'s own "Télécharger le bulletin"
+  action shows this task's own exact future-feature notice
+  ("La génération du bulletin PDF sera connectée au moteur documentaire
+  ultérieurement."), never a real file. Meryem Bakkali's July entry
+  (`mock-payroll-data.ts`) reproduces this task's own §47 worked
+  example verbatim: 5 000 base + 300 bonus, no commission = 5 300 net —
+  proven by a direct test, not just eyeballed.
+
+  **Gate 4 — Commissions.** `CommissionRule`'s `basis` is fixed to
+  `"collected_payments"` — the only basis the approved specifications
+  actually demonstrate with a worked example (Spec #9 Screen 38's own
+  "Base de calcul — Montants encaissés"; Spec #3 WF-40's own "Collected
+  amount: 4 000 MAD × 30% = 1 200 MAD," reproduced verbatim by a direct
+  test) — the other bases CLAUDE.md §28 lists (invoiced amount, fixed
+  per service, ...) are not implemented since no approved
+  wireframe/workflow demonstrates their exact rule (§54: "Do NOT invent
+  the business basis"). `getEligibleCommissionActivity` derives every
+  figure live from the *existing* `getPaymentsMockData()`/
+  `getInvoicesMockData()` fixtures — posted payments only, allocated to
+  an invoice genuinely attributed to this practitioner via
+  `Invoice.practitionerName`, within the requested period — summing
+  each payment's own *allocation* amount (never the whole payment) so a
+  hypothetical multi-invoice payment could never be double-counted onto
+  one practitioner (WF-40's own acceptance criterion, directly tested).
+  `isCommissionEligible` requires both `role === "practitioner"` AND a
+  real `practitionerId` link (§56) — Othmane Zouiten (`team-7`, a
+  practitioner with no `practitionerId`, already UI-007A's own
+  "deliberately unlinked" fixture) proves the distinction: no
+  Commissions tab in `TeamMemberNav` (`showCommissions` prop), and
+  direct route access shows a "Commissions non applicables" state
+  rather than crashing or silently rendering empty (§62). Every
+  activity row shows only patient identity, date, service description
+  and amount — no clinical data of any kind, verified structurally by a
+  test asserting the exact key set on every activity item (§60).
+  `mock-commissions-data.ts` gives Dr. Benali (20%) and Dr. Amal (25%)
+  active rules; a dedicated reconciliation test proves Dr. Benali's own
+  `PayrollEntry.commissionAmount` for every period he has one equals
+  Gate 4's own live `computeCommissionAmount` output exactly — never an
+  independently hardcoded figure (§61).
+
+  All 849 frontend tests (706 carried over through UI-007B + 143 net
+  new), typecheck, lint and build pass on the first full-suite run
+  after fixing one self-caught bug (the cabinet attendance page's
+  per-row status badge originally used the raw 5-value
+  `AttendanceStatus` instead of the same 4-bucket categorization as its
+  own summary counts, so a late-then-completed day showed "Terminé" in
+  its own row while being counted under "En retard" above — fixed by
+  reusing `resolveCabinetBucket` for the row badge too) and one
+  test-authoring bug (several money-amount literals in
+  `team-member-detail-page.test.tsx`'s new Payroll/Commissions describe
+  blocks were typed with a stray U+00A0 no-break space instead of a
+  regular space, causing `getByText` to fail exact-match against the
+  DOM's own narrow-no-break-space-normalized grouping separator even
+  though the underlying values were already correct — found by
+  isolating the exact byte sequence with a throwaway debug assertion,
+  fixed by a byte-level `sed` replacement across the file, confirmed
+  absent from every other file touched this task). Backend regression
+  (10 tests, 26 assertions, clean) unaffected — no backend files
+  touched.

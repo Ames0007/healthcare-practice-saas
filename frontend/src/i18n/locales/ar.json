@@ -943,6 +943,33 @@
       "saturday": "السبت",
       "sunday": "الأحد"
     },
+    "attendanceLink": "حضور اليوم",
+    "attendanceStatus": {
+      "notCheckedIn": "لم يسجل الحضور",
+      "present": "حاضر",
+      "late": "متأخر",
+      "completed": "منتهٍ",
+      "absent": "غائب"
+    },
+    "leaveType": {
+      "annual": "إجازة سنوية",
+      "sick": "إجازة مرضية",
+      "unpaid": "إجازة بدون أجر",
+      "other": "أخرى"
+    },
+    "leaveStatus": {
+      "pending": "قيد الانتظار",
+      "approved": "موافق عليها",
+      "rejected": "مرفوضة"
+    },
+    "payrollEntryStatus": {
+      "unpaid": "غير مدفوع",
+      "paid": "مدفوع"
+    },
+    "payrollPeriodStatus": {
+      "draft": "مسودة",
+      "finalized": "نهائي"
+    },
     "form": {
       "createTitle": "عضو جديد",
       "editTitle": "تعديل بيانات العضو",
@@ -983,7 +1010,108 @@
       "navigationLabel": "أقسام الموظف",
       "profile": "الملف الشخصي",
       "contract": "العقد",
-      "schedule": "الجدول الأسبوعي"
+      "schedule": "الجدول الأسبوعي",
+      "attendance": "الحضور",
+      "leave": "الإجازات",
+      "payroll": "الرواتب",
+      "commissions": "العمولات"
+    },
+    "attendance": {
+      "todayTitle": "اليوم",
+      "restDay": "راحة",
+      "restDayDescription": "لا حضور متوقع في هذا اليوم.",
+      "onLeave": "في إجازة",
+      "onLeaveDescription": "هذا العضو في إجازة موافق عليها اليوم.",
+      "expectedLabel": "الجدول المتوقع",
+      "checkInLabel": "الوصول",
+      "checkOutLabel": "المغادرة",
+      "workedLabel": "الوقت المعمول",
+      "lateLabel": "التأخير",
+      "overtimeLabel": "ساعات إضافية",
+      "none": "لا شيء",
+      "checkInAction": "تسجيل الوصول",
+      "checkOutAction": "تسجيل المغادرة",
+      "historyTitle": "السجل الأخير"
+    },
+    "leave": {
+      "balanceTitle": "رصيد الإجازات",
+      "availableLabel": "الرصيد المتاح",
+      "usedLabel": "المستخدم",
+      "pendingLabel": "أيام قيد المراجعة",
+      "requestsTitle": "الطلبات",
+      "newRequest": "+ طلب إجازة",
+      "typeLabel": "النوع",
+      "startDateLabel": "تاريخ البدء",
+      "endDateLabel": "تاريخ الانتهاء",
+      "reasonLabel": "السبب",
+      "durationValue": "{{count}} أيام",
+      "approve": "الموافقة",
+      "reject": "الرفض",
+      "approveConfirmTitle": "الموافقة على هذه الإجازة؟",
+      "rejectConfirmTitle": "رفض هذه الإجازة؟",
+      "confirmDescription": "{{type}} — من {{start}} إلى {{end}}.",
+      "reviewNoteLabel": "سبب الرفض",
+      "defaultReviewer": "يوسف بنعلي",
+      "empty": {
+        "title": "لا توجد طلبات إجازة حاليًا."
+      },
+      "toast": {
+        "created": "تم إرسال طلب الإجازة.",
+        "approved": "تمت الموافقة على الإجازة.",
+        "rejected": "تم رفض الإجازة."
+      },
+      "form": {
+        "title": "طلب إجازة جديد",
+        "submit": "إرسال الطلب",
+        "dateRangeError": "يجب أن يكون تاريخ الانتهاء بعد أو يساوي تاريخ البدء."
+      }
+    },
+    "payroll": {
+      "periodLabel": "الفترة",
+      "baseLabel": "الأساسي",
+      "overtimeLabel": "ساعات إضافية",
+      "bonusesLabel": "المكافآت",
+      "commissionLabel": "العمولات",
+      "deductionsLabel": "الخصومات",
+      "netLabel": "الصافي المستحق",
+      "viewPayslip": "عرض كشف الراتب",
+      "addBonus": "+ إضافة مكافأة",
+      "addDeduction": "+ إضافة خصم",
+      "adjustmentLabelLabel": "الوصف",
+      "adjustmentAmountLabel": "المبلغ",
+      "addAction": "إضافة",
+      "finalizedNotice": "هذه الفترة نهائية ولا يمكن تعديلها.",
+      "empty": {
+        "title": "لا توجد كشوف رواتب لهذه الفترة."
+      },
+      "toast": {
+        "bonusAdded": "تمت إضافة المكافأة.",
+        "deductionAdded": "تمت إضافة الخصم."
+      },
+      "payslip": {
+        "title": "كشف الراتب",
+        "download": "تحميل كشف الراتب",
+        "downloadNotice": "سيتم ربط إنشاء ملف PDF لكشف الراتب بمحرك المستندات لاحقًا."
+      }
+    },
+    "commissions": {
+      "basisLabel": "أساس الاحتساب",
+      "basisValue": "المبالغ المحصلة",
+      "eligibleBaseLabel": "المبلغ المؤهل",
+      "rateLabel": "النسبة",
+      "commissionLabel": "العمولة المحتسبة",
+      "detailTitle": "التفاصيل",
+      "noActivity": "لا يوجد نشاط قابل للعمولة في هذه الفترة.",
+      "table": {
+        "date": "التاريخ",
+        "patientService": "المريض / الخدمة",
+        "base": "الأساس",
+        "commission": "العمولة"
+      },
+      "notApplicable": {
+        "title": "العمولات غير قابلة للتطبيق",
+        "description": "هذا العضو ليس ممارسًا مرتبطًا بقاعدة عمولة."
+      }
     },
     "contract": {
       "title": "عقد العمل",
@@ -1027,6 +1155,29 @@
         "startLabelForSlot": "البداية — {{day}} {{slot}}",
         "endLabelForSlot": "النهاية — {{day}} {{slot}}"
       }
+    }
+  },
+  "teamAttendance": {
+    "pageTitle": "الحضور",
+    "pageDescription": "اليوم — حضور الفريق.",
+    "restDay": "راحة",
+    "counts": {
+      "present": "حاضرون",
+      "late": "متأخرون",
+      "absent": "غائبون",
+      "notCheckedIn": "لم يسجلوا الحضور"
+    },
+    "table": {
+      "member": "العضو",
+      "planning": "الجدول",
+      "checkIn": "الوصول",
+      "checkOut": "المغادرة",
+      "worked": "الوقت المعمول",
+      "status": "الحالة"
+    },
+    "error": {
+      "title": "تعذّر تحميل الحضور.",
+      "retry": "إعادة المحاولة"
     }
   },
   "admin": {

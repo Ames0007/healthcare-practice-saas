@@ -943,6 +943,33 @@
       "saturday": "Samedi",
       "sunday": "Dimanche"
     },
+    "attendanceLink": "Présence du jour",
+    "attendanceStatus": {
+      "notCheckedIn": "Non pointé",
+      "present": "Présent",
+      "late": "En retard",
+      "completed": "Terminé",
+      "absent": "Absent"
+    },
+    "leaveType": {
+      "annual": "Congé annuel",
+      "sick": "Congé maladie",
+      "unpaid": "Congé sans solde",
+      "other": "Autre"
+    },
+    "leaveStatus": {
+      "pending": "En attente",
+      "approved": "Approuvé",
+      "rejected": "Refusé"
+    },
+    "payrollEntryStatus": {
+      "unpaid": "Non payé",
+      "paid": "Payé"
+    },
+    "payrollPeriodStatus": {
+      "draft": "Brouillon",
+      "finalized": "Finalisé"
+    },
     "form": {
       "createTitle": "Nouveau membre",
       "editTitle": "Modifier le membre",
@@ -983,7 +1010,108 @@
       "navigationLabel": "Sections de l'employé",
       "profile": "Profil",
       "contract": "Contrat",
-      "schedule": "Planning"
+      "schedule": "Planning",
+      "attendance": "Présence",
+      "leave": "Congés",
+      "payroll": "Paie",
+      "commissions": "Commissions"
+    },
+    "attendance": {
+      "todayTitle": "Aujourd'hui",
+      "restDay": "Repos",
+      "restDayDescription": "Aucune présence n'est attendue ce jour.",
+      "onLeave": "En congé",
+      "onLeaveDescription": "Ce membre est en congé approuvé aujourd'hui.",
+      "expectedLabel": "Planning prévu",
+      "checkInLabel": "Arrivée",
+      "checkOutLabel": "Départ",
+      "workedLabel": "Temps travaillé",
+      "lateLabel": "Retard",
+      "overtimeLabel": "Heures supplémentaires",
+      "none": "Aucun",
+      "checkInAction": "Enregistrer l'arrivée",
+      "checkOutAction": "Enregistrer le départ",
+      "historyTitle": "Historique récent"
+    },
+    "leave": {
+      "balanceTitle": "Solde de congés",
+      "availableLabel": "Solde disponible",
+      "usedLabel": "Utilisé",
+      "pendingLabel": "Jours en attente",
+      "requestsTitle": "Demandes",
+      "newRequest": "+ Demander un congé",
+      "typeLabel": "Type",
+      "startDateLabel": "Date de début",
+      "endDateLabel": "Date de fin",
+      "reasonLabel": "Motif",
+      "durationValue": "{{count}} jours",
+      "approve": "Approuver",
+      "reject": "Refuser",
+      "approveConfirmTitle": "Approuver ce congé ?",
+      "rejectConfirmTitle": "Refuser ce congé ?",
+      "confirmDescription": "{{type}} — du {{start}} au {{end}}.",
+      "reviewNoteLabel": "Motif du refus",
+      "defaultReviewer": "Youssef Benali",
+      "empty": {
+        "title": "Aucune demande de congé pour le moment."
+      },
+      "toast": {
+        "created": "Demande de congé envoyée.",
+        "approved": "Congé approuvé.",
+        "rejected": "Congé refusé."
+      },
+      "form": {
+        "title": "Nouvelle demande de congé",
+        "submit": "Envoyer la demande",
+        "dateRangeError": "La date de fin doit être postérieure ou égale à la date de début."
+      }
+    },
+    "payroll": {
+      "periodLabel": "Période",
+      "baseLabel": "Base",
+      "overtimeLabel": "Heures supplémentaires",
+      "bonusesLabel": "Primes",
+      "commissionLabel": "Commissions",
+      "deductionsLabel": "Déductions",
+      "netLabel": "NET À PAYER",
+      "viewPayslip": "Voir le bulletin",
+      "addBonus": "+ Ajouter une prime",
+      "addDeduction": "+ Ajouter une déduction",
+      "adjustmentLabelLabel": "Libellé",
+      "adjustmentAmountLabel": "Montant",
+      "addAction": "Ajouter",
+      "finalizedNotice": "Cette période est finalisée et ne peut plus être modifiée.",
+      "empty": {
+        "title": "Aucune fiche de paie pour cette période."
+      },
+      "toast": {
+        "bonusAdded": "Prime ajoutée.",
+        "deductionAdded": "Déduction ajoutée."
+      },
+      "payslip": {
+        "title": "Bulletin de paie",
+        "download": "Télécharger le bulletin",
+        "downloadNotice": "La génération du bulletin PDF sera connectée au moteur documentaire ultérieurement."
+      }
+    },
+    "commissions": {
+      "basisLabel": "Base de calcul",
+      "basisValue": "Montants encaissés",
+      "eligibleBaseLabel": "Montant éligible",
+      "rateLabel": "Taux",
+      "commissionLabel": "Commission calculée",
+      "detailTitle": "Détail",
+      "noActivity": "Aucune activité commissionnable pour cette période.",
+      "table": {
+        "date": "Date",
+        "patientService": "Patient / Service",
+        "base": "Base",
+        "commission": "Commission"
+      },
+      "notApplicable": {
+        "title": "Commissions non applicables",
+        "description": "Ce membre n'est pas un praticien lié à une règle de commission."
+      }
     },
     "contract": {
       "title": "Contrat de travail",
@@ -1027,6 +1155,29 @@
         "startLabelForSlot": "Début — {{day}} {{slot}}",
         "endLabelForSlot": "Fin — {{day}} {{slot}}"
       }
+    }
+  },
+  "teamAttendance": {
+    "pageTitle": "Présence",
+    "pageDescription": "Aujourd'hui — présence de l'équipe.",
+    "restDay": "Repos",
+    "counts": {
+      "present": "Présents",
+      "late": "En retard",
+      "absent": "Absents",
+      "notCheckedIn": "Non pointés"
+    },
+    "table": {
+      "member": "Membre",
+      "planning": "Planning",
+      "checkIn": "Arrivée",
+      "checkOut": "Départ",
+      "worked": "Temps travaillé",
+      "status": "Statut"
+    },
+    "error": {
+      "title": "Impossible de charger les présences.",
+      "retry": "Réessayer"
     }
   },
   "admin": {

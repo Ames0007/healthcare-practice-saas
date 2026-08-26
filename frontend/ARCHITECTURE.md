@@ -304,6 +304,36 @@ src/components/
             "reference week" purely to borrow day-name labels would be
             exactly the appointment-scheduling coupling the task's own
             §4 warns against.
+            UI-007CDEF (Gates 1-4) completes the HR domain layer with four
+            more, still deliberately separate, types in the same
+            `types.ts` — `TeamMember`/`EmploymentContract`/`WorkInterval`
+            remain exactly as UI-007A/B left them. `AttendanceRecord`
+            (PRESENCE — what actually happened, vs. `WorkInterval`'s own
+            PLANNING) stores only raw `checkIn?`/`checkOut?`; every
+            status/worked/late/overtime figure is *derived*, never a
+            duplicated stored field (`features/team/attendance.ts`,
+            below) — the same discipline UI-006E already established for
+            Caisse's own theoretical balance. It is a deliberate
+            frontend-only prototype running ahead of the approved backend
+            scope (`docs/implementation/DECISIONS.md` ADR-005) — Spec #4
+            §20 and Spec #3 §39/WF-36 both say clock-in/out is not a
+            required V1 *backend* entity/workflow, which this type does
+            not create (no API, no persistence). `LeaveRequest`/
+            `LeaveBalance` mirror Spec #4 §20.2's `leave_requests` fields,
+            narrowed to this prototype's own bounded `LeaveType`
+            (annual/sick/unpaid/other) and 3-value `LeaveRequestStatus`
+            (pending/approved/rejected). `PayrollPeriod`/`PayrollEntry`/
+            `PayrollAdjustment` are an explicitly cabinet-*operational*
+            prototype — no statutory Moroccan tax/CNSS/AMO/IR field
+            exists on any of them; `baseAmount` is a payroll-specific
+            synthetic figure, never added to `EmploymentContract`, which
+            UI-007B deliberately kept salary-free. `CommissionRule`'s
+            `basis` is fixed to the single literal type
+            `"collected_payments"` — the only basis the approved specs
+            actually demonstrate with a worked example. Four new
+            registries (`attendance-status.ts`, `leave-type.ts`,
+            `leave-status.ts`, `payroll-status.ts`) mirror
+            `team-role.ts`/`team-member-status.ts`'s exact split pattern.
 
 src/features/
   today/    Aujourd'hui screen composition (UI-001): `types.ts` (mock
@@ -943,6 +973,97 @@ src/features/
             `computeWeeklyScheduledHours` matches their own contract's
             `weeklyHours` exactly, integrity-tested rather than left to
             accidental agreement between the two fixture files.
+
+            UI-007CDEF adds the four remaining Employee 360° tabs —
+            Présence/Congés/Paie/Commissions — across `features/team/`'s
+            own `attendance.ts`/`leave.ts`/`payroll.ts`/`commissions.ts`
+            (pure functions) and their matching `mock-*-data.ts` fixture
+            files, `components/team-member-attendance-content.tsx`/
+            `team-member-leave-content.tsx`/`team-member-payroll-content.tsx`/
+            `team-member-commissions-content.tsx` (the four tab bodies),
+            plus a new cabinet-level `team-attendance-page.tsx` at
+            `/app/equipe/attendance` (reached from the Équipe directory's
+            own header, §66 — no new main-sidebar entry). `TeamMemberNav`
+            grew a `showCommissions` prop (§8/§52/§62) — the tab is
+            omitted entirely, never shown disabled, for anyone without
+            `role === "practitioner"` and a real `practitionerId`.
+
+            **The required cross-HR source-of-truth chain (§64)**,
+            enforced by construction and proven end to end by
+            `cross-hr-integrity.test.ts`:
+
+            ```text
+            EmploymentContract (UI-007B)
+                    |
+                    +-- employment context (jobTitle, dates)
+
+            WorkInterval (UI-007B)
+                    |
+                    v
+            attendance.ts: getExpectedIntervalsForDate
+                    |
+                    v
+            AttendanceRecord (checkIn?/checkOut?)
+                    |
+                    v
+            attendance.ts: computeAttendance
+              (workedMinutes/lateMinutes/overtimeMinutes — derived, never stored)
+                    |
+                    v
+            payroll.ts: computePeriodOvertimeMinutes
+                    |
+                    v
+            PayrollEntry.overtimeMinutes (duration only, never monetized, §43)
+
+            LeaveRequest (status === "approved")
+                    |
+                    v
+            leave.ts: doesApprovedLeaveCoverDate
+                    |
+                    v
+            TeamMemberAttendanceContent's "En congé" presentation (§33)
+
+            features/patients/mock-invoices-data.ts + mock-payments-data.ts
+              (existing UI-004D/E fixtures, never duplicated)
+                    |
+                    v
+            commissions.ts: getEligibleCommissionActivity
+              (practitionerId -> Agenda PRACTITIONERS -> Invoice.practitionerName)
+                    |
+                    v
+            commissions.ts: computeCommissionAmount
+                    |
+                    v
+            PayrollEntry.commissionAmount (§61 — reconciled, never a second figure)
+            ```
+
+            `attendance.ts`'s `computeWorkedMinutes` is the one
+            non-obvious calculation: for a split-shift day it subtracts
+            only the *unpaid gap between* the day's own two expected
+            intervals (the lunch break) from the raw check-in/check-out
+            span — never a naive "checkout minus checkin," which would
+            silently count the break as worked time (the task's own
+            explicit warning, §18). `resolveCabinetBucket` is a second,
+            deliberately different view of the same `AttendanceStatus`
+            for the cabinet workspace's own 4-bucket summary (PRÉSENTS/EN
+            RETARD/ABSENTS/NON POINTÉS) — a late-then-completed day stays
+            "En retard" there even though the per-employee Présence tab
+            itself still shows the richer "Terminé" lifecycle status; a
+            self-caught bug where the cabinet table's own row badge
+            originally used the ungrouped 5-value status (silently
+            contradicting its own summary counts) was fixed by reusing
+            `resolveCabinetBucket` for the row too, not just the totals.
+            `leave.ts`'s `applyApprovedLeaveToBalance` only ever runs on
+            approval — a pending or rejected request never touches
+            `available`/`used` (§35). `payroll.ts`'s `computeGrossPayable`
+            deliberately never reads `overtimeMinutes` — no monetary
+            overtime rate is defined by the approved specifications, so
+            overtime duration is shown but never paid in this prototype
+            (§43). `commissions.ts`'s `getEligibleCommissionActivity`
+            sums each payment's own *allocation* amount (not the whole
+            payment), so a hypothetical multi-invoice payment could never
+            be double-counted onto one practitioner (Spec #3 WF-40's own
+            acceptance criterion).
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,

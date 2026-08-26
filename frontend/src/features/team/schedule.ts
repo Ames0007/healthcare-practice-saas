@@ -3,6 +3,12 @@ import { parseTimeToMinutes } from "@/features/agenda/format";
 
 export const WEEKDAY_ORDER: Weekday[] = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 
+/** `Date.getUTCDay()` is 0=Sunday..6=Saturday; `WEEKDAY_ORDER` starts at Monday, so this reindexes to match (UI-007CDEF §11/§15). */
+export function getWeekdayFromIso(iso: string): Weekday {
+  const jsDay = new Date(`${iso}T00:00:00Z`).getUTCDay();
+  return WEEKDAY_ORDER[(jsDay + 6) % 7];
+}
+
 export function getIntervalsForMember(intervals: WorkInterval[], teamMemberId: string): WorkInterval[] {
   return intervals.filter((interval) => interval.teamMemberId === teamMemberId && interval.active);
 }
