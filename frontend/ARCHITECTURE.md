@@ -161,6 +161,14 @@ src/components/
             "read model, not a second source of truth" discipline as
             `features/finance/aggregations.ts`'s own receivables/
             activity builders.
+            `CabinetExpense` (UI-006A) gained three optional fields in
+            UI-006D — `time`, `createdBy`, `supportingDocument` (a new
+            `ExpenseSupportingDocument` metadata-only type: `fileName`/
+            `mimeType`/`sizeBytes`, mirroring `ClinicalDocument`'s own
+            shape, never `File`/`Blob`/base64/an `ObjectURL`) — rather
+            than a second expense-entry type, so UI-006A's original
+            fixtures stay untouched (all three are optional; a fixture
+            without them renders exactly as before).
             `domain/clinical/` (UI-005A) — the first real clinical
             prototype, deliberately separate from `domain/patients/`'s
             administrative `PatientOverview` and from
@@ -640,6 +648,31 @@ src/features/
             md:block` / `divide-y ... md:hidden` dual-render convention
             — the established responsive pattern for any tabular data in
             this codebase, not reinvented here.
+            UI-006D adds `expenses.ts` and `expenses-page.tsx` for
+            `/app/finance/expenses` — the cabinet cash-expense capture
+            workspace, scoped to `MOCK_BUSINESS_DATE` only (like
+            `caisse/` itself below) rather than a broader filterable
+            ledger, since a décaissement is a cash-register operation
+            tied to the currently open session, not an accounting
+            history browser (documented deviation from Spec #9 Screen
+            32's own Période/Catégorie filters). `createExpenseAndMovement`
+            is the reuse-and-integrity boundary: a pure function
+            returning a matching `CabinetExpense` + `CashMovement` OUT
+            pair whose direction/type/`expenseId`/amount are consistent
+            by construction, applied to local state together in the
+            page's one create handler (never an intermediate render
+            where one exists without the other). It never renders
+            Caisse's own theoretical-balance summary (`caisse/`'s own
+            scope) — the balance-decrease relationship is instead proven
+            directly against `features/caisse/calculations.ts`'s
+            exported functions in `expenses.test.ts`, and a persistent
+            "Voir la caisse" link is the only cross-page connection
+            (cross-route prototype state is not expected to survive
+            navigation, same as UI-006C's own documented boundary). The
+            supporting-document file input reuses the exact PDF/JPEG/PNG
+            allowlist and metadata-only discipline UI-005D's clinical-
+            document upload already established, rather than a second
+            policy.
 
   caisse/   Today's cash register (UI-006C), at `/app/finance/caisse`
             (Spec #2's own IA sitemap nests Caisse under Finance — not a

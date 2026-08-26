@@ -804,6 +804,43 @@
       "closeFutureNotice": "La clôture de caisse sera implémentée dans UI-006E.",
       "errorTitle": "Impossible de charger la caisse.",
       "errorRetry": "Réessayer"
+    },
+    "expenses": {
+      "pageTitle": "Décaissements",
+      "pageDescription": "Enregistrez et consultez les décaissements de caisse du cabinet.",
+      "newAction": "+ Nouveau décaissement",
+      "viewCaisseAction": "Voir la caisse",
+      "closedGuidance": "La caisse doit être ouverte avant d'enregistrer un décaissement.",
+      "todayLabel": "Aujourd'hui",
+      "totalTodayLabel": "Total aujourd'hui",
+      "countLabel": "Nombre de décaissements",
+      "historyTitle": "Décaissements",
+      "resultCount": "{{count}} décaissements",
+      "emptyTodayTitle": "Aucun décaissement aujourd'hui.",
+      "emptyTodayDescription": "Les décaissements enregistrés apparaîtront ici.",
+      "errorTitle": "Impossible de charger les décaissements.",
+      "errorRetry": "Réessayer",
+      "expenseRecorded": "Décaissement enregistré.",
+      "detail": {
+        "title": "Décaissement",
+        "categoryLabel": "Catégorie",
+        "descriptionLabel": "Description",
+        "dateLabel": "Date",
+        "recordedByLabel": "Enregistré par",
+        "supportingDocumentLabel": "Justificatif",
+        "noSupportingDocument": "Aucun justificatif.",
+        "download": "Télécharger le justificatif"
+      },
+      "form": {
+        "title": "Nouveau décaissement",
+        "categoryLabel": "Catégorie",
+        "categoryPlaceholder": "Sélectionner une catégorie",
+        "amountLabel": "Montant",
+        "descriptionLabel": "Description / motif",
+        "fileLabel": "Justificatif",
+        "cancel": "Annuler",
+        "submit": "Enregistrer"
+      }
     }
   },
   "admin": {

@@ -1361,3 +1361,92 @@ All notable changes to this project are documented in this file.
   32 new UI-006C tests), typecheck, lint and build pass on the first
   full-suite run; backend regression (10 tests, clean) unaffected — no
   backend files touched.
+- UI-006D — Décaissements & Expenses: `/app/finance/expenses` — the
+  cabinet cash-expense capture workspace, completing the
+  Caisse-open → new décaissement → Expense + CashMovement OUT →
+  theoretical balance decrease workflow whose opening/movement-history
+  half UI-006C already implemented. Scoped to `MOCK_BUSINESS_DATE` only,
+  like `/app/finance/caisse` itself, rather than Spec #9 Screen 32's own
+  broader Période/Catégorie-filterable ledger: a décaissement is
+  conceptually a cash-register operation tied to the *currently open*
+  session, not an accounting history browser, so a period selector was
+  deliberately not added (documented decision, §15's own explicit
+  "otherwise do not expand scope" instruction) — the task's own §13
+  mockup (today-only, "TOTAL AUJOURD'HUI" + a flat list) was treated as
+  authoritative over the wireframe under CLAUDE.md §1. For the same
+  reason, the "+ Nouveau décaissement" form's field list follows the
+  task's own explicit §19 enumeration (category/amount/description/
+  optional supporting document) rather than Screen 32's beneficiary/
+  payment-method fields — every décaissement recorded here is implicitly
+  a cash expense (`CabinetExpense` has no payment-method field to begin
+  with, an UI-006A-era simplification carried forward unchanged).
+  `CabinetExpense` (UI-006A) is extended, not replaced: three new
+  optional fields (`time`, `createdBy`, `supportingDocument`, plus a new
+  `ExpenseSupportingDocument` metadata-only type — `fileName`/
+  `mimeType`/`sizeBytes`, mirroring `ClinicalDocument`'s own shape, never
+  `File`/`Blob`/base64/an `ObjectURL`) so UI-006A's five original
+  fixtures are completely unaffected. New `features/finance/expenses.ts`
+  holds every pure, directly-tested calculation: `filterTodayPostedExpenses`/
+  `sortExpensesNewestFirst` (a missing `time` — UI-006A's date-only
+  fixtures — sorts as if "00:00", never a fabricated time),
+  `computeExpensesTotal`, a strictly-positive `isValidExpenseAmount`
+  (deliberately a separate function from Caisse's own
+  `isValidOpeningBalance`, which allows 0 — a different validation rule,
+  not the same one duplicated), a deterministic `nextSyntheticTimeForSequence`
+  (never `Date.now()`, independent from but stylistically consistent
+  with UI-006C's own synthetic-time generator — that one assigns times
+  to *derived* movements, this one to a *newly created* expense), and
+  `createExpenseAndMovement` — a pure builder returning a matching
+  `CabinetExpense` + `CashMovement` OUT pair whose direction/type/
+  `expenseId`/amount are consistent by construction, not by a separate
+  reconciliation check. The page's create handler calls this once and
+  applies both results to local state in the same function (§30's own
+  "one orchestrated handler" requirement) — never an intermediate render
+  where the expense exists but the movement does not, or vice versa. A
+  dedicated cross-module test (`expenses.test.ts`) proves the resulting
+  `CashMovement`, once folded into `features/caisse/calculations.ts`'s
+  own `computeTheoreticalBalance`, decreases the theoretical balance by
+  exactly the new expense's amount — the balance itself is deliberately
+  never re-rendered on this page (§45: "do not duplicate the entire
+  Caisse page"), only proven by calculation; a persistent "Voir la
+  caisse" link (header + closed-state guidance) is the only cross-page
+  connection, consistent with §32-33's explicit allowance that
+  cross-route prototype state does not need to survive navigation.
+  `EXPENSE_CATEGORY_MAP` (UI-006A) is reused unmodified for both the
+  form's category `Select` and every rendered category label — no second
+  taxonomy. The optional supporting-document file input reuses the exact
+  same conservative PDF/JPEG/PNG MIME allowlist and metadata-only
+  discipline already established by UI-005D's clinical-document upload,
+  and the read-only detail drawer's "Télécharger le justificatif" reuses
+  that same feature's exact future-feature Toast message rather than
+  inventing a second one. Caisse-open is enforced structurally: while
+  closed, both "+ Nouveau décaissement" affordances (header and the
+  empty-state's own action) are simply not rendered, replaced with an
+  alert-styled guidance card linking to `/app/finance/caisse` — never a
+  silent auto-open. Expense detail is read-only — no "Modifier"/
+  "Supprimer" anywhere, matching CLAUDE.md §24 (financial records are not
+  ordinary CRUD). Added `frontend/src/features/finance/expenses.test.ts`
+  (21 tests: MIME allowlist, amount validation including zero/negative/
+  non-integer/NaN, today+posted filtering including the real cancelled
+  `exp-5`-style case, newest-first ordering including the missing-time
+  tiebreak, the total, the deterministic time generator, the atomic
+  builder's structural reference/amount integrity, supporting-document
+  metadata pass-through and its metadata-only field shape, and the
+  cross-module Caisse-balance-decrease proof),
+  `expenses-page.test.tsx` (21 tests: header/summary, existing today's
+  history rendering, cancelled-expense exclusion from the total,
+  newest-first ordering, the create dialog opening only while Caisse is
+  open, closed-state guidance and its link, required-field validation,
+  zero/negative amount rejection, disallowed MIME rejection, optional
+  document success, immediate list/total update on valid submit,
+  `createdBy` sourced from the open session, detail-drawer rendering
+  including supporting-document metadata and the future-only download
+  notice, no-document detail state, empty state with/without the create
+  action depending on Caisse status, loading, error, Arabic/RTL, and
+  absence of every forbidden supplier/accounting/Caisse-closing
+  control), and one more case in `components/app/app-sidebar.test.tsx`
+  (Finance remains active for the new nested `/app/finance/expenses`
+  route too). All 575 frontend tests (532 carried over through UI-006C +
+  43 new UI-006D tests), typecheck, lint and build pass on the first
+  full-suite run; backend regression (10 tests, clean) unaffected — no
+  backend files touched.

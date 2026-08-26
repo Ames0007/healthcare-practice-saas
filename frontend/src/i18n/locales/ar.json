@@ -804,6 +804,43 @@
       "closeFutureNotice": "سيتم تنفيذ إغلاق الصندوق في UI-006E.",
       "errorTitle": "تعذّر تحميل الصندوق.",
       "errorRetry": "إعادة المحاولة"
+    },
+    "expenses": {
+      "pageTitle": "المصروفات",
+      "pageDescription": "سجّل واطّلع على مصروفات صندوق العيادة.",
+      "newAction": "+ مصروف جديد",
+      "viewCaisseAction": "عرض الصندوق",
+      "closedGuidance": "يجب فتح الصندوق قبل تسجيل مصروف.",
+      "todayLabel": "اليوم",
+      "totalTodayLabel": "إجمالي اليوم",
+      "countLabel": "عدد المصروفات",
+      "historyTitle": "المصروفات",
+      "resultCount": "{{count}} مصروف",
+      "emptyTodayTitle": "لا توجد مصروفات اليوم.",
+      "emptyTodayDescription": "ستظهر هنا المصروفات المسجّلة.",
+      "errorTitle": "تعذّر تحميل المصروفات.",
+      "errorRetry": "إعادة المحاولة",
+      "expenseRecorded": "تم تسجيل المصروف.",
+      "detail": {
+        "title": "مصروف",
+        "categoryLabel": "الفئة",
+        "descriptionLabel": "الوصف",
+        "dateLabel": "التاريخ",
+        "recordedByLabel": "سُجّل بواسطة",
+        "supportingDocumentLabel": "المستند الداعم",
+        "noSupportingDocument": "لا يوجد مستند داعم.",
+        "download": "تنزيل المستند الداعم"
+      },
+      "form": {
+        "title": "مصروف جديد",
+        "categoryLabel": "الفئة",
+        "categoryPlaceholder": "اختر فئة",
+        "amountLabel": "المبلغ",
+        "descriptionLabel": "الوصف / السبب",
+        "fileLabel": "المستند الداعم",
+        "cancel": "إلغاء",
+        "submit": "تسجيل"
+      }
     }
   },
   "admin": {

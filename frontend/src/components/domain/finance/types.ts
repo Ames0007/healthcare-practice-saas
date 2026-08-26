@@ -124,13 +124,31 @@ export type ExpenseCategory = "supplies" | "utilities" | "services" | "other";
  */
 export type ExpenseStatus = "posted" | "cancelled";
 
+/**
+ * Metadata-only supporting-document reference (UI-006D §26) — mirrors
+ * `ClinicalDocument`'s own `fileName`/`mimeType`/`sizeBytes` fields.
+ * Deliberately never stores `File`/`Blob`/base64/an object URL: only what
+ * the native `<input type="file">` exposes without reading the file's
+ * contents (same discipline as UI-005D's document upload).
+ */
+export interface ExpenseSupportingDocument {
+  fileName: string;
+  mimeType: string;
+  sizeBytes: number;
+}
+
 export interface CabinetExpense {
   id: string;
   date: string;
+  /** Deterministic prototype time-of-day (`HH:MM`), set only for expenses recorded through the UI-006D form — UI-006A's original fixtures predate this concept and stay date-only. */
+  time?: string;
   label: string;
   category: ExpenseCategory;
   amount: MoneyAmount;
   status: ExpenseStatus;
+  /** Set only for expenses recorded through the UI-006D form (UI-006A's fixtures predate this). */
+  createdBy?: string;
+  supportingDocument?: ExpenseSupportingDocument;
 }
 
 /**
