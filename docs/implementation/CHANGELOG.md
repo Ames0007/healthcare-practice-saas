@@ -1558,3 +1558,109 @@ All notable changes to this project are documented in this file.
   wording confirmed absent) — no browser-automation/screenshot tool was
   available in this environment, so true pixel-level rendered QA was not
   performed; the dev server was left running for manual browser review.
+- UI-006E — Caisse Closing & Reconciliation: completes the daily
+  lifecycle UI-006C left open-ended — CLOSED → OPEN → theoretical
+  balance was already there; this task adds physical cash count →
+  reconciliation → balanced/discrepancy handling → controlled closing →
+  read-only closed summary, all inside the existing `/app/finance/caisse`
+  (no new route, per the task's own explicit instruction).
+  `CashSession` (`components/domain/finance/types.ts`) gains 7 new
+  optional fields — `expectedClosingBalance`/`physicalClosingBalance`/
+  `differenceAmount`/`differenceType`/`discrepancyReason`/`closedAt`/
+  `closedBy` — plus a new `CashDifferenceType` ("balanced"/"shortage"/
+  "overage", deliberately never accounting debit/credit terms, §14).
+  `CashSessionStatus` itself is untouched — still exactly `"closed" |
+  "open"` — resolving §8's own explicit question ("distinguish
+  not_opened/open/closed ONLY if required... retain existing status
+  semantics and use the presence of closedAt to distinguish") in favor
+  of NOT adding a third status value: `session === null` continues to
+  mean "not yet opened today" (no row exists until first opened,
+  matching backend truth), while a genuinely completed closed session is
+  `status: "closed"` with `closedAt` set. `CaissePage` now branches on
+  three states instead of two — `session === null` (opening panel,
+  unchanged) / `session.status === "open"` (live summary + movements +
+  "Fermer la caisse", unchanged except the button's own handler) /
+  `session.status === "closed"` (new: `ClosedCaisseSummary`, read-only,
+  no opening panel ever shown again — no reopening anywhere in this
+  prototype, per the task's own explicit instruction). The movement
+  history section itself was hoisted out of the open-only branch so it
+  renders for both open AND closed sessions (§25's own read-only
+  "MOUVEMENTS" requirement), using the exact same `buildCashMovements`
+  call as before — gated on `session !== null` instead of `isOpen`.
+  New pure functions in `features/caisse/calculations.ts`:
+  `computeCashDifference(physicalClosingBalance, expectedClosingBalance)`
+  — physical minus expected, the task's own §13 "CRITICAL — NOT the
+  reverse" formula, directly tested both ways to guard the sign — and
+  `resolveCashDifferenceType` (0 → balanced, negative → shortage,
+  positive → overage). Physical-count validation reuses
+  `isValidOpeningBalance` as-is rather than a new function — the rule
+  (whole-MAD, `>= 0`, zero valid) is genuinely identical, not just
+  similarly-shaped, matching this task's own §12 requirement exactly.
+  New `components/domain/finance/cash-difference-type.ts`
+  (`CASH_DIFFERENCE_TYPE_MAP`, mirroring `cash-session-status.ts`'s
+  registry pattern) maps balanced→success, shortage→danger,
+  overage→**warning** — deliberately not `success` for overage, per the
+  task's own explicit "do not treat positive discrepancy as good" (§17).
+  Two-step closing UI, mirroring the existing `CancelConfirmDialog`
+  (Agenda, UI-002) form-then-confirm convention: `CashCountDialog`
+  (`features/caisse/components/`) shows a read-only opening/incoming/
+  outgoing/théorique recap reusing `CaisseSummary`'s own
+  `finance.caisse.summary.*` labels (no duplicate strings, just a
+  vertical-list layout instead of a card grid, matching the task's own
+  §10 wireframe), a physical-count `Input` that deliberately starts
+  empty rather than prefilled with the expected balance (prefilling the
+  value being verified against would defeat the point of counting), a
+  live écart via `StatusBadge`, and a reason `Textarea` that only
+  appears once the difference is non-zero — required then, never
+  otherwise (§18-19). "Continuer" never closes the register (§20) — it
+  hands the validated `{physicalClosingBalance, discrepancyReason}` up
+  to `CaissePage`, which opens `CloseConfirmDialog` (a thin wrapper
+  around the existing `ConfirmDialog` primitive, not a bespoke dialog)
+  showing the same théorique/compté/écart/reason recap plus the
+  consequence sentence ("Une fois clôturée... lecture seule.") before
+  the actual mutation happens on explicit "Fermer la caisse" confirm.
+  New read-only `ClosedCaisseSummary` renders business date, opened-at/
+  by, closed-at/by, a 6-metric recap grid (opening/incoming/outgoing
+  live-derived from the same immutable movement history; théorique/
+  compté/écart from the session's own *frozen* closing fields — CLAUDE.md
+  §24: a closed session's closing figures are financial history, never
+  recomputed live afterward) with the écart card colored via
+  `MetricCard`'s own existing `emphasis` prop (danger/warning/neutral,
+  the same established pattern `KpiSummary` already uses for overdue —
+  never color/sign alone, the label itself says "Écart"), and a
+  "JUSTIFICATION" section that only renders when a discrepancy reason
+  exists. `mock-data.ts` gains one new deterministic constant,
+  `SESSION_CLOSED_AT = "18:35"` (never `Date.now()`, matching the task's
+  own wireframe example exactly); `closedBy` reuses the session's own
+  `openedBy` rather than a second identity constant — this prototype has
+  no multi-shift/handoff concept, so the person who opened today's
+  register is who closes it. `CaisseSummary`'s own doc comment (which
+  said "Écart/Solde réel/Montant compté... stays UI-006E's scope") was
+  corrected now that UI-006E exists — a one-line accuracy fix, not new
+  behavior. The obsolete `finance.caisse.closeFutureNotice` toast key
+  (FR+AR) is removed — grep-confirmed unreferenced anywhere else before
+  deletion. Updated `caisse-page.test.tsx`'s own "Fermer la caisse
+  shows a future notice" test — its entire premise was this task's own
+  objective, so it was replaced with a `describe("closing/reconciliation")`
+  block (11 tests: dialog opens instead of closing immediately, required/
+  invalid/zero physical count, balanced state hides the reason field,
+  the difference-sign proof — §13 — both directions, shortage requires
+  a reason and blocks Continuer until provided, overage also requires a
+  reason and its badge is never `success`-toned, the confirmation step's
+  own recap + consequence text + cancel-discards-without-mutating,
+  confirming actually closes the session with the full read-only recap
+  and removes both the closing AND opening actions permanently, a
+  balanced closing omits the justification section entirely) plus one
+  more Arabic/RTL case for the full closing flow end-to-end. The
+  existing "never introduces manual movement creation..." test was
+  narrowed to "...on the default open view (before opening the closing
+  dialog)" — cash counting/reconciliation/a functional close are real
+  now, just not visible without clicking "Fermer la caisse" first — and
+  had "Espèces comptées"/"Écart"/"Solde réel"/"Comptage physique" moved
+  from a permanently-forbidden list into that same "not yet visible by
+  default" list, since claiming they're forever absent would now be
+  false. Added `computeCashDifference`/`resolveCashDifferenceType` tests
+  to `calculations.test.ts` (3 new). All 598 frontend tests (586 carried
+  over through UI-006X + 12 net new), typecheck, lint and build pass on
+  the first full-suite run; backend regression (10 tests, clean)
+  unaffected — no backend files touched.

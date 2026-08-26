@@ -14,11 +14,28 @@ import { getExpensesMockData } from "@/features/finance/mock-expenses-data";
 import { getPatientsMockData } from "@/features/patients/mock-data";
 import type { Patient } from "@/features/patients/types";
 import { FinanceNav } from "@/features/finance/components/finance-nav";
-import { buildCashMovements, computeIncomingTotal, computeOutgoingTotal, computeTheoreticalBalance } from "./calculations";
-import { DEFAULT_OPENING_BALANCE, getDefaultOpenSessionMockData, MOCK_BUSINESS_DATE, OPENED_BY_NAME, SESSION_OPENED_AT } from "./mock-data";
+import {
+  buildCashMovements,
+  computeCashDifference,
+  computeIncomingTotal,
+  computeOutgoingTotal,
+  computeTheoreticalBalance,
+  resolveCashDifferenceType,
+} from "./calculations";
+import {
+  DEFAULT_OPENING_BALANCE,
+  getDefaultOpenSessionMockData,
+  MOCK_BUSINESS_DATE,
+  OPENED_BY_NAME,
+  SESSION_CLOSED_AT,
+  SESSION_OPENED_AT,
+} from "./mock-data";
 import { ClosedCaissePanel } from "./components/closed-caisse-panel";
 import { CaisseSummary } from "./components/caisse-summary";
+import { ClosedCaisseSummary } from "./components/closed-caisse-summary";
 import { CaisseMovementList } from "./components/caisse-movement-list";
+import { CashCountDialog, type CashCountResult } from "./components/cash-count-dialog";
+import { CloseConfirmDialog } from "./components/close-confirm-dialog";
 import { CaisseSkeleton } from "./components/caisse-skeleton";
 
 export type CaissePageState = "loading" | "loaded" | "error";
@@ -40,16 +57,24 @@ export interface CaissePageProps {
 }
 
 /**
- * Caisse — today's cash register (UI-006C), at `/app/finance/caisse`
- * (Spec #2 §3's own IA sitemap nests Caisse under Finance, alongside
- * Factures/Échéances/Encaissements/Décaissements — not a standalone
- * `/app/caisse`). Answers "is the register open, what cash moved, what
- * should physically be inside it now" — never "how much did the cabinet
- * collect this period" (that remains the Finance dashboard, UI-006A).
- * Movements are always derived from the existing Payment/CabinetExpense
- * fixtures (UI-004E/UI-006A), never independently authored. No closing,
- * no reconciliation, no physical cash count, no expense entry, no second
- * payment-capture workflow anywhere in this screen.
+ * Caisse — today's cash register (UI-006C, closing/reconciliation added by
+ * UI-006E), at `/app/finance/caisse` (Spec #2 §3's own IA sitemap nests
+ * Caisse under Finance, alongside Factures/Échéances/Encaissements/
+ * Décaissements — not a standalone `/app/caisse`). Answers "is the
+ * register open, what cash moved, what should physically be inside it
+ * now, and — once closed — what was actually counted and why it did or
+ * didn't match." Movements are always derived from the existing Payment/
+ * CabinetExpense fixtures (UI-004E/UI-006A), never independently
+ * authored. No expense entry, no second payment-capture workflow, no
+ * Caisse reopening anywhere in this screen.
+ *
+ * Three distinct states share this one route (UI-006E §8): `session ===
+ * null` is "not yet opened today" (no row exists until first opened,
+ * matching backend truth); `session.status === "closed"` is a genuinely
+ * completed, read-only closed session (`closedAt` set) — the two "not
+ * open" states are deliberately NOT the same `CashSessionStatus` value
+ * collapsed together, so a closed session never falls back into the
+ * opening-balance panel.
  */
 export function CaissePage({
   payments: providedPayments,
@@ -64,6 +89,9 @@ export function CaissePage({
     initialSession !== undefined ? initialSession : getDefaultOpenSessionMockData(),
   );
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isCashCountOpen, setCashCountOpen] = useState(false);
+  const [cashCountDialogKey, setCashCountDialogKey] = useState(0);
+  const [pendingClosing, setPendingClosing] = useState<CashCountResult | null>(null);
 
   if (state === "loading") {
     return <CaisseSkeleton />;
@@ -101,12 +129,46 @@ export function CaissePage({
   }
 
   const isOpen = session !== null && session.status === "open";
+  const isClosed = session !== null && session.status === "closed";
   const statusMeta = CASH_SESSION_STATUS_MAP[isOpen ? "open" : "closed"];
 
-  const movements = isOpen ? buildCashMovements(payments, expenses, patients, session.id, session.businessDate) : [];
+  const movements =
+    session !== null ? buildCashMovements(payments, expenses, patients, session.id, session.businessDate) : [];
   const incoming = computeIncomingTotal(movements);
   const outgoing = computeOutgoingTotal(movements);
-  const theoretical = isOpen ? computeTheoreticalBalance(session.openingBalance, incoming, outgoing) : 0;
+  const theoretical = session !== null ? computeTheoreticalBalance(session.openingBalance, incoming, outgoing) : 0;
+
+  function openClosingFlow() {
+    setCashCountOpen(true);
+    setCashCountDialogKey((key) => key + 1);
+  }
+
+  function handleCashCountContinue(result: CashCountResult) {
+    setCashCountOpen(false);
+    setPendingClosing(result);
+  }
+
+  function handleCloseConfirm() {
+    if (session === null || pendingClosing === null) {
+      return;
+    }
+
+    const differenceAmount = computeCashDifference(pendingClosing.physicalClosingBalance, theoretical);
+
+    setSession({
+      ...session,
+      status: "closed",
+      expectedClosingBalance: theoretical,
+      physicalClosingBalance: pendingClosing.physicalClosingBalance,
+      differenceAmount,
+      differenceType: resolveCashDifferenceType(differenceAmount),
+      discrepancyReason: pendingClosing.discrepancyReason,
+      closedAt: SESSION_CLOSED_AT,
+      closedBy: session.openedBy,
+    });
+    setPendingClosing(null);
+    setToastMessage(t("finance.caisse.closing.closedSuccess"));
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -117,8 +179,10 @@ export function CaissePage({
 
       <FinanceNav />
 
-      {!isOpen ? (
+      {session === null ? (
         <ClosedCaissePanel defaultOpeningBalance={DEFAULT_OPENING_BALANCE} onOpen={handleOpen} />
+      ) : isClosed ? (
+        <ClosedCaisseSummary session={session} incoming={incoming} outgoing={outgoing} />
       ) : (
         <>
           <p className="text-sm text-text-muted">
@@ -127,30 +191,52 @@ export function CaissePage({
           </p>
 
           <CaisseSummary opening={session.openingBalance} incoming={incoming} outgoing={outgoing} theoretical={theoretical} />
-
-          <div className="flex flex-col gap-3 border-t border-border pt-6">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-text-muted">
-                {t("finance.caisse.movements.title")}
-              </h2>
-              <p className="text-sm text-text-muted" aria-live="polite">
-                {t("finance.caisse.movements.resultCount", { count: movements.length })}
-              </p>
-            </div>
-            <CaisseMovementList movements={movements} />
-          </div>
-
-          <div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setToastMessage(t("finance.caisse.closeFutureNotice"))}
-            >
-              {t("finance.caisse.closeAction")}
-            </Button>
-          </div>
         </>
+      )}
+
+      {session !== null && (
+        <div className="flex flex-col gap-3 border-t border-border pt-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-text-muted">
+              {t("finance.caisse.movements.title")}
+            </h2>
+            <p className="text-sm text-text-muted" aria-live="polite">
+              {t("finance.caisse.movements.resultCount", { count: movements.length })}
+            </p>
+          </div>
+          <CaisseMovementList movements={movements} />
+        </div>
+      )}
+
+      {isOpen && (
+        <div>
+          <Button type="button" variant="outline" size="sm" onClick={openClosingFlow}>
+            {t("finance.caisse.closeAction")}
+          </Button>
+        </div>
+      )}
+
+      <CashCountDialog
+        key={cashCountDialogKey}
+        open={isCashCountOpen}
+        onClose={() => setCashCountOpen(false)}
+        opening={session?.openingBalance ?? 0}
+        incoming={incoming}
+        outgoing={outgoing}
+        expectedClosingBalance={theoretical}
+        onContinue={handleCashCountContinue}
+      />
+
+      {pendingClosing && (
+        <CloseConfirmDialog
+          open
+          onClose={() => setPendingClosing(null)}
+          onConfirm={handleCloseConfirm}
+          expectedClosingBalance={theoretical}
+          physicalClosingBalance={pendingClosing.physicalClosingBalance}
+          differenceAmount={computeCashDifference(pendingClosing.physicalClosingBalance, theoretical)}
+          discrepancyReason={pendingClosing.discrepancyReason}
+        />
       )}
 
       <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />

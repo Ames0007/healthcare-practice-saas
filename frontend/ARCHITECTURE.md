@@ -148,11 +148,7 @@ src/components/
             fork a second implementation.
             `CashSession`/`CashMovementDirection`/`CashMovementType`/
             `CashMovement` (UI-006C) — simplified from Spec #4 §18's
-            `cash_register_sessions`/`cash_movements`, deliberately
-            omitting every closing/reconciliation field
-            (`expected_closing_balance`/`physical_closing_balance`/
-            `difference_*`/`closed_by`/`closed_at`) rather than
-            half-modeling UI-006E's own future scope. `cash-session-
+            `cash_register_sessions`/`cash_movements`. `cash-session-
             status.ts` (`CASH_SESSION_STATUS_MAP` — closed/open) mirrors
             `invoice-status.ts`'s registry pattern exactly. A
             `CashMovement` is always derived from an existing `Payment`
@@ -161,6 +157,21 @@ src/components/
             "read model, not a second source of truth" discipline as
             `features/finance/aggregations.ts`'s own receivables/
             activity builders.
+            `CashSession` gained 7 optional closing fields in UI-006E —
+            `expectedClosingBalance`/`physicalClosingBalance`/
+            `differenceAmount`/`differenceType`/`discrepancyReason`/
+            `closedAt`/`closedBy` — plus a new sibling `CashDifferenceType`
+            ("balanced"/"shortage"/"overage") and its own registry,
+            `cash-difference-type.ts` (`CASH_DIFFERENCE_TYPE_MAP`,
+            mirroring `cash-session-status.ts`'s exact pattern; overage
+            maps to `warning`, deliberately not `success` — a positive
+            discrepancy is still an anomaly). `CashSessionStatus` itself
+            was NOT extended with a third value: `session === null`
+            still means "not yet opened today," while a genuinely closed
+            session is `status: "closed"` with `closedAt` set — the two
+            "not open" states are distinguished by that field's
+            presence, not by the status enum (UI-006E §8's own explicit
+            decision, documented in `CaissePage`'s own doc comment).
             `CabinetExpense` (UI-006A) gained three optional fields in
             UI-006D — `time`, `createdBy`, `supportingDocument` (a new
             `ExpenseSupportingDocument` metadata-only type: `fileName`/
@@ -734,12 +745,10 @@ src/features/
             gives each derived movement a reproducible display time
             without hand-mapping specific fixture ids. Theoretical
             balance reuses `computeCashBalance`
-            (`features/finance/aggregations.ts`) — extracted from
-            UI-006A's own Position Caisse formula via the smallest safe
-            refactor rather than a second copy of `opening + in − out`;
-            see that function's own doc comment for the documented
-            semantic difference between Finance's period-constant
-            "opening" and Caisse's own real entered opening balance.
+            (`features/finance/aggregations.ts`, `opening + in − out`) —
+            the one arithmetic primitive shared with the Finance
+            dashboard's own `DashboardCaisseSection` (UI-006X); no second
+            copy of the formula anywhere.
             `caisse-page.tsx` takes an `initialSession: CashSession |
             null` prop — omitted for the live default (already open, so
             movement history is inspectable immediately), or `null` to
@@ -748,6 +757,42 @@ src/features/
             convention. `components/` (ClosedCaissePanel, CaisseSummary
             — Spec #8 §69's own named component, CaisseMovementList,
             CaisseSkeleton).
+            UI-006E adds the closing/reconciliation half of the
+            lifecycle, entirely inside this same route (no
+            `/app/finance/caisse/closing`, per the task's own explicit
+            instruction). `CaissePage` now branches on three states
+            instead of two: `session === null` (opening panel), `session.
+            status === "open"` (unchanged), `session.status === "closed"`
+            (new — `ClosedCaisseSummary`, read-only, no path back to the
+            opening panel — no Caisse reopening in this prototype). The
+            movement-history section was hoisted out of the open-only
+            branch so it renders for both open and closed sessions,
+            using the exact same `buildCashMovements` call, now gated on
+            `session !== null` instead of `isOpen`.
+            `calculations.ts` gains `computeCashDifference` (physical
+            minus expected — the task's own explicitly-flagged-critical
+            operand order, never reversed) and `resolveCashDifferenceType`.
+            Physical-count validation reuses `isValidOpeningBalance`
+            as-is rather than a new function — the rule (whole-MAD,
+            `>= 0`) is genuinely identical, not just similarly shaped.
+            The closing flow is two dialogs in sequence, mirroring
+            Agenda's own `CancelConfirmDialog` form-then-confirm
+            convention: `CashCountDialog` (recap + physical-count input +
+            live écart + a reason `Textarea` that only appears once the
+            difference is non-zero) hands its validated result to
+            `CloseConfirmDialog` (a thin wrapper around the existing
+            `ConfirmDialog` primitive) for an explicit second
+            confirmation before the actual mutation — "Continuer" alone
+            never closes the register. `ClosedCaisseSummary` shows
+            opening/incoming/outgoing derived live from the same
+            immutable movement history, but théorique/compté/écart from
+            the session's own *frozen* closing fields — never
+            recomputed after closing (CLAUDE.md §24: closed-session
+            figures are financial history). `mock-data.ts` adds one
+            deterministic constant, `SESSION_CLOSED_AT`; `closedBy`
+            reuses the session's own `openedBy` rather than a second
+            identity constant (this prototype has no multi-shift/handoff
+            concept).
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,

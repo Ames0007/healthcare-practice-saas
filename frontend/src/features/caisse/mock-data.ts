@@ -15,6 +15,9 @@ export { MOCK_BUSINESS_DATE };
 export const OPENED_BY_NAME = "Meryem Bakkali";
 export const SESSION_OPENED_AT = "08:15";
 
+/** Deterministic prototype "Close Caisse" time (UI-006E §23) — never `Date.now()`, matching the task's own wireframe example exactly. */
+export const SESSION_CLOSED_AT = "18:35";
+
 /** Sensible prefill for the opening-balance input — matches the same 500 MAD float already used by the Finance dashboard's own prototype cash-position seed (UI-006A). */
 export const DEFAULT_OPENING_BALANCE = 500;
 

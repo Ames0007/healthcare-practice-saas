@@ -810,7 +810,24 @@
         "viewPaymentAriaLabel": "Voir le paiement de {{patientName}}"
       },
       "closeAction": "Fermer la caisse",
-      "closeFutureNotice": "La clôture de caisse sera implémentée dans UI-006E.",
+      "closing": {
+        "title": "Clôture de caisse",
+        "physicalCountTitle": "Comptage physique",
+        "physicalCountLabel": "Espèces comptées",
+        "differenceLabel": "Écart",
+        "balanced": "La caisse est équilibrée.",
+        "discrepancy": "Écart de caisse constaté.",
+        "reasonLabel": "Justification de l'écart",
+        "cancel": "Annuler",
+        "continue": "Continuer",
+        "confirmTitle": "Fermer la caisse ?",
+        "confirmDescription": "Une fois clôturée, cette session de caisse deviendra en lecture seule.",
+        "closedSuccess": "Caisse clôturée.",
+        "summaryTitle": "Récapitulatif",
+        "closedAtLabel": "Clôturée à",
+        "closedByLabel": "Clôturée par",
+        "reasonSectionTitle": "Justification"
+      },
       "errorTitle": "Impossible de charger la caisse.",
       "errorRetry": "Réessayer"
     },

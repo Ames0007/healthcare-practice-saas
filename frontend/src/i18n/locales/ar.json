@@ -810,7 +810,24 @@
         "viewPaymentAriaLabel": "عرض دفعة {{patientName}}"
       },
       "closeAction": "إغلاق الصندوق",
-      "closeFutureNotice": "سيتم تنفيذ إغلاق الصندوق في UI-006E.",
+      "closing": {
+        "title": "إغلاق الصندوق",
+        "physicalCountTitle": "العد الفعلي",
+        "physicalCountLabel": "النقد المعدود",
+        "differenceLabel": "الفرق",
+        "balanced": "الصندوق متوازن.",
+        "discrepancy": "تم رصد فرق في الصندوق.",
+        "reasonLabel": "تبرير الفرق",
+        "cancel": "إلغاء",
+        "continue": "متابعة",
+        "confirmTitle": "إغلاق الصندوق؟",
+        "confirmDescription": "بمجرد الإغلاق، ستصبح هذه الجلسة للقراءة فقط.",
+        "closedSuccess": "تم إغلاق الصندوق.",
+        "summaryTitle": "الملخص",
+        "closedAtLabel": "وقت الإغلاق",
+        "closedByLabel": "أُغلق بواسطة",
+        "reasonSectionTitle": "التبرير"
+      },
       "errorTitle": "تعذّر تحميل الصندوق.",
       "errorRetry": "إعادة المحاولة"
     },

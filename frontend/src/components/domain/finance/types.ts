@@ -153,14 +153,19 @@ export interface CabinetExpense {
 
 /**
  * Caisse domain (UI-006C, Spec #4 §18) — simplified frontend prototype of
- * `cash_register_sessions`. Deliberately omits
- * `expected_closing_balance`/`physical_closing_balance`/`difference_*`/
- * `closed_by`/`closed_at` (UI-006E's own scope, not harmless to model half
- * here) and narrows `status` to exactly the two values this task uses —
- * the backend ENUM(open, closed) already matches 1:1, so no reconciliation
- * is needed later.
+ * `cash_register_sessions`. `status` stays exactly the two values UI-006C
+ * defined — the backend ENUM(open, closed) already matches 1:1. UI-006E
+ * (§8) deliberately does not add a third `not_opened` status: "not yet
+ * opened today" is still represented by `session === null` (no row exists
+ * until first opened, matching backend truth), while a genuinely
+ * completed closed session is `status: "closed"` with `closedAt` set —
+ * the presence of `closedAt` is what distinguishes the two "not open"
+ * cases, not the status value itself.
  */
 export type CashSessionStatus = "closed" | "open";
+
+/** 0 → balanced, < 0 → shortage, > 0 → overage (UI-006E §14) — never accounting debit/credit terminology. */
+export type CashDifferenceType = "balanced" | "shortage" | "overage";
 
 export interface CashSession {
   id: string;
@@ -170,6 +175,21 @@ export interface CashSession {
   openedAt?: string;
   openedBy?: string;
   openingBalance: MoneyAmount;
+  /**
+   * Set only once closed (UI-006E §7/§22) — the frozen values recorded at
+   * closing time, never recomputed live afterward (CLAUDE.md §24: a
+   * closed session's own closing figures are financial history, not a
+   * live derivation that could drift).
+   */
+  expectedClosingBalance?: MoneyAmount;
+  physicalClosingBalance?: MoneyAmount;
+  differenceAmount?: MoneyAmount;
+  differenceType?: CashDifferenceType;
+  /** Required only when `differenceType !== "balanced"` (UI-006E §18-19). */
+  discrepancyReason?: string;
+  /** Deterministic prototype value (UI-006E §23), never `Date.now()`. */
+  closedAt?: string;
+  closedBy?: string;
 }
 
 export type CashMovementDirection = "in" | "out";

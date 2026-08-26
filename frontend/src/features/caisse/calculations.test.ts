@@ -7,10 +7,12 @@ import { getPatientsMockData } from "@/features/patients/mock-data";
 import { computeCashBalance } from "@/features/finance/aggregations";
 import {
   buildCashMovements,
+  computeCashDifference,
   computeIncomingTotal,
   computeOutgoingTotal,
   computeTheoreticalBalance,
   isValidOpeningBalance,
+  resolveCashDifferenceType,
 } from "./calculations";
 import { MOCK_BUSINESS_DATE } from "./mock-data";
 
@@ -208,5 +210,21 @@ describe("isValidOpeningBalance", () => {
 
   it("rejects non-integer amounts (CLAUDE.md §20 whole-MAD discipline)", () => {
     expect(isValidOpeningBalance(500.5)).toBe(false);
+  });
+});
+
+describe("computeCashDifference", () => {
+  it("is physical minus expected, never the reverse (UI-006E §13 — CRITICAL)", () => {
+    expect(computeCashDifference(4850, 4850)).toBe(0);
+    expect(computeCashDifference(4800, 4850)).toBe(-50); // shortage
+    expect(computeCashDifference(4900, 4850)).toBe(50); // overage
+  });
+});
+
+describe("resolveCashDifferenceType", () => {
+  it("maps 0 to balanced, negative to shortage, positive to overage", () => {
+    expect(resolveCashDifferenceType(0)).toBe("balanced");
+    expect(resolveCashDifferenceType(-50)).toBe("shortage");
+    expect(resolveCashDifferenceType(50)).toBe("overage");
   });
 });

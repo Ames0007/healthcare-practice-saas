@@ -15,9 +15,10 @@ export interface CaisseSummaryProps {
 /**
  * "CaisseSummary" (Spec #8 §69: Opening/IN/OUT/Expected — status is shown
  * separately by the page header's own StatusBadge, not a fifth card here).
- * Restrained neutral MetricCards only (UI-006C §26) — this calculated
- * figure is explicitly NOT the physically counted balance (§25); no
- * Écart/Solde réel/Montant compté anywhere, that stays UI-006E's scope.
+ * Restrained neutral MetricCards only (UI-006C §26) — this `theoretical`
+ * figure is the calculated expectation only, never the physically counted
+ * balance (§25); Écart/Montant compté are UI-006E's own separate closing
+ * flow (`CashCountDialog`/`ClosedCaisseSummary`), not added here.
  */
 export function CaisseSummary({ opening, incoming, outgoing, theoretical }: CaisseSummaryProps) {
   const { t, locale } = useLocale();

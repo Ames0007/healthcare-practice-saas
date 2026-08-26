@@ -1,6 +1,6 @@
 import { computeCashBalance } from "@/features/finance/aggregations";
 import { getPatientFullName } from "@/features/patients/format";
-import type { CabinetExpense, CashMovement, MoneyAmount, Payment } from "@/components/domain/finance/types";
+import type { CabinetExpense, CashDifferenceType, CashMovement, MoneyAmount, Payment } from "@/components/domain/finance/types";
 import type { Patient } from "@/features/patients/types";
 
 /**
@@ -116,4 +116,20 @@ export function computeTheoreticalBalance(openingBalance: MoneyAmount, incoming:
 /** Whole-MAD, non-negative (UI-006C §19) — mirrors the rest of this codebase's float-free money discipline (CLAUDE.md §20). */
 export function isValidOpeningBalance(value: number): boolean {
   return Number.isInteger(value) && value >= 0;
+}
+
+/**
+ * Closing-time cash difference (UI-006E §13 — CRITICAL, do not reverse the
+ * operands): the physically counted amount minus what was expected. A
+ * shortfall (counted less than expected) is negative; an excess is
+ * positive.
+ */
+export function computeCashDifference(physicalClosingBalance: MoneyAmount, expectedClosingBalance: MoneyAmount): MoneyAmount {
+  return physicalClosingBalance - expectedClosingBalance;
+}
+
+/** 0 → balanced, negative → shortage, positive → overage (UI-006E §14). */
+export function resolveCashDifferenceType(differenceAmount: MoneyAmount): CashDifferenceType {
+  if (differenceAmount === 0) return "balanced";
+  return differenceAmount < 0 ? "shortage" : "overage";
 }
