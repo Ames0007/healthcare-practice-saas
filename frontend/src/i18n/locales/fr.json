@@ -869,6 +869,97 @@
       }
     }
   },
+  "team": {
+    "pageTitle": "Équipe",
+    "pageDescription": "Gérez les membres de votre cabinet.",
+    "memberCount": "{{count}} membres",
+    "newMember": "+ Ajouter un membre",
+    "open": "Ouvrir",
+    "edit": "Modifier",
+    "searchLabel": "Rechercher un membre...",
+    "resultCount": "{{count}} résultats",
+    "notProvided": "Non renseigné",
+    "table": {
+      "member": "Membre",
+      "role": "Rôle",
+      "phone": "Téléphone",
+      "email": "Email",
+      "startDate": "Date d'entrée",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "filters": {
+      "roleLabel": "Rôle",
+      "allRoles": "Tous les rôles",
+      "statusLabel": "Statut",
+      "allStatuses": "Tous les statuts",
+      "clear": "Effacer les filtres"
+    },
+    "empty": {
+      "title": "Aucun membre pour le moment.",
+      "description": "Ajoutez votre premier membre d'équipe pour commencer.",
+      "action": "Ajouter un membre"
+    },
+    "filteredEmpty": {
+      "title": "Aucun membre ne correspond à vos critères.",
+      "action": "Effacer les filtres"
+    },
+    "error": {
+      "title": "Impossible de charger l'équipe.",
+      "retry": "Réessayer"
+    },
+    "toast": {
+      "created": "Membre ajouté.",
+      "updated": "Membre modifié."
+    },
+    "role": {
+      "practitioner": "Praticien",
+      "receptionist": "Réceptionniste",
+      "assistant": "Assistant(e)",
+      "manager": "Responsable",
+      "other": "Autre"
+    },
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif"
+    },
+    "form": {
+      "createTitle": "Nouveau membre",
+      "editTitle": "Modifier le membre",
+      "close": "Fermer",
+      "employeeNumberLabel": "Numéro employé : {{number}}",
+      "firstNameLabel": "Prénom",
+      "lastNameLabel": "Nom",
+      "roleLabel": "Rôle",
+      "professionalTitleLabel": "Titre professionnel",
+      "professionalTitleHelp": "Ex. Médecin, Kinésithérapeute (optionnel).",
+      "phoneLabel": "Téléphone",
+      "emailLabel": "Email",
+      "startDateLabel": "Date d'entrée",
+      "statusLabel": "Statut",
+      "requiredError": "Ce champ est requis.",
+      "phoneError": "Numéro de téléphone invalide.",
+      "emailError": "Adresse email invalide.",
+      "cancel": "Annuler",
+      "submitCreate": "Ajouter le membre",
+      "submitEdit": "Enregistrer"
+    }
+  },
+  "teamDetail": {
+    "errorTitle": "Impossible de charger les informations du membre.",
+    "errorRetry": "Réessayer",
+    "notFoundTitle": "Membre introuvable",
+    "notFoundDescription": "Ce membre n'existe pas ou n'est plus accessible.",
+    "backToTeam": "Retour à l'équipe",
+    "informationsTitle": "Informations",
+    "phoneLabel": "Téléphone",
+    "emailLabel": "Email",
+    "startDateLabel": "Date d'entrée",
+    "workTitle": "Travail",
+    "roleLabel": "Rôle",
+    "statusLabel": "Statut",
+    "edit": "Modifier"
+  },
   "admin": {
     "brand": "Platform Admin",
     "nav": {

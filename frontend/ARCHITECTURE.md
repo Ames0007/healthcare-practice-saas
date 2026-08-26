@@ -255,6 +255,28 @@ src/components/
             contradiction of the domain spec; a future generated PDF
             would still be recorded as one `generated_documents` row
             referencing this record (§42, not implemented).
+            `domain/team/` (UI-007A) — the first cabinet HR domain layer.
+            `types.ts` (`TeamMember`/`TeamRole`/`TeamMemberStatus`)
+            deliberately carries no authentication field (password/MFA/
+            session/permission) anywhere — a `TeamMember` is a person
+            working in the cabinet, a future auth `User` is a separate,
+            unbuilt concept (CLAUDE.md §9-10, task §7). An optional
+            `practitionerId` links to Agenda/Patients/Caisse's own
+            existing lightweight `AgendaPractitioner` fixture
+            (`features/agenda/mock-data.ts`'s `PRACTITIONERS`) for the
+            subset of members who are also schedulable practitioners —
+            deliberately not a refactor of those existing selectors to
+            consume `TeamMember` instead (§8: the two representations
+            coexist until a later task decides otherwise).
+            `team-role.ts` (`TEAM_ROLE_MAP`) mirrors
+            `expense-category.ts`'s label/icon registry pattern exactly
+            — no `StatusTone`, since role is a functional category, not
+            a status (§12). `team-member-status.ts`
+            (`TEAM_MEMBER_STATUS_MAP`) mirrors `cash-session-status.ts`'s
+            tone/label registry instead — active/inactive only;
+            suspended/on-leave states are deliberately not part of
+            `TeamMemberStatus`'s literal union, since UI-007D owns leave
+            state (§13).
 
 src/features/
   today/    Aujourd'hui screen composition (UI-001): `types.ts` (mock
@@ -793,6 +815,54 @@ src/features/
             reuses the session's own `openedBy` rather than a second
             identity constant (this prototype has no multi-shift/handoff
             concept).
+
+  team/     Équipe team directory + employee profile (UI-007A), at
+            `/app/equipe` and nested `/app/equipe/[id]` — the sidebar's
+            pre-existing "Équipe" link (unchanged since TASK-003) now
+            resolves here instead of the `[...slug]` catch-all; no
+            `nav-config.ts` change was needed. `team-page.tsx` mirrors
+            `features/patients/patients-page.tsx`'s architecture: one
+            centralized `TeamMember[]` array backs search (name/employee
+            number/phone/email — phone normalized via
+            `features/patients/normalize.ts`'s `normalizePhoneDigits`,
+            reused rather than reimplemented), a role filter (built only
+            from roles actually present, never a permanently-empty
+            option) and a status filter, composing together and reset by
+            "Effacer les filtres." No `Pagination` — `filter-team-
+            members.ts` operates over the full ~8-member fixture set
+            directly, a documented decision (task §25), not an omission.
+            `components/` (`TeamTable`/`TeamCardList` — desktop table +
+            mobile card dual-render, mirroring `PatientTable`/
+            `PatientCardList`'s exact convention including which columns
+            hide first on tablet; `TeamFilters`; `TeamMemberFormDialog` —
+            bounded create/edit, mirroring `PatientFormDialog`'s drawer/
+            validate/submit shape and reusing `isValidEmail`/
+            `isValidMoroccanPhone` from `features/patients/patient-form-
+            validation.ts` unmodified, deliberately with no duplicate-
+            detection and no contract/schedule/payroll/document fields;
+            `TeamSkeleton`/`TeamMemberDetailSkeleton`).
+            `employee-number.ts`'s `generateEmployeeNumber` mirrors
+            `features/patients/patient-number.ts`'s
+            `generatePatientNumber` exactly, producing `EMP-####`.
+            `mock-data.ts`'s 8 synthetic fixtures were chosen to share no
+            first/last-name fragment with any seeded patient
+            (`features/patients/mock-data.ts`) — except the two team
+            members who are also existing practitioner identities
+            (Youssef Benali/`pr-1`, Amal Idrissi/`pr-2`), which
+            deliberately reuse Agenda's own established names/ids
+            instead of inventing new ones not to contradict them
+            (task §16), proven by a dedicated fixture-integrity test
+            (`mock-data.test.ts`) rather than left to accidental
+            agreement.
+            `team-member-detail-page.tsx` (Spec #9 Screen 34) renders
+            only the "Profil" surface this task scopes — no tab bar,
+            since Planning/Congés/Paie/Documents/Permissions are Screen
+            34's own later tabs, owned by UI-007B through UI-007F. It
+            reuses the exact same `TeamMemberFormDialog` for its own
+            "Modifier" action, but edits made there update only this
+            page's own local state, not `/app/equipe`'s array — the same
+            documented prototype limitation `PatientDetailPage` already
+            has relative to `/app/patients` (UI-004A §7), not a new one.
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,

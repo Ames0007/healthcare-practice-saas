@@ -869,6 +869,97 @@
       }
     }
   },
+  "team": {
+    "pageTitle": "الفريق",
+    "pageDescription": "إدارة أعضاء فريق عيادتك.",
+    "memberCount": "{{count}} أعضاء",
+    "newMember": "+ إضافة عضو",
+    "open": "فتح",
+    "edit": "تعديل",
+    "searchLabel": "البحث عن عضو...",
+    "resultCount": "{{count}} نتيجة",
+    "notProvided": "غير محدد",
+    "table": {
+      "member": "العضو",
+      "role": "الدور",
+      "phone": "الهاتف",
+      "email": "البريد الإلكتروني",
+      "startDate": "تاريخ الالتحاق",
+      "status": "الحالة",
+      "actions": "إجراءات"
+    },
+    "filters": {
+      "roleLabel": "الدور",
+      "allRoles": "كل الأدوار",
+      "statusLabel": "الحالة",
+      "allStatuses": "كل الحالات",
+      "clear": "مسح المرشحات"
+    },
+    "empty": {
+      "title": "لا يوجد أعضاء حاليًا.",
+      "description": "أضف أول عضو في فريقك للبدء.",
+      "action": "إضافة عضو"
+    },
+    "filteredEmpty": {
+      "title": "لا يوجد عضو يطابق معاييرك.",
+      "action": "مسح المرشحات"
+    },
+    "error": {
+      "title": "تعذّر تحميل الفريق.",
+      "retry": "إعادة المحاولة"
+    },
+    "toast": {
+      "created": "تمت إضافة العضو.",
+      "updated": "تم تعديل بيانات العضو."
+    },
+    "role": {
+      "practitioner": "ممارس",
+      "receptionist": "موظف استقبال",
+      "assistant": "مساعد(ة)",
+      "manager": "مسؤول",
+      "other": "آخر"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "form": {
+      "createTitle": "عضو جديد",
+      "editTitle": "تعديل بيانات العضو",
+      "close": "إغلاق",
+      "employeeNumberLabel": "رقم الموظف: {{number}}",
+      "firstNameLabel": "الاسم الأول",
+      "lastNameLabel": "الاسم العائلي",
+      "roleLabel": "الدور",
+      "professionalTitleLabel": "اللقب المهني",
+      "professionalTitleHelp": "مثال: طبيب، أخصائي علاج طبيعي (اختياري).",
+      "phoneLabel": "الهاتف",
+      "emailLabel": "البريد الإلكتروني",
+      "startDateLabel": "تاريخ الالتحاق",
+      "statusLabel": "الحالة",
+      "requiredError": "هذا الحقل مطلوب.",
+      "phoneError": "رقم هاتف غير صالح.",
+      "emailError": "بريد إلكتروني غير صالح.",
+      "cancel": "إلغاء",
+      "submitCreate": "إضافة العضو",
+      "submitEdit": "حفظ"
+    }
+  },
+  "teamDetail": {
+    "errorTitle": "تعذّر تحميل معلومات العضو.",
+    "errorRetry": "إعادة المحاولة",
+    "notFoundTitle": "العضو غير موجود",
+    "notFoundDescription": "هذا العضو غير موجود أو لم يعد متاحًا.",
+    "backToTeam": "العودة إلى الفريق",
+    "informationsTitle": "المعلومات",
+    "phoneLabel": "الهاتف",
+    "emailLabel": "البريد الإلكتروني",
+    "startDateLabel": "تاريخ الالتحاق",
+    "workTitle": "العمل",
+    "roleLabel": "الدور",
+    "statusLabel": "الحالة",
+    "edit": "تعديل"
+  },
   "admin": {
     "brand": "إدارة المنصة",
     "nav": {

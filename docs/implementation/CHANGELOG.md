@@ -1664,3 +1664,75 @@ All notable changes to this project are documented in this file.
   over through UI-006X + 12 net new), typecheck, lint and build pass on
   the first full-suite run; backend regression (10 tests, clean)
   unaffected — no backend files touched.
+- UI-007A — Équipe Directory & Employee Profiles: replaces the generic
+  catch-all placeholder at `/app/equipe` with the first real cabinet
+  Team/HR workspace, plus a nested `/app/equipe/[id]` employee profile
+  (Spec #9 Screens 33-34) — the sidebar's own existing "Équipe" link
+  (already pointing at `/app/equipe`, unchanged since TASK-003) now
+  resolves to real content instead of the shared "Pas encore
+  implémenté" screen, with no change needed to `nav-config.ts` or the
+  `[...slug]` catch-all itself. New bounded `TeamMember` domain model
+  (`components/domain/team/types.ts`) is deliberately kept separate
+  from a future authentication User — no password/MFA/session/
+  permission fields anywhere on it (§7) — and carries an optional
+  `practitionerId` that links to Agenda/Patients/Caisse's own existing
+  lightweight `PRACTITIONERS` fixture (`pr-1`/`pr-2`) for the two team
+  members who are also schedulable practitioners, without refactoring
+  any of those existing selectors to consume `TeamMember` instead (§8,
+  documented as a deliberate future-relationship decision, not an
+  oversight). Role is intentionally not a status: the new
+  `TEAM_ROLE_MAP` registry (`components/domain/team/team-role.ts`,
+  mirroring `expense-category.ts`'s exact pattern) carries only a
+  translation key + optional icon, no `StatusTone`, while a separate
+  `TEAM_MEMBER_STATUS_MAP` (mirroring `cash-session-status.ts`) owns
+  active/inactive → success/neutral (§12/§14) — two roles were
+  deliberately kept out of `TeamRole`'s literal union scope for now
+  (`suspended`/`on_leave`), since UI-007D owns that state (§13).
+  8 centralized synthetic fixtures (`features/team/mock-data.ts`) were
+  chosen so no first/last name shares a fragment with any seeded
+  patient (`features/patients/mock-data.ts`) — except the two
+  explicitly-required practitioner identities (Youssef Benali, Amal
+  Idrissi), which deliberately reuse Agenda's own established names/ids
+  instead of inventing new ones, proven consistent by a dedicated
+  fixture-integrity test (§16) rather than left to accidental
+  agreement. `TeamPage` mirrors `PatientsPage`'s architecture line for
+  line: search (name/employee number/phone/email — phone normalized via
+  the existing `normalizePhoneDigits` from `features/patients/normalize.ts`,
+  not a second implementation) composes with a role filter (built from
+  only the roles actually present in the data, never a permanently
+  empty option — §21) and a status filter, all reset together by
+  "Effacer les filtres." No pagination was added — 8 synthetic members
+  render fine as a single list, and Patients already having pagination
+  was explicitly not treated as a reason to add it here (§25, a
+  documented decision, not an omission). Desktop `TeamTable` + mobile
+  `TeamCardList` reuse `PatientTable`/`PatientCardList`'s exact
+  dual-render convention, including hiding Email/Date d'entrée before
+  Contact/Role/Status/Actions on tablet (§29). `TeamMemberDetailPage`
+  (Spec #9 Screen 34) renders only the "Profil" surface described by
+  this task — no tab bar — since Planning/Congés/Paie/Documents/
+  Permissions are Screen 34's own later tabs, explicitly owned by
+  UI-007B through UI-007F. A bounded `TeamMemberFormDialog` (create/edit
+  only — no duplicate detection, no contract/schedule/payroll/document
+  fields) mirrors `PatientFormDialog`'s drawer/validate/submit shape and
+  reuses `isValidEmail`/`isValidMoroccanPhone` from
+  `features/patients/patient-form-validation.ts` unmodified; a new
+  `generateEmployeeNumber` mirrors `generatePatientNumber`'s exact
+  local-sequential-reference pattern, producing `EMP-####`. The same
+  dialog is reachable both from the directory (row "Modifier" / "+
+  Ajouter un membre") and from the profile page's own "Modifier"
+  action; edits made from the profile page update only that page's own
+  local state, not `/app/equipe`'s array — the same documented
+  prototype limitation `PatientDetailPage` already has relative to
+  `/app/patients` (UI-004A §7), not a new one. No avatar photo upload
+  (§27 — initials-only `Avatar` reuse, no synthetic image assets
+  exist), no employment-contract/schedule/shift/attendance/leave/
+  payroll/bonus/commission/document-storage functionality anywhere, no
+  backend integration (mock data only). All 646 frontend tests (598
+  carried over through UI-006E + 48 net new — 6 fixture-integrity, 28
+  directory/search/filter/create/edit, 12 profile/edit, 2 sidebar
+  active-state), typecheck, lint and build pass on the first full-suite
+  run; backend regression (10 tests, 26 assertions, clean) unaffected —
+  no backend files touched. Manual review: DOM/SSR-level only (curl
+  against the running dev server — `/app/equipe` and `/app/equipe/[id]`
+  both 200, `dir="rtl"` present for the Arabic variant) — no
+  browser-automation/screenshot tool was available in this environment.
