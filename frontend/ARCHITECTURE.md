@@ -334,6 +334,35 @@ src/components/
             registries (`attendance-status.ts`, `leave-type.ts`,
             `leave-status.ts`, `payroll-status.ts`) mirror
             `team-role.ts`/`team-member-status.ts`'s exact split pattern.
+            `domain/stock/` (UI-008ABCD) — the healthcare inventory
+            domain layer, replacing the generic Stock placeholder.
+            `types.ts`'s `InventoryItem`/`InventoryLot`/`StockMovement`
+            deliberately carry **no balance field anywhere** — every
+            item/lot balance is always derived from `StockMovement[]`
+            (`features/stock/stock.ts`/`lots.ts`, below), the same
+            discipline UI-006E/UI-007CDEF already established for
+            Caisse's expected balance and Attendance's worked minutes.
+            A single 10-value `InventoryCategory` doubles as the
+            item-type axis the task's own §14 proposed as a second,
+            separate field — judged unnecessary duplication rather than
+            a genuinely distinct concept (§14's own "avoid unnecessary
+            complexity" caution), since the category values already
+            encode handling semantics as granularly as a separate
+            `itemType` would. `StockPolicy` layers optional
+            `safetyStock`/`reorderPoint`/`maximumStock`/
+            `reorderQuantity`/`leadTimeDays` planning metadata on top of
+            the approved schema's mandatory `minimumStock` (Spec #4
+            §23.1 defines only that one field) — a deliberate,
+            non-persisted enrichment recorded as
+            `docs/implementation/DECISIONS.md` ADR-006, not a silent
+            contradiction. `expirationTracking` is only ever `true`
+            alongside `lotTracking` (`isValidItemTrackingFlags`), since
+            expiration dates live on lots, not items (Spec #2 §37).
+            Six registries (`category.ts`, `unit.ts`,
+            `attention-status.ts`, `expiry-status.ts`,
+            `movement-type.ts`, `movement-reason.ts`) mirror
+            `expense-category.ts`/`cash-session-status.ts`'s exact
+            label/icon/tone-registry split pattern.
 
 src/features/
   today/    Aujourd'hui screen composition (UI-001): `types.ts` (mock
@@ -1064,6 +1093,88 @@ src/features/
             payment), so a hypothetical multi-invoice payment could never
             be double-counted onto one practitioner (Spec #3 WF-40's own
             acceptance criterion).
+
+  stock/    Pharmacie & Stock (UI-008ABCD), replacing the generic Stock
+            placeholder at `/app/stock` — Vue d'ensemble/Articles/
+            Mouvements/Lots & expirations, executed as four gates
+            against one shared 24-item fixture universe (`mock-items-
+            data.ts`/`mock-lots-data.ts`/`mock-movements-data.ts`,
+            fixture-integrity tested for internal consistency). `stock.ts`
+            (item balance/attention-status/CRUD helpers), `lots.ts`
+            (lot balance/expiry-status/cabinet-row builders), `movements.ts`
+            (movement history/running balance/negative-stock validation),
+            `dashboard.ts` (KPI/attention-list derivation) are the pure
+            function layer every screen composes — no component computes
+            a balance or status inline. `StockNav` (Vue d'ensemble/
+            Articles/Mouvements/Lots & expirations) mirrors `FinanceNav`'s
+            exact `usePathname`-prefix `Tabs` usage (non-parameterized
+            routes); `ItemNav` (Aperçu/Lots/Mouvements) mirrors
+            `TeamMemberNav`'s own per-id explicit-`activeTab`-prop
+            pattern instead, since it sits under a per-item `[id]`.
+            `items-page.tsx` (`/app/stock/items`) mirrors
+            `GlobalInvoicesPage`'s search/filter/table/card-list
+            architecture; `item-detail-page.tsx` (`/app/stock/items/[id]`)
+            mirrors `TeamMemberDetailPage`'s header-then-tabs-then-
+            switched-content shell — editing an article happens on its
+            own detail page's Aperçu tab (`ItemOverviewContent`), never
+            from the list, the same edit-on-detail convention Team
+            established. `stock-movements-page.tsx`
+            (`/app/stock/movements`) starts with an article `Select`
+            (movements are always scoped to one item) then reuses the
+            exact same `ItemMovementsContent` component the item's own
+            Mouvements tab renders — no duplicate movement-table
+            implementation. `stock-lots-page.tsx` (`/app/stock/lots`) and
+            `stock-dashboard.tsx` (`/app/stock`) are both purely derived
+            read views composed from the same pure functions above.
+
+            **The required cross-inventory chain**, enforced by
+            construction and proven end to end by
+            `cross-inventory-integrity.test.ts`:
+
+            ```text
+            StockMovement[] (source of truth, Spec #4 §23.3)
+                    |
+                    +-----------------------------+
+                    v                              v
+            stock.ts: computeItemStockBalance   lots.ts: computeLotBalance
+              (sum per itemId)                    (sum per lotId)
+                    |                              |
+                    | <---- always reconcile ----> |
+                    v                              v
+            InventoryItem.stockPolicy           InventoryLot.expirationDate
+                    |                              |
+                    v                              v
+            stock.ts: resolveStockAttentionStatus   lots.ts: resolveLotExpiryStatus
+              (out_of_stock/critical/low/             (expired/expiring_soon/valid,
+               reorder/available)                      EXPIRY_WARNING_HORIZON_DAYS)
+                    |                              |
+                    v                              v
+            items.ts: buildItemRows             lots.ts: getExpiryAttentionLots
+                    |                              |
+                    +-------------+  +-------------+
+                                  v  v
+                       dashboard.ts: computeStockKpis /
+                       getAttentionItems / getExpiryAttentionForDashboard
+                       (never a second, independent derivation)
+            ```
+
+            `computeItemStockBalance`/`computeLotBalance` are the only
+            two functions in this module that ever read `direction` —
+            everything downstream (attention status, expiry status, KPI
+            counts, both attention lists) is a pure function of their
+            own output, so a movement recorded through any of the three
+            entry points (item detail, cabinet Movements page, or a
+            future API) updates every screen identically with no
+            reconciliation step required. `wouldCauseNegativeItemBalance`/
+            `wouldCauseNegativeLotBalance` (`movements.ts`) are the one
+            place negative stock is actively prevented rather than
+            merely computed (ADR-006) — checked before submit, never
+            clamped after the fact. `getExpiryAttentionLots` (the
+            dashboard's actionable subset) deliberately excludes a
+            depleted lot even if expired, while `buildLotRows` (the
+            cabinet Lots & Expirations browsing list) deliberately keeps
+            it visible — two different, intentional views of the same
+            underlying rows, not an inconsistency.
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,

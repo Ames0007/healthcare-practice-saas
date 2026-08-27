@@ -2027,3 +2027,137 @@ All notable changes to this project are documented in this file.
   absent from every other file touched this task). Backend regression
   (10 tests, 26 assertions, clean) unaffected — no backend files
   touched.
+
+- UI-008ABCD — Pharmacie & Stock: Catalog, Stock Parameters, Lots &
+  Expiration, Movements & Alerts. Replaces the generic Stock placeholder
+  with a real healthcare inventory prototype at `/app/stock`
+  (Vue d'ensemble/Articles/Mouvements/Lots & expirations, `StockNav`
+  mirroring `FinanceNav`'s exact `usePathname`-prefix pattern), executed
+  as four sequential gates against one shared 24-item fixture universe —
+  no contradictory duplicate mock data anywhere, verified by a dedicated
+  `cross-inventory-integrity.test.ts`. The sidebar label changes from
+  "Stock" to "Pharmacie & Stock" (`nav.stock`) — this module covers
+  every category of cabinet medical/operational stock, not only
+  medicines.
+
+  **Domain-wide discipline.** `InventoryItem`/`InventoryLot`/
+  `StockMovement` (`components/domain/stock/types.ts`) deliberately
+  store **no balance field anywhere** — every item and lot balance is
+  derived live from `StockMovement[]` (`computeItemStockBalance`,
+  `computeLotBalance`), the exact "derive, don't duplicate" discipline
+  already applied to Caisse's expected balance and Attendance's worked
+  minutes. For a lot-tracked item, the sum of every one of its own
+  lots' own balances always equals the item's own total, proven by a
+  dedicated cross-check rather than assumed. A single 10-value
+  `category` taxonomy (medical_consumables/medicines/procedure_products/
+  diagnostic_consumables/sterilization_infection_control/ppe/
+  disposable_medical_devices/patient_aftercare/emergency_stock/
+  operational_stock) doubles as the item-type axis the task's own §14
+  proposed separately — a second, near-1:1 parallel taxonomy was judged
+  unnecessary duplication rather than a genuinely distinct concept, per
+  that same section's own "avoid unnecessary complexity" caution.
+  `expirationTracking` is only ever `true` alongside `lotTracking`
+  (`isValidItemTrackingFlags`), since expiration dates live on lots, not
+  items (Spec #2 §37) — enforced by both fixture-integrity and form
+  validation.
+
+  **Gate 1 — Catalog & Stock Parameters.** `StockPolicy` layers optional
+  `safetyStock`/`reorderPoint`/`maximumStock`/`reorderQuantity`/
+  `leadTimeDays` planning metadata on top of the approved schema's
+  mandatory `minimumStock` (Spec #4 §23.1 defines only that one field) —
+  a deliberate, non-persisted, product-owner-requested enrichment rather
+  than a silent contradiction of the approved domain model, recorded as
+  `docs/implementation/DECISIONS.md` ADR-006. `resolveStockAttentionStatus`
+  buckets worst-to-best (out_of_stock → critical → low → reorder →
+  available), gracefully skipping the `critical`/`reorder` tiers when an
+  item configures no `safetyStock`/`reorderPoint`, and reproduces the
+  task's own worked example exactly: Compresses stériles 10×10
+  (`item-02`) at balance 18, minimum 25, safety 15, reorder 30 resolves
+  "Stock faible," not "Critique" or "À commander" — verified by a direct
+  test, not eyeballed. The Articles catalog (`/app/stock/items`) offers
+  search (name/reference) plus bounded category/status filters,
+  desktop table + mobile card dual-render mirroring
+  `GlobalInvoiceTable`/`GlobalInvoiceCardList`'s exact convention, and a
+  bounded Add-article dialog (`ItemFormDialog`, `STK-####` generated
+  reference). Editing an existing article lives on its own Item 360°
+  detail page (`/app/stock/items/[id]`, mirroring `TeamMemberDetailPage`'s
+  header-then-tabs-then-switched-content shell) rather than the list —
+  the same edit-on-detail convention Team already established.
+
+  **Gate 2 — Lots & Expiration.** `resolveLotExpiryStatus`
+  (expired/expiring_soon/valid) uses a 30-day warning horizon
+  (`EXPIRY_WARNING_HORIZON_DAYS`), an explicit documented default since
+  Spec #3's own open-questions list leaves "Expiration warning horizon"
+  unresolved (ADR-006) — every consumer (item Lots tab, cabinet Lots
+  workspace, dashboard KPI/alerts) derives from that one shared
+  constant, never a second independent threshold. The read-only Lots &
+  Expirations workspace (`/app/stock/lots`, cabinet-wide, worst-expiry-
+  first, search by lot number/article name) and each item's own Lots
+  tab are both purely derived views — lots are never created here, only
+  through Stock IN (Gate 3). Fixtures deliberately include a lot that
+  has since expired but still holds remaining quantity
+  (`item-13`/`lot-13-1`, 5 units, expired) alongside a second, healthy
+  lot on the same item (`lot-13-2`, 35 units) — proving an expired lot
+  stays flagged even when the item overall looks comfortably above its
+  minimum, a real WF-48 scenario a stock-level alert alone would never
+  surface. A multi-lot item (`item-12`) proves lot-balance aggregation
+  across two lots; a fully depleted expired lot (`item-07`/`lot-07-1`,
+  balance 0) proves the browsing list still shows historical lots while
+  the narrower dashboard alert subset correctly excludes it (nothing
+  actionable remains).
+
+  **Gate 3 — Stock Movements.** One shared `StockMovementFormDialog`
+  serves Stock IN/OUT/Adjustment (bounded reason vocabulary per type via
+  `REASON_OPTIONS_BY_MOVEMENT_TYPE` — an IN can never be reasoned
+  "used_for_care," an OUT can never be "stock_received"). Negative stock
+  is disallowed outright (`wouldCauseNegativeItemBalance`/
+  `wouldCauseNegativeLotBalance`, ADR-006): an OUT or a negative
+  adjustment that would drive the item's or the selected lot's own real
+  balance below zero is blocked before submit with an explicit error,
+  never silently clamped to zero. A Stock IN on a lot-tracked item can
+  either select an existing lot or create a brand-new one inline
+  (number, plus expiration date when the item tracks it); a Stock
+  OUT/Adjustment must select an existing lot with remaining balance —
+  the dialog's own lot dropdown excludes any lot already at zero.
+  Movement history (`buildMovementHistory`) shows a running balance by
+  chronologically replaying an item's own movements and reversing for
+  display — its own most-recent balance always reconciles exactly with
+  `computeItemStockBalance`, proven directly. The cabinet-wide
+  `/app/stock/movements` workspace starts with an article selector, then
+  reuses the exact same `ItemMovementsContent` component the item's own
+  Mouvements tab uses — no duplicate movement-table implementation
+  anywhere. Fixtures exercise every one of the nine `StockMovementReason`
+  values and both `adjustment` directions at least once.
+
+  **Gate 4 — Dashboard & Alerts.** `/app/stock` shows the exact three
+  KPIs Spec #2 §42.5 defines — low-stock items (out_of_stock/critical/
+  low, excluding the softer "reorder" tier), expiring lots (reusing
+  Gate 2's own `getExpiryAttentionLots` count directly, never a second
+  derivation), and stock movement volume (movements within the last 30
+  days, the same rolling window as the expiry horizon) — plus worst-
+  first attention lists for both stock and expiry, each linking through
+  to the relevant item. Every dashboard figure reconciles exactly with
+  the same pure functions Gates 1-3 already built, proven by
+  `cross-inventory-integrity.test.ts` rather than merely assumed.
+  `StockNav` gains its final "Vue d'ensemble" tab now that the dashboard
+  route exists, completing the four-tab workspace nav.
+
+  No procurement/purchase-order vocabulary anywhere (Spec #7 §24: "Do
+  not introduce purchasing/procurement vocabulary" — grep-confirmed, no
+  supplier/bon-de-commande/achat concept exists), no pricing/cost field
+  (this domain is quantity-based only, CLAUDE.md §30), no
+  LocalStorage/global persistence, no API calls, no authentication.
+  161 net new tests (1010 total, up from the UI-007CDEF baseline of
+  849), typecheck, lint and build pass on the first full-suite run
+  after fixing several self-caught issues while authoring targeted
+  component tests (required-field labels render a trailing " *," so
+  `getByLabelText("Nom")` needed `getByLabelText("Nom *")` — the same
+  established convention already used by Team's own tests; a couple of
+  ambiguous `getByText` matches where a value legitimately appears twice
+  on one page, resolved with `getAllByText`/scoped `within()` queries;
+  and one genuinely wrong test assumption, corrected rather than the
+  underlying code, once the fixtures showed the cabinet Lots &
+  Expirations page is deliberately the *full* browsing list including
+  depleted lots, distinct from the dashboard's narrower actionable-alert
+  subset). Backend regression (10 tests, 26 assertions, clean)
+  unaffected — no backend files touched.

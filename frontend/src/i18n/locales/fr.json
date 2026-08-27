@@ -12,7 +12,7 @@
     "patients": "Patients",
     "finance": "Finance",
     "equipe": "Équipe",
-    "stock": "Stock",
+    "stock": "Pharmacie & Stock",
     "communication": "Communication",
     "rapports": "Rapports",
     "parametres": "Paramètres",
@@ -866,6 +866,270 @@
         "fileLabel": "Justificatif",
         "cancel": "Annuler",
         "submit": "Enregistrer"
+      }
+    }
+  },
+  "stock": {
+    "pageTitle": "Pharmacie & Stock",
+    "nav": {
+      "navigationLabel": "Navigation Stock",
+      "overview": "Vue d'ensemble",
+      "items": "Articles",
+      "movements": "Mouvements",
+      "lots": "Lots & expirations"
+    },
+    "dashboard": {
+      "pageDescription": "Vue d'ensemble du stock médical du cabinet.",
+      "errorTitle": "Impossible de charger le tableau de bord",
+      "errorRetry": "Réessayer",
+      "kpis": {
+        "lowStockItems": "Articles en stock faible",
+        "expiringLots": "Lots à échéance",
+        "movementVolume": "Mouvements (30 derniers jours)"
+      },
+      "attentionItems": {
+        "title": "Articles à surveiller",
+        "empty": "Aucun article ne nécessite d'attention particulière."
+      },
+      "expiryAttention": {
+        "title": "Lots proches de la péremption",
+        "empty": "Aucun lot expiré ou proche de la péremption."
+      }
+    },
+    "category": {
+      "medical_consumables": "Consommables médicaux",
+      "medicines": "Médicaments",
+      "procedure_products": "Produits de procédure",
+      "diagnostic_consumables": "Diagnostic",
+      "sterilization_infection_control": "Stérilisation & hygiène",
+      "ppe": "EPI",
+      "disposable_medical_devices": "Dispositifs médicaux jetables",
+      "patient_aftercare": "Produits post-soins",
+      "emergency_stock": "Stock d'urgence",
+      "operational_stock": "Stock opérationnel"
+    },
+    "unit": {
+      "unit": "Unité",
+      "box": "Boîte",
+      "pack": "Paquet",
+      "bottle": "Flacon",
+      "vial": "Ampoule",
+      "tube": "Tube",
+      "roll": "Rouleau",
+      "bag": "Sac",
+      "kit": "Kit",
+      "pair": "Paire"
+    },
+    "attentionStatus": {
+      "out_of_stock": "Rupture",
+      "critical": "Critique",
+      "low": "Stock faible",
+      "reorder": "À commander",
+      "available": "Disponible"
+    },
+    "storageCondition": {
+      "ambient": "Température ambiante",
+      "refrigerated": "Réfrigéré",
+      "other": "Autre"
+    },
+    "expiryStatus": {
+      "expired": "Expiré",
+      "expiring_soon": "Expire bientôt",
+      "valid": "Valide"
+    },
+    "movementType": {
+      "in": "Entrée",
+      "out": "Sortie",
+      "adjustment": "Ajustement"
+    },
+    "movementReason": {
+      "stock_received": "Réception de stock",
+      "returned_to_stock": "Retour en stock",
+      "initial_stock": "Stock initial",
+      "used_for_care": "Utilisé pour un soin",
+      "expired_discarded": "Péremption / mise au rebut",
+      "damaged_or_lost": "Endommagé / perdu",
+      "internal_use": "Usage interne",
+      "inventory_correction": "Correction d'inventaire",
+      "other": "Autre"
+    },
+    "movementForm": {
+      "directionLabel": "Sens",
+      "directionIn": "Entrée",
+      "directionOut": "Sortie",
+      "quantityLabel": "Quantité",
+      "quantityInvalidError": "La quantité doit être un nombre supérieur à zéro.",
+      "dateLabel": "Date",
+      "dateInFutureError": "La date ne peut pas être postérieure à aujourd'hui.",
+      "reasonLabel": "Motif",
+      "lotLabel": "Lot",
+      "selectLotPlaceholder": "Sélectionner un lot",
+      "newLotOption": "Nouveau lot",
+      "lotRequiredError": "Sélectionnez un lot ou indiquez un nouveau numéro de lot.",
+      "lotSelectionRequiredError": "Sélectionnez un lot.",
+      "newLotNumberLabel": "Numéro du nouveau lot",
+      "newLotExpirationLabel": "Date de péremption",
+      "insufficientStockError": "Quantité supérieure au stock disponible.",
+      "noteLabel": "Note",
+      "submit": "Enregistrer"
+    },
+    "movements": {
+      "pageTitle": "Mouvements",
+      "pageDescription": "Entrées, sorties et ajustements de stock du cabinet.",
+      "itemSelectLabel": "Article",
+      "itemSelectPlaceholder": "Sélectionner un article",
+      "viewItemLink": "Voir la fiche de l'article",
+      "noSelectionTitle": "Aucun article sélectionné",
+      "noSelectionDescription": "Sélectionnez un article pour voir ou enregistrer ses mouvements.",
+      "table": {
+        "date": "Date",
+        "type": "Type",
+        "quantity": "Quantité",
+        "reason": "Motif",
+        "balanceAfter": "Solde"
+      },
+      "errorTitle": "Impossible de charger les mouvements",
+      "errorRetry": "Réessayer"
+    },
+    "lots": {
+      "pageTitle": "Lots & expirations",
+      "pageDescription": "Suivi des lots et des dates de péremption du stock.",
+      "searchLabel": "Rechercher un lot",
+      "statusFilterLabel": "Statut",
+      "statusFilterPlaceholder": "Tous les statuts",
+      "resultCount": "{{count}} lot(s)",
+      "table": {
+        "article": "Article",
+        "lotNumber": "Lot",
+        "stock": "Stock",
+        "receivedDate": "Date de réception",
+        "expirationDate": "Expiration",
+        "status": "Statut"
+      },
+      "noExpiration": "—",
+      "emptyAllTitle": "Aucun lot",
+      "emptyAllDescription": "Aucun lot n'est enregistré pour le moment.",
+      "searchEmptyTitle": "Aucun résultat",
+      "clearSearch": "Effacer la recherche",
+      "filteredEmptyTitle": "Aucun lot ne correspond aux filtres",
+      "clearFilters": "Réinitialiser les filtres",
+      "errorTitle": "Impossible de charger les lots",
+      "errorRetry": "Réessayer"
+    },
+    "items": {
+      "pageTitle": "Articles",
+      "pageDescription": "Catalogue des articles de stock du cabinet.",
+      "addButton": "Ajouter un article",
+      "searchLabel": "Rechercher un article",
+      "categoryFilterLabel": "Catégorie",
+      "categoryFilterPlaceholder": "Toutes les catégories",
+      "statusFilterLabel": "Statut",
+      "statusFilterPlaceholder": "Tous les statuts",
+      "resultCount": "{{count}} article(s)",
+      "table": {
+        "article": "Article",
+        "category": "Catégorie",
+        "unit": "Unité",
+        "stock": "Stock",
+        "minimum": "Minimum",
+        "reorderPoint": "Point commande",
+        "status": "Statut",
+        "actions": "Actions"
+      },
+      "inactiveBadge": "Inactif",
+      "view": "Voir",
+      "emptyAllTitle": "Aucun article",
+      "emptyAllDescription": "Le catalogue de stock est vide.",
+      "searchEmptyTitle": "Aucun résultat",
+      "clearSearch": "Effacer la recherche",
+      "filteredEmptyTitle": "Aucun article ne correspond aux filtres",
+      "clearFilters": "Réinitialiser les filtres",
+      "errorTitle": "Impossible de charger le catalogue",
+      "errorRetry": "Réessayer"
+    },
+    "itemDetail": {
+      "notFoundTitle": "Article introuvable",
+      "notFoundDescription": "Cet article n'existe pas ou a été supprimé.",
+      "backToItems": "Retour aux articles",
+      "errorTitle": "Impossible de charger l'article",
+      "errorRetry": "Réessayer",
+      "referenceLabel": "Référence",
+      "categoryLabel": "Catégorie",
+      "unitLabel": "Unité",
+      "packageSizeLabel": "Conditionnement",
+      "descriptionLabel": "Description",
+      "editButton": "Modifier",
+      "inactiveNotice": "Cet article est inactif.",
+      "toast": {
+        "updated": "Article mis à jour."
+      },
+      "tabs": {
+        "navigationLabel": "Navigation article",
+        "overview": "Aperçu",
+        "lots": "Lots",
+        "movements": "Mouvements"
+      },
+      "overview": {
+        "stockSectionTitle": "Stock",
+        "currentStockLabel": "Stock disponible",
+        "minimumLabel": "Minimum",
+        "safetyStockLabel": "Stock de sécurité",
+        "reorderPointLabel": "Point de commande",
+        "maximumStockLabel": "Maximum",
+        "replenishmentSectionTitle": "Approvisionnement",
+        "leadTimeLabel": "Délai",
+        "leadTimeValue": "{{days}} jours",
+        "reorderQuantityLabel": "Quantité suggérée",
+        "medicineSectionTitle": "Médicament",
+        "medicineFormLabel": "Forme",
+        "medicineConcentrationLabel": "Concentration",
+        "storageConditionLabel": "Conservation",
+        "noDescription": "Aucune description."
+      },
+      "lots": {
+        "notLotTracked": "Cet article n'est pas suivi par lot.",
+        "emptyTitle": "Aucun lot",
+        "emptyDescription": "Cet article n'a aucun lot enregistré."
+      },
+      "movements": {
+        "emptyTitle": "Aucun mouvement",
+        "emptyDescription": "Aucun mouvement de stock n'est enregistré pour cet article.",
+        "toast": {
+          "recorded": "Mouvement enregistré."
+        }
+      },
+      "form": {
+        "addTitle": "Ajouter un article",
+        "editTitle": "Modifier l'article",
+        "nameLabel": "Nom",
+        "categoryLabel": "Catégorie",
+        "unitLabel": "Unité",
+        "packageSizeLabel": "Conditionnement",
+        "packageSizeHelp": "Ex. \"100 unités / boîte\" — informatif uniquement.",
+        "descriptionLabel": "Description",
+        "activeLabel": "Article actif",
+        "lotTrackingLabel": "Suivi par lot",
+        "expirationTrackingLabel": "Suivi de péremption",
+        "expirationTrackingHelp": "Nécessite le suivi par lot.",
+        "expirationRequiresLotError": "Le suivi de péremption nécessite le suivi par lot.",
+        "storageConditionLabel": "Conservation",
+        "storageConditionPlaceholder": "Non spécifiée",
+        "medicineFormLabel": "Forme",
+        "medicineConcentrationLabel": "Concentration",
+        "policySectionTitle": "Paramètres de stock",
+        "minimumStockLabel": "Stock minimum",
+        "safetyStockLabel": "Stock de sécurité",
+        "reorderPointLabel": "Point de commande",
+        "maximumStockLabel": "Stock maximum",
+        "reorderQuantityLabel": "Quantité de réapprovisionnement",
+        "leadTimeDaysLabel": "Délai (jours)",
+        "requiredError": "Ce champ est obligatoire.",
+        "negativeValueError": "La valeur ne peut pas être négative.",
+        "maximumBelowMinimumError": "Le maximum ne peut pas être inférieur au minimum.",
+        "cancel": "Annuler",
+        "submitAdd": "Ajouter",
+        "submitEdit": "Enregistrer",
+        "close": "Fermer"
       }
     }
   },

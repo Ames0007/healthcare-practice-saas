@@ -339,3 +339,92 @@ inline.
 ### Date
 
 2026-08-26
+
+---
+
+## ADR-006 — UI-008ABCD Pharmacie & Stock: planning-metadata enrichment, negative-stock policy, and expiry-horizon default
+
+### Status
+
+Accepted
+
+### Decision
+
+Three related prototype-scoping decisions made while implementing the
+healthcare inventory module, each recorded here per CLAUDE.md §1/§59
+rather than silently assumed:
+
+1.  **Stock-policy enrichment stays additive and non-persisted.**
+    `InventoryItem.stockPolicy` (`components/domain/stock/types.ts`)
+    carries `safetyStock`/`reorderPoint`/`maximumStock`/
+    `reorderQuantity`/`leadTimeDays` alongside the mandatory
+    `minimumStock` — but the approved domain model (Spec #4 §23.1) only
+    defines `minimum_stock`. This task's own instructions (§5 preamble)
+    explicitly frame the richer parameter set as a deliberate
+    product-owner enrichment, and — unlike ADR-005's check-in/out case —
+    nothing in the approved specs *prohibits* these fields; they are
+    simply absent. `minimumStock` stays mandatory to match the approved
+    field exactly; every other threshold is optional, frontend-only
+    prototype metadata (never sent anywhere, never implying a
+    purchase-order/supplier entity) that degrades gracefully when unset.
+2.  **Negative stock is disallowed.** An OUT (or a negative adjustment)
+    that would drive an item's or a specific lot's own balance below
+    zero is blocked client-side before submit
+    (`wouldCauseNegativeItemBalance`/`wouldCauseNegativeLotBalance`,
+    `features/stock/movements.ts`) rather than silently allowed or
+    clamped. CLAUDE.md §59 lists "Negative stock" explicitly as an
+    ADR-worthy topic; Spec #4 (around §41.3) also anticipates "Prevent
+    race causing invalid negative quantity" without settling the
+    prototype-level policy itself.
+3.  **30-day expiry warning horizon is an explicit assumption.**
+    Spec #3's own open-questions list names "Expiration warning
+    horizon" as unresolved. `EXPIRY_WARNING_HORIZON_DAYS = 30`
+    (`features/stock/lots.ts`) is a common pharmacy/medical-stock
+    convention used here as a documented placeholder, not a silently
+    invented one.
+
+### Context
+
+All three are prototype-scoping calls with no security/data-integrity
+risk (nothing persists past the browser session), so none met the
+CLAUDE.md §63 bar to stop and ask — but all three shape visible
+behavior (which thresholds a form accepts, whether an OUT can be
+submitted, which lots a dashboard flags), so silently picking values
+without a durable record would leave a future contributor unable to
+tell "deliberate default" from "accidental gap."
+
+### Alternatives
+
+1.  Limit `StockPolicy` to `minimumStock` only, matching the approved
+    schema exactly — rejected: contradicts the task's own explicit
+    enrichment instructions without a genuine specification conflict to
+    justify the refusal.
+2.  Allow negative stock (or silently clamp to zero) — rejected: would
+    let a Stock OUT/adjustment silently misrepresent real physical
+    inventory, the opposite of what an inventory module exists to
+    prevent; CLAUDE.md §59 flags this exact question as needing a
+    recorded decision, not a silent default.
+3.  Leave the expiry horizon unresolved/hardcode it inline without
+    comment — rejected: the specs mark it explicitly open; a silent
+    guess would be indistinguishable from an oversight later.
+4.  **Chosen:** implement all three as documented, reversible defaults —
+    reviewable and adjustable once real policy/configuration exists.
+
+### Consequences
+
+- A future backend Inventory module can adopt, narrow, or reject the
+  optional `StockPolicy` fields independently of this prototype; none
+  of them are implied to exist server-side yet.
+- If the real negative-stock policy is later decided differently (e.g.
+  allowing negative stock with a warning), only
+  `wouldCauseNegativeItemBalance`/`wouldCauseNegativeLotBalance` and
+  their call sites need to change — the rest of the balance-derivation
+  chain is unaffected.
+- If a different expiry warning horizon is adopted, only
+  `EXPIRY_WARNING_HORIZON_DAYS` changes; every consumer
+  (`resolveLotExpiryStatus`, the dashboard KPI, both attention lists)
+  already derives from that one constant.
+
+### Date
+
+2026-08-27

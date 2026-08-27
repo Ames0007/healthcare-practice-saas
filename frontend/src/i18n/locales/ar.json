@@ -12,7 +12,7 @@
     "patients": "المرضى",
     "finance": "المالية",
     "equipe": "الفريق",
-    "stock": "المخزون",
+    "stock": "الصيدلية والمخزون",
     "communication": "التواصل",
     "rapports": "التقارير",
     "parametres": "الإعدادات",
@@ -866,6 +866,270 @@
         "fileLabel": "المستند الداعم",
         "cancel": "إلغاء",
         "submit": "تسجيل"
+      }
+    }
+  },
+  "stock": {
+    "pageTitle": "الصيدلية والمخزون",
+    "nav": {
+      "navigationLabel": "التنقل في المخزون",
+      "overview": "نظرة عامة",
+      "items": "المواد",
+      "movements": "الحركات",
+      "lots": "الدفعات والصلاحية"
+    },
+    "dashboard": {
+      "pageDescription": "نظرة عامة على المخزون الطبي للعيادة.",
+      "errorTitle": "تعذر تحميل لوحة المعلومات",
+      "errorRetry": "إعادة المحاولة",
+      "kpis": {
+        "lowStockItems": "مواد بمخزون منخفض",
+        "expiringLots": "دفعات قريبة من انتهاء الصلاحية",
+        "movementVolume": "الحركات (آخر 30 يومًا)"
+      },
+      "attentionItems": {
+        "title": "مواد تستدعي المتابعة",
+        "empty": "لا توجد مادة تستدعي متابعة خاصة."
+      },
+      "expiryAttention": {
+        "title": "دفعات على وشك انتهاء الصلاحية",
+        "empty": "لا توجد دفعة منتهية أو قريبة من انتهاء الصلاحية."
+      }
+    },
+    "category": {
+      "medical_consumables": "المستهلكات الطبية",
+      "medicines": "الأدوية",
+      "procedure_products": "مستلزمات الإجراءات",
+      "diagnostic_consumables": "مستلزمات التشخيص",
+      "sterilization_infection_control": "التعقيم ومكافحة العدوى",
+      "ppe": "معدات الوقاية الشخصية",
+      "disposable_medical_devices": "الأجهزة الطبية القابلة للاستعمال مرة واحدة",
+      "patient_aftercare": "منتجات ما بعد الرعاية",
+      "emergency_stock": "مخزون الطوارئ",
+      "operational_stock": "المخزون التشغيلي"
+    },
+    "unit": {
+      "unit": "وحدة",
+      "box": "علبة",
+      "pack": "رزمة",
+      "bottle": "قارورة",
+      "vial": "أمبولة",
+      "tube": "أنبوب",
+      "roll": "لفافة",
+      "bag": "كيس",
+      "kit": "طقم",
+      "pair": "زوج"
+    },
+    "attentionStatus": {
+      "out_of_stock": "نفاد المخزون",
+      "critical": "حرج",
+      "low": "مخزون منخفض",
+      "reorder": "يلزم إعادة الطلب",
+      "available": "متوفر"
+    },
+    "storageCondition": {
+      "ambient": "درجة حرارة الغرفة",
+      "refrigerated": "مبرّد",
+      "other": "أخرى"
+    },
+    "expiryStatus": {
+      "expired": "منتهي الصلاحية",
+      "expiring_soon": "قريب من انتهاء الصلاحية",
+      "valid": "صالح"
+    },
+    "movementType": {
+      "in": "إدخال",
+      "out": "إخراج",
+      "adjustment": "تسوية"
+    },
+    "movementReason": {
+      "stock_received": "استلام مخزون",
+      "returned_to_stock": "إرجاع إلى المخزون",
+      "initial_stock": "مخزون أولي",
+      "used_for_care": "استُخدم لأجل رعاية",
+      "expired_discarded": "انتهاء الصلاحية / إتلاف",
+      "damaged_or_lost": "تالف / مفقود",
+      "internal_use": "استخدام داخلي",
+      "inventory_correction": "تصحيح جرد",
+      "other": "أخرى"
+    },
+    "movementForm": {
+      "directionLabel": "الاتجاه",
+      "directionIn": "إدخال",
+      "directionOut": "إخراج",
+      "quantityLabel": "الكمية",
+      "quantityInvalidError": "يجب أن تكون الكمية رقمًا أكبر من صفر.",
+      "dateLabel": "التاريخ",
+      "dateInFutureError": "لا يمكن أن يكون التاريخ لاحقًا لليوم.",
+      "reasonLabel": "السبب",
+      "lotLabel": "الدفعة",
+      "selectLotPlaceholder": "اختر دفعة",
+      "newLotOption": "دفعة جديدة",
+      "lotRequiredError": "اختر دفعة أو أدخل رقم دفعة جديدة.",
+      "lotSelectionRequiredError": "اختر دفعة.",
+      "newLotNumberLabel": "رقم الدفعة الجديدة",
+      "newLotExpirationLabel": "تاريخ انتهاء الصلاحية",
+      "insufficientStockError": "الكمية أكبر من المخزون المتاح.",
+      "noteLabel": "ملاحظة",
+      "submit": "حفظ"
+    },
+    "movements": {
+      "pageTitle": "الحركات",
+      "pageDescription": "إدخالات وإخراجات وتسويات مخزون العيادة.",
+      "itemSelectLabel": "المادة",
+      "itemSelectPlaceholder": "اختر مادة",
+      "viewItemLink": "عرض بطاقة المادة",
+      "noSelectionTitle": "لم يتم اختيار مادة",
+      "noSelectionDescription": "اختر مادة لعرض حركاتها أو تسجيل حركة جديدة.",
+      "table": {
+        "date": "التاريخ",
+        "type": "النوع",
+        "quantity": "الكمية",
+        "reason": "السبب",
+        "balanceAfter": "الرصيد"
+      },
+      "errorTitle": "تعذر تحميل الحركات",
+      "errorRetry": "إعادة المحاولة"
+    },
+    "lots": {
+      "pageTitle": "الدفعات والصلاحية",
+      "pageDescription": "متابعة دفعات المخزون وتواريخ انتهاء صلاحيتها.",
+      "searchLabel": "البحث عن دفعة",
+      "statusFilterLabel": "الحالة",
+      "statusFilterPlaceholder": "جميع الحالات",
+      "resultCount": "{{count}} دفعة",
+      "table": {
+        "article": "المادة",
+        "lotNumber": "الدفعة",
+        "stock": "المخزون",
+        "receivedDate": "تاريخ الاستلام",
+        "expirationDate": "تاريخ انتهاء الصلاحية",
+        "status": "الحالة"
+      },
+      "noExpiration": "—",
+      "emptyAllTitle": "لا توجد دفعات",
+      "emptyAllDescription": "لا توجد أي دفعة مسجلة حاليًا.",
+      "searchEmptyTitle": "لا توجد نتائج",
+      "clearSearch": "مسح البحث",
+      "filteredEmptyTitle": "لا توجد دفعة مطابقة للمرشحات",
+      "clearFilters": "إعادة تعيين المرشحات",
+      "errorTitle": "تعذر تحميل الدفعات",
+      "errorRetry": "إعادة المحاولة"
+    },
+    "items": {
+      "pageTitle": "المواد",
+      "pageDescription": "كتالوج مواد المخزون في العيادة.",
+      "addButton": "إضافة مادة",
+      "searchLabel": "البحث عن مادة",
+      "categoryFilterLabel": "الفئة",
+      "categoryFilterPlaceholder": "جميع الفئات",
+      "statusFilterLabel": "الحالة",
+      "statusFilterPlaceholder": "جميع الحالات",
+      "resultCount": "{{count}} مادة",
+      "table": {
+        "article": "المادة",
+        "category": "الفئة",
+        "unit": "الوحدة",
+        "stock": "المخزون",
+        "minimum": "الحد الأدنى",
+        "reorderPoint": "نقطة الطلب",
+        "status": "الحالة",
+        "actions": "إجراءات"
+      },
+      "inactiveBadge": "غير نشطة",
+      "view": "عرض",
+      "emptyAllTitle": "لا توجد مواد",
+      "emptyAllDescription": "كتالوج المخزون فارغ.",
+      "searchEmptyTitle": "لا توجد نتائج",
+      "clearSearch": "مسح البحث",
+      "filteredEmptyTitle": "لا توجد مادة مطابقة للمرشحات",
+      "clearFilters": "إعادة تعيين المرشحات",
+      "errorTitle": "تعذر تحميل الكتالوج",
+      "errorRetry": "إعادة المحاولة"
+    },
+    "itemDetail": {
+      "notFoundTitle": "المادة غير موجودة",
+      "notFoundDescription": "هذه المادة غير موجودة أو تم حذفها.",
+      "backToItems": "العودة إلى المواد",
+      "errorTitle": "تعذر تحميل المادة",
+      "errorRetry": "إعادة المحاولة",
+      "referenceLabel": "المرجع",
+      "categoryLabel": "الفئة",
+      "unitLabel": "الوحدة",
+      "packageSizeLabel": "حجم العبوة",
+      "descriptionLabel": "الوصف",
+      "editButton": "تعديل",
+      "inactiveNotice": "هذه المادة غير نشطة.",
+      "toast": {
+        "updated": "تم تحديث المادة."
+      },
+      "tabs": {
+        "navigationLabel": "التنقل في المادة",
+        "overview": "نظرة عامة",
+        "lots": "الدفعات",
+        "movements": "الحركات"
+      },
+      "overview": {
+        "stockSectionTitle": "المخزون",
+        "currentStockLabel": "المخزون المتاح",
+        "minimumLabel": "الحد الأدنى",
+        "safetyStockLabel": "مخزون الأمان",
+        "reorderPointLabel": "نقطة الطلب",
+        "maximumStockLabel": "الحد الأقصى",
+        "replenishmentSectionTitle": "التزويد",
+        "leadTimeLabel": "المهلة",
+        "leadTimeValue": "{{days}} أيام",
+        "reorderQuantityLabel": "الكمية المقترحة",
+        "medicineSectionTitle": "الدواء",
+        "medicineFormLabel": "الشكل الصيدلاني",
+        "medicineConcentrationLabel": "التركيز",
+        "storageConditionLabel": "شروط الحفظ",
+        "noDescription": "لا يوجد وصف."
+      },
+      "lots": {
+        "notLotTracked": "هذه المادة غير متتبعة بالدفعات.",
+        "emptyTitle": "لا توجد دفعات",
+        "emptyDescription": "لا توجد أي دفعة مسجلة لهذه المادة."
+      },
+      "movements": {
+        "emptyTitle": "لا توجد حركات",
+        "emptyDescription": "لا توجد أي حركة مخزون مسجلة لهذه المادة.",
+        "toast": {
+          "recorded": "تم تسجيل الحركة."
+        }
+      },
+      "form": {
+        "addTitle": "إضافة مادة",
+        "editTitle": "تعديل المادة",
+        "nameLabel": "الاسم",
+        "categoryLabel": "الفئة",
+        "unitLabel": "الوحدة",
+        "packageSizeLabel": "حجم العبوة",
+        "packageSizeHelp": "مثال: \"100 وحدة / علبة\" — لأغراض إعلامية فقط.",
+        "descriptionLabel": "الوصف",
+        "activeLabel": "مادة نشطة",
+        "lotTrackingLabel": "تتبع الدفعات",
+        "expirationTrackingLabel": "تتبع تاريخ الصلاحية",
+        "expirationTrackingHelp": "يتطلب تتبع الدفعات.",
+        "expirationRequiresLotError": "تتبع تاريخ الصلاحية يتطلب تتبع الدفعات.",
+        "storageConditionLabel": "شروط الحفظ",
+        "storageConditionPlaceholder": "غير محددة",
+        "medicineFormLabel": "الشكل الصيدلاني",
+        "medicineConcentrationLabel": "التركيز",
+        "policySectionTitle": "إعدادات المخزون",
+        "minimumStockLabel": "الحد الأدنى للمخزون",
+        "safetyStockLabel": "مخزون الأمان",
+        "reorderPointLabel": "نقطة الطلب",
+        "maximumStockLabel": "الحد الأقصى للمخزون",
+        "reorderQuantityLabel": "كمية إعادة التزويد",
+        "leadTimeDaysLabel": "المهلة (أيام)",
+        "requiredError": "هذا الحقل إلزامي.",
+        "negativeValueError": "لا يمكن أن تكون القيمة سالبة.",
+        "maximumBelowMinimumError": "لا يمكن أن يكون الحد الأقصى أقل من الحد الأدنى.",
+        "cancel": "إلغاء",
+        "submitAdd": "إضافة",
+        "submitEdit": "حفظ",
+        "close": "إغلاق"
       }
     }
   },
