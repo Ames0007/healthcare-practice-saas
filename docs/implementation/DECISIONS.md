@@ -523,3 +523,110 @@ given its own numbered decision.
 ### Date
 
 2026-08-27
+
+---
+
+## ADR-008 — UI-010ABC Reports & Cabinet Configuration: cabinet-level working hours, read-only numbering, and a partitioned Stock KPI grouping
+
+### Status
+
+Accepted
+
+### Decision
+
+Three related prototype-scoping decisions made while implementing Reports
+& Cabinet Configuration, recorded here per CLAUDE.md §1/§59:
+
+1.  **Cabinet working hours are modeled cabinet-wide only, never
+    per-practitioner.** Spec #4 §12 ("Availability domain") only ever
+    defines `practitioner_working_hours`/`practitioner_breaks` — no
+    `practice_working_hours` table exists anywhere in the approved domain
+    model. Spec #2 §46 ("Settings — Working hours") lists "Practice
+    hours" and "Practitioner hours" as two separate configurable things
+    in prose, without resolving how a multi-practitioner cabinet would
+    reconcile the two. `CabinetWorkingHoursDay`
+    (`components/domain/settings/types.ts`) implements the one
+    unambiguous case both the onboarding wireframe (Spec #9 Screen 05)
+    and CLAUDE.md's own "solo-first, cabinet-capable" framing actually
+    show: one weekly schedule for the cabinet as a whole. Team's own
+    per-practitioner `WorkInterval` (`components/domain/team/types.ts`,
+    UI-007B) is untouched and remains the authoritative per-practitioner
+    concept.
+2.  **Numbering & Documents (`/app/parametres/numerotation`) is
+    read-only**, never an editable configuration form. Spec #4 §59
+    ("Concurrency controls") requires invoice/receipt numbering to "lock
+    sequence row during allocation" — a real database-transaction
+    guarantee this frontend-only prototype cannot provide. Showing an
+    editable prefix/format form here would imply a safety property (no
+    duplicate/skipped numbers under concurrent access) the prototype
+    cannot actually honor. The page instead shows each sequence's own
+    live-computed next number (`computeNumberingSummary`,
+    `features/parametres/numbering.ts`) — informational, not
+    configurable.
+3.  **`StockReportKpis` splits Stock's own combined `lowStockItemsCount`
+    into `outOfStockCount` (out_of_stock only) and `lowStockCount`
+    (critical + low)**, a different grouping of the exact same
+    `StockAttentionStatus` rows `computeStockKpis` (UI-008ABCD) already
+    reads — never a second balance/attention derivation. This follows
+    the task's own Overview wireframe, which asks for "Articles en
+    rupture" and "Stock faible" as two separate numbers rather than
+    Stock's own single combined figure.
+
+### Context
+
+None of the three carries security/data-integrity risk, so none met the
+CLAUDE.md §63 bar to stop and ask — but all three shape visible behavior
+(what the Working Hours page actually edits, whether Numbering looks
+editable, how the Stock KPI blocks are split), so recording them prevents
+a future contributor from mistaking a deliberate boundary for an
+oversight.
+
+A fourth, smaller scoping call from the same task — Reports deliberately
+does **not** implement an invented "confirmation rate" KPI (Spec #2
+§42.1 names the KPI label with no defined formula anywhere in the
+approved specifications) or a "revenue by service" breakdown (Spec #2
+§42.2; `Invoice` carries no service/service-id field, so any join to
+Agenda's `SERVICES` catalog would require an unreliable free-text-
+description match) — is a direct application of CLAUDE.md §3's
+"do not invent requirements" rule rather than an independent judgment
+call, so it is noted here for completeness but not given its own
+numbered decision.
+
+### Alternatives
+
+1.  Model working hours per-practitioner from the start (matching Spec
+    #4 §12's own schema literally) — rejected for this task: the primary
+    persona is solo-first, no UI anywhere yet lets an owner pick "whose"
+    hours are being viewed, and building a practitioner-selector purely
+    to satisfy schema symmetry would be scope creep with no consuming
+    screen. Per-practitioner working-hours *editing* remains a real gap,
+    explicitly deferred rather than silently resolved.
+2.  Build a fully editable numbering-configuration form (prefix, format
+    pattern, manual reset) — rejected: would misrepresent a concurrency
+    guarantee this prototype cannot provide, and no approved wireframe
+    defines the exact editable fields.
+3.  Keep Stock's existing single `lowStockItemsCount` figure and show it
+    twice, unpartitioned — rejected: does not satisfy the task's own
+    explicit two-number wireframe ask, and would make "Articles en
+    rupture" and "Stock faible" show the identical value, which is
+    actively misleading.
+
+### Consequences
+
+- If a future task adds real per-practitioner cabinet scheduling,
+  `CabinetWorkingHoursDay` can be extended with an optional
+  `practitionerId` (or superseded by a per-practitioner list) without
+  touching Team's own `WorkInterval` model.
+- If a future task adds real backend-controlled numbering sequences,
+  `/app/parametres/numerotation` gains an edit affordance at that point;
+  `computeNumberingSummary`'s read-only figures remain valid as the
+  "current state" display underneath it.
+- If Stock's own dashboard KPI shape changes, `computeStockReportKpis`
+  must be re-verified against it (already proven live via
+  `cross-configuration-integrity.test.ts` and
+  `cross-reporting-integrity.test.ts`) rather than assumed to still
+  reconcile.
+
+### Date
+
+2026-08-28

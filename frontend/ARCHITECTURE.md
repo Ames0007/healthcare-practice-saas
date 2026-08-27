@@ -396,6 +396,37 @@ src/components/
             `variable.ts`, `event-type.ts`) mirror
             `expense-category.ts`/`cash-session-status.ts`'s exact
             label/icon/tone-registry split pattern.
+            `domain/reports/` (UI-010ABC) — deliberately thin: Reports
+            projects existing domain types rather than owning new
+            business entities, so `types.ts` holds only read-model row
+            shapes (`ActivityReportKpis`, `AppointmentStatusBreakdownRow`,
+            `PractitionerActivityRow`, `FinanceReportSummary`,
+            `HrReportKpis`, `StockReportKpis`, `ReportsOverview`) — no
+            registry files, since none of these are bounded-vocabulary
+            fields needing a label/tone map. `StockReportKpis`
+            deliberately does not reuse `features/stock/dashboard.ts`'s
+            own `StockKpis` shape: it partitions the same
+            `StockAttentionStatus` rows differently (out-of-stock split
+            from critical/low) to match the task's own two-number
+            wireframe (`docs/implementation/DECISIONS.md` ADR-008) — the
+            underlying rows are still `buildItemRows`'s, never a second
+            derivation.
+            `domain/settings/` (UI-010ABC) — Cabinet Settings/Services/
+            Working Hours/Numbering. `CabinetProfile` narrows Spec #4
+            §5.1's `tenants` schema (no `slug`, no `logo_file_id` — see
+            `features/parametres/`, below); `currencyCode`/`timezone`
+            are fixed, non-editable fields. `CabinetService.schedulingMode`
+            reuses `AppointmentSchedulingType` from `domain/appointments/`
+            verbatim rather than a second exact/window enum.
+            `CabinetWorkingHoursDay.weekday` reuses `Weekday` from
+            `domain/team/` verbatim — its own doc comment already
+            anticipated this exact "abstract calendar-independent weekly
+            pattern" reuse. `NumberingSequenceRow` is read-only by
+            design (ADR-008: concurrency-safe allocation is a backend
+            concern this prototype does not implement). One registry
+            (`specialty.ts`) mirrors the established label-registry
+            pattern for `CabinetSpecialty`'s 7 values (CLAUDE.md's own
+            "Primary initial specialties" list verbatim).
 
 src/features/
   today/    Aujourd'hui screen composition (UI-001): `types.ts` (mock
@@ -1300,6 +1331,65 @@ src/features/
             template whose own `channel` matches the rule's `channel`
             and whose own `active` flag agrees whenever the rule itself
             is active.
+
+  rapports/
+            Reports (UI-010ABC Gate 1), replacing the generic Rapports
+            placeholder at `/app/rapports` — Vue d'ensemble/Activité/
+            Finance/Équipe/Stock. No `mock-*-data.ts` file exists in this
+            directory at all — every KPI is a pure function over
+            fixtures owned by other, already-shipped feature directories
+            (`activity-report.ts` reads Agenda's `AgendaAppointment[]`
+            and Finance's `Invoice[]`/`Payment[]`; `finance-report.ts`
+            reuses `features/finance/aggregations.ts`'s own
+            `computeFinanceKpis` unmodified; `hr-report.ts` reuses
+            Équipe's own `computeAttendance`/`computePeriodOvertimeMinutes`;
+            `stock-report.ts` reuses Stock's own `buildItemRows`/
+            `getExpiryAttentionLots`). `overview.ts`'s
+            `computeReportsOverview` takes one `ReportsSources` bundle
+            (every fixture array passed straight through) and calls each
+            detail report's own function — the Overview page and the
+            four detail pages can never independently disagree, proven
+            by `cross-reporting-integrity.test.ts`. `ReportsNav` mirrors
+            `StockNav`/`CommunicationNav`'s exact `usePathname`-prefix
+            `Tabs` pattern. Each detail page reuses Finance's own
+            `PeriodSelector`/`getPeriodRange` (UI-006A) rather than a
+            second period-toggle — except `stock-report-page.tsx`, which
+            deliberately omits the period selector since none of its
+            three KPIs are period-scoped (showing a selector that
+            changes nothing would be misleading, not merely decorative).
+
+  parametres/
+            Cabinet Settings & Operational Configuration (UI-010ABC Gates
+            2-3), replacing the generic Paramètres placeholder at
+            `/app/parametres` — Cabinet/Services & tarifs/Horaires/
+            Numérotation. `ParametresNav` grew one tab per gate exactly
+            like `CommunicationNav` (Gate 2 shipped only "Cabinet"; Gate
+            3 added the other three). `cabinet-settings-page.tsx` and
+            `working-hours-page.tsx` are both single-record view/edit
+            toggles (a "Modifier" button reveals an inline form; there is
+            exactly one `CabinetProfile` and one weekly schedule, so
+            neither needed a list+dialog pattern). `services-page.tsx`
+            is the one list+dialog surface in this directory —
+            `ServiceFormDialog`'s Add instance stays permanently mounted
+            (`open={isAddDialogOpen}`) while its Edit instance is
+            conditionally rendered with `key={editingService.id}`,
+            mirroring `TemplateFormDialog`'s own documented stale-
+            `useState` fix (UI-009ABC) rather than reintroducing the same
+            bug. `numbering-page.tsx` renders `computeNumberingSummary`'s
+            rows with no interactive controls at all (`domain/settings/`'s
+            own `NumberingSequenceRow` doc comment explains why). Every
+            page's edits are local `useState` only — `mock-cabinet-
+            profile-data.ts`, `mock-cabinet-services-data.ts` and
+            `mock-cabinet-working-hours-data.ts` are the only three
+            `mock-*-data.ts` files in this directory, one per genuinely
+            new fixture; `numbering.ts` and the Activité/Finance report
+            modules deliberately have none, reading other directories'
+            fixtures instead. `cross-configuration-integrity.test.ts`
+            proves `CabinetService.name` values trace back to Agenda's
+            own `SERVICES` array and that `computeNumberingSummary`'s
+            PAT/EMP rows reconcile exactly with `generatePatientNumber`/
+            `generateEmployeeNumber`, the same generators Patients'/
+            Équipe's own create flows already call.
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,

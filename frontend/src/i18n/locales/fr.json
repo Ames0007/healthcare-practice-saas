@@ -1619,6 +1619,212 @@
       }
     }
   },
+  "rapports": {
+    "pageTitle": "Rapports",
+    "pageDescription": "Indicateurs de gestion du cabinet, dérivés de l'activité réelle.",
+    "nav": {
+      "navigationLabel": "Navigation Rapports",
+      "overview": "Vue d'ensemble",
+      "activite": "Activité",
+      "finance": "Finance",
+      "equipe": "Équipe",
+      "stock": "Stock"
+    },
+    "overview": {
+      "activitySection": "Activité",
+      "financeSection": "Finance",
+      "hrSection": "Équipe",
+      "stockSection": "Stock",
+      "appointments": "Rendez-vous",
+      "patientsSeen": "Patients vus",
+      "noShowRate": "Taux d'absence",
+      "collected": "Encaissé",
+      "receivable": "À encaisser",
+      "overdue": "En retard",
+      "workedHours": "Heures travaillées",
+      "lateCount": "Retards",
+      "overtimeHours": "Heures supplémentaires",
+      "outOfStock": "Articles en rupture",
+      "lowStock": "Stock faible",
+      "expiringLots": "Lots proches expiration"
+    },
+    "activity": {
+      "pageTitle": "Rapports — Activité",
+      "pageDescription": "Rendez-vous, patients vus et performance par praticien pour la période sélectionnée.",
+      "kpis": {
+        "appointments": "Rendez-vous",
+        "patientsSeen": "Patients vus",
+        "noShowRate": "Taux d'absence"
+      },
+      "statusBreakdown": {
+        "title": "Répartition par statut",
+        "status": "Statut",
+        "count": "Nombre"
+      },
+      "practitionerTable": {
+        "title": "Performance par praticien",
+        "practitioner": "Praticien",
+        "appointments": "RDV",
+        "completed": "Complétés",
+        "noShow": "No-show",
+        "collected": "Encaissé"
+      }
+    },
+    "finance": {
+      "pageTitle": "Rapports — Finance",
+      "pageDescription": "Facturation, encaissements et créances du cabinet pour la période sélectionnée.",
+      "kpis": {
+        "invoiced": "Facturé",
+        "collected": "Encaissé",
+        "receivable": "À encaisser",
+        "overdue": "En retard",
+        "collectionRate": "Taux de recouvrement"
+      }
+    },
+    "equipe": {
+      "pageTitle": "Rapports — Équipe",
+      "pageDescription": "Présence et temps de travail de l'équipe pour la période sélectionnée.",
+      "kpis": {
+        "activeHeadcount": "Effectif actif",
+        "workedHours": "Heures travaillées",
+        "lateCount": "Retards",
+        "overtimeHours": "Heures supplémentaires"
+      }
+    },
+    "stock": {
+      "pageTitle": "Rapports — Stock",
+      "pageDescription": "État actuel des stocks nécessitant une attention.",
+      "kpis": {
+        "outOfStock": "Articles en rupture",
+        "lowStock": "Stock faible",
+        "expiringLots": "Lots proches expiration"
+      },
+      "viewStockAction": "Voir le stock"
+    },
+    "error": {
+      "title": "Impossible de charger les rapports.",
+      "retry": "Réessayer"
+    }
+  },
+  "parametres": {
+    "pageTitle": "Paramètres",
+    "pageDescription": "Identité du cabinet, services et configuration opérationnelle.",
+    "nav": {
+      "navigationLabel": "Navigation Paramètres",
+      "cabinet": "Cabinet",
+      "services": "Services & tarifs",
+      "horaires": "Horaires",
+      "numerotation": "Numérotation"
+    },
+    "cabinet": {
+      "sectionTitle": "Identité du cabinet",
+      "editAction": "Modifier",
+      "notSet": "Non renseigné",
+      "currencyLabel": "Devise",
+      "timezoneLabel": "Fuseau horaire",
+      "logoLabel": "Logo",
+      "logoPlaceholder": "Téléversement du logo — à venir",
+      "language": {
+        "fr": "Français",
+        "ar": "Arabe"
+      },
+      "specialty": {
+        "generalMedicine": "Médecine générale",
+        "dentistry": "Dentisterie",
+        "physiotherapy": "Kinésithérapie",
+        "psychology": "Psychologie",
+        "nutrition": "Nutrition",
+        "dermatology": "Dermatologie / esthétique",
+        "multiPractitioner": "Cabinet multi-praticiens"
+      },
+      "form": {
+        "nameLabel": "Nom du cabinet",
+        "specialtyLabel": "Spécialité principale",
+        "phoneLabel": "Téléphone",
+        "emailLabel": "Email",
+        "addressLabel": "Adresse",
+        "cityLabel": "Ville",
+        "languageLabel": "Langue d'affichage",
+        "fixedFieldsNote": "La devise (MAD) et le fuseau horaire sont fixes et ne sont pas modifiables.",
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "requiredError": "Ce champ est obligatoire.",
+        "invalidPhoneError": "Numéro de téléphone invalide.",
+        "invalidEmailError": "Adresse email invalide."
+      }
+    },
+    "services": {
+      "pageTitle": "Services & tarifs",
+      "pageDescription": "Services proposés par le cabinet, durée et prix.",
+      "addButton": "+ Ajouter un service",
+      "editAction": "Modifier",
+      "emptyTitle": "Aucun service configuré.",
+      "emptyDescription": "Les services du cabinet apparaîtront ici.",
+      "durationValue": "{{minutes}} min",
+      "activeYes": "Actif",
+      "activeNo": "Inactif",
+      "table": {
+        "service": "Service",
+        "price": "Prix",
+        "duration": "Durée",
+        "schedulingMode": "Mode RDV",
+        "active": "Actif",
+        "actions": "Actions"
+      },
+      "schedulingMode": {
+        "exact": "Heure fixe",
+        "window": "Plage"
+      },
+      "form": {
+        "addTitle": "Ajouter un service",
+        "editTitle": "Modifier le service",
+        "nameLabel": "Nom du service",
+        "durationLabel": "Durée (minutes)",
+        "priceLabel": "Prix (MAD)",
+        "schedulingModeLabel": "Mode de rendez-vous",
+        "activeLabel": "Service actif",
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "close": "Fermer",
+        "requiredError": "Ce champ est obligatoire.",
+        "invalidNumberError": "Valeur numérique invalide."
+      }
+    },
+    "horaires": {
+      "pageTitle": "Horaires du cabinet",
+      "pageDescription": "Jours et heures d'ouverture du cabinet.",
+      "editAction": "Modifier",
+      "closed": "Fermé",
+      "startLabel": "Ouverture",
+      "endLabel": "Fermeture",
+      "invalidError": "L'heure de fermeture doit être après l'heure d'ouverture pour chaque jour ouvert.",
+      "cancel": "Annuler",
+      "save": "Enregistrer"
+    },
+    "numbering": {
+      "pageTitle": "Numérotation & documents",
+      "pageDescription": "Format de numérotation actuel des documents du cabinet (lecture seule).",
+      "readOnlyNote": "La numérotation est gérée automatiquement et protégée contre les doublons ; sa configuration n'est pas modifiable dans ce prototype.",
+      "yearResetYes": "Oui",
+      "yearResetNo": "Non",
+      "table": {
+        "type": "Type",
+        "prefix": "Préfixe",
+        "yearReset": "Réinitialisation annuelle",
+        "nextNumber": "Prochain numéro"
+      },
+      "sequence": {
+        "patient": "Patients",
+        "employee": "Employés",
+        "invoice": "Factures",
+        "receipt": "Reçus"
+      }
+    },
+    "error": {
+      "title": "Impossible de charger les paramètres.",
+      "retry": "Réessayer"
+    }
+  },
   "admin": {
     "brand": "Platform Admin",
     "nav": {

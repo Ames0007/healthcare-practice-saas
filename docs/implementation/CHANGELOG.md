@@ -2284,3 +2284,103 @@ All notable changes to this project are documented in this file.
   retried message — caught by the test's own failure, not silently
   passed). Backend regression (10 tests, 26 assertions, clean)
   unaffected — no backend files touched.
+
+- UI-010ABC — Reports & Cabinet Configuration: Reports, Cabinet Settings,
+  Services & Operational Configuration. Replaces the generic Rapports and
+  Paramètres placeholders with `/app/rapports` (Vue d'ensemble/Activité/
+  Finance/Équipe/Stock, `ReportsNav`) and `/app/parametres` (Cabinet/
+  Services & tarifs/Horaires/Numérotation, `ParametresNav`), executed as
+  three sequential gates. The task's own central rule — "Reports MUST
+  derive from existing domain fixtures. Do NOT create an independent
+  fake reporting universe" — is enforced structurally: every KPI is
+  computed by a pure function that reuses an *already-shipped* module's
+  own calculation (`computeFinanceKpis` from UI-006A, `buildItemRows`/
+  `getExpiryAttentionLots` from UI-008ABCD, `computeAttendance`/
+  `computePeriodOvertimeMinutes` from UI-007CDEF) — there is no
+  `mock-report-data.ts` anywhere in this task. Proven end to end by
+  `cross-reporting-integrity.test.ts` and
+  `cross-configuration-integrity.test.ts`.
+
+  **Gate 1 — Reports.** The Overview (`/app/rapports`) reproduces the
+  task's own exact wireframe: four category blocks (Activité/Finance/
+  Équipe/Stock), each exactly three MetricCards, under one period
+  selector defaulting to "Ce mois" — reusing Finance's own
+  `PeriodSelector`/`getPeriodRange`/`FinancePeriod` (UI-006A) rather than
+  building a second period-toggle component. `StockReportKpis`
+  deliberately partitions Stock's own combined `lowStockItemsCount` into
+  `outOfStockCount` (out_of_stock only) and `lowStockCount` (critical +
+  low) to match the wireframe's own two-number ask — a different
+  grouping of the exact same attention rows `computeStockKpis` already
+  reads, never a second balance derivation (ADR-008). The Activité and
+  Finance detail pages each add one bounded table beyond their own KPI
+  row: a "Performance par praticien" table (Spec #3 WF-72: appointments/
+  completed/no-shows/collected per practitioner, joined by
+  `practitionerName` — the one field both `AgendaAppointment` and
+  `Invoice` reliably share) and a "Répartition par statut" breakdown.
+  Deliberately **not implemented**: an invented "confirmation rate" KPI
+  (Spec #2 §42.1 names the label with no defined formula anywhere in the
+  approved specifications) and a "revenue by service" breakdown (Spec #2
+  §42.2; `Invoice` has no service/service-id field, so a join to
+  Agenda's `SERVICES` catalog would require an unreliable free-text
+  match) — both recorded in ADR-008 rather than silently guessed. A new
+  `APPOINTMENT_STATUS_ORDER` export was added to the existing
+  `appointment-status.ts` map (additive only, mirrors
+  `STOCK_ATTENTION_STATUS_ORDER`'s established pattern) — no other
+  module's file was touched. 60 targeted tests.
+
+  **Gate 2 — Cabinet Settings.** New bounded domain
+  (`components/domain/settings/types.ts`): `CabinetProfile` narrows Spec
+  #4 §5.1's `tenants` schema — no `slug` (public booking routing is a
+  separate, unbuilt backend concern), no `logo_file_id` (the settings
+  form shows a read-only "à venir" placeholder rather than building a
+  fake upload flow with no real object storage behind it).
+  `currencyCode`/`timezone` are fixed and excluded from the editable
+  form entirely — Spec #2 §44 itself says "Currency fixed to MAD
+  initially," and no timezone picker UX is defined anywhere in the
+  approved specifications. `/app/parametres` is a single-record view/
+  edit toggle, not a list-plus-dialog pattern (there is exactly one
+  cabinet profile) — reuses the existing `isValidEmail`/
+  `isValidMoroccanPhone` validators (UI-003B) rather than a second,
+  possibly-diverging pattern. Edits are local component state only, and
+  deliberately do **not** propagate to `topbar.practiceName` elsewhere
+  in the app — no global store exists in this prototype, the same
+  local-state-only boundary every prior UI-00X edit flow already has.
+  16 targeted tests.
+
+  **Gate 3 — Operational Configuration.** `CabinetService.name` seeds
+  verbatim from Agenda's own pre-existing `SERVICES` string array
+  (task's own repository-inspection guidance: "provide them a coherent
+  configuration home") enriched with `durationMinutes`/`price`/
+  `schedulingMode` (reusing `AppointmentSchedulingType` verbatim — the
+  same exact/window vocabulary, never a second near-identical enum).
+  `/app/parametres/services` reuses `TemplateFormDialog`'s own
+  two-instance-dialog-plus-`key`-remount pattern for Add/Edit
+  (UI-009ABC's documented stale-`useState` fix, applied preemptively
+  here rather than rediscovered). `CabinetWorkingHoursDay`
+  (`/app/parametres/horaires`) is deliberately cabinet-level only, never
+  per-practitioner — Spec #4 §12 only defines `practitioner_working_hours`
+  (no cabinet-wide table exists), and Spec #2 §46's own prose leaves the
+  practice-vs-practitioner-hours distinction unresolved for a
+  multi-practitioner cabinet (ADR-008); `weekday` reuses Team's own
+  `Weekday`/`WEEKDAY_ORDER` verbatim, never a second weekday sequence.
+  `/app/parametres/numerotation` is deliberately **read-only**:
+  concurrency-safe sequence allocation ("lock sequence row during
+  allocation," Spec #4 §59) is a real backend/database guarantee this
+  frontend prototype cannot provide, so showing an editable form would
+  misrepresent it (ADR-008); PAT/EMP rows reuse
+  `generatePatientNumber`/`generateEmployeeNumber` verbatim, and FAC/REC
+  apply the identical regex-extract-max+1 pattern locally since no
+  existing generator covers them. Appointment operational parameters
+  (buffer time, booking-advance window, cancellation policy) were
+  searched for across all approved specifications and are simply not
+  defined anywhere beyond what Services & Pricing's own
+  `durationMinutes`/`schedulingMode` already cover — not implemented,
+  per CLAUDE.md §3/§50. 42 targeted tests.
+
+  No Laravel integration, no API calls, no database changes, no
+  persistence, no accounting engine, no analytics warehouse, no payment
+  gateway, no production document generation, no fake file-upload flow.
+  123 net new tests (1267 total, up from the UI-009ABC baseline of
+  1144), typecheck, lint and build pass on the first full-suite run.
+  Backend regression (10 tests, 26 assertions, clean) unaffected — no
+  backend files touched.

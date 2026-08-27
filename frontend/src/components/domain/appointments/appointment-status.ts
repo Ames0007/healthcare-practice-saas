@@ -27,3 +27,18 @@ export const APPOINTMENT_STATUS_MAP: Record<AppointmentStatus, AppointmentStatus
   cancelled_by_practice: { tone: "neutral", translationKey: "appointment.status.cancelledByPractice" },
   no_show: { tone: "danger", translationKey: "appointment.status.noShow" },
 };
+
+/** Operational sequence, terminal/negative states last — mirrors `STOCK_ATTENTION_STATUS_ORDER`'s pattern (added UI-010ABC for the Reports status breakdown; no prior module needed a deterministic order). */
+export const APPOINTMENT_STATUS_ORDER: AppointmentStatus[] = [
+  "requested",
+  "to_confirm",
+  "confirmed",
+  "arrived",
+  "waiting",
+  "in_consultation",
+  "completed",
+  "rescheduled",
+  "cancelled_by_patient",
+  "cancelled_by_practice",
+  "no_show",
+];

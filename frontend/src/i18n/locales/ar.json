@@ -1619,6 +1619,212 @@
       }
     }
   },
+  "rapports": {
+    "pageTitle": "التقارير",
+    "pageDescription": "مؤشرات إدارة العيادة، مستمدة من النشاط الفعلي.",
+    "nav": {
+      "navigationLabel": "تنقل التقارير",
+      "overview": "نظرة عامة",
+      "activite": "النشاط",
+      "finance": "المالية",
+      "equipe": "الفريق",
+      "stock": "المخزون"
+    },
+    "overview": {
+      "activitySection": "النشاط",
+      "financeSection": "المالية",
+      "hrSection": "الفريق",
+      "stockSection": "المخزون",
+      "appointments": "المواعيد",
+      "patientsSeen": "المرضى الذين تم استقبالهم",
+      "noShowRate": "معدل الغياب",
+      "collected": "المحصّل",
+      "receivable": "المستحق",
+      "overdue": "المتأخر",
+      "workedHours": "ساعات العمل",
+      "lateCount": "التأخيرات",
+      "overtimeHours": "الساعات الإضافية",
+      "outOfStock": "أصناف نفدت",
+      "lowStock": "مخزون منخفض",
+      "expiringLots": "دفعات قاربة الانتهاء"
+    },
+    "activity": {
+      "pageTitle": "التقارير — النشاط",
+      "pageDescription": "المواعيد والمرضى الذين تم استقبالهم وأداء كل ممارس خلال الفترة المحددة.",
+      "kpis": {
+        "appointments": "المواعيد",
+        "patientsSeen": "المرضى الذين تم استقبالهم",
+        "noShowRate": "معدل الغياب"
+      },
+      "statusBreakdown": {
+        "title": "التوزيع حسب الحالة",
+        "status": "الحالة",
+        "count": "العدد"
+      },
+      "practitionerTable": {
+        "title": "أداء الممارسين",
+        "practitioner": "الممارس",
+        "appointments": "المواعيد",
+        "completed": "المكتملة",
+        "noShow": "الغياب",
+        "collected": "المحصّل"
+      }
+    },
+    "finance": {
+      "pageTitle": "التقارير — المالية",
+      "pageDescription": "الفوترة والتحصيل والذمم المدينة للعيادة خلال الفترة المحددة.",
+      "kpis": {
+        "invoiced": "المفوتر",
+        "collected": "المحصّل",
+        "receivable": "المستحق",
+        "overdue": "المتأخر",
+        "collectionRate": "معدل التحصيل"
+      }
+    },
+    "equipe": {
+      "pageTitle": "التقارير — الفريق",
+      "pageDescription": "الحضور وساعات عمل الفريق خلال الفترة المحددة.",
+      "kpis": {
+        "activeHeadcount": "عدد الموظفين النشطين",
+        "workedHours": "ساعات العمل",
+        "lateCount": "التأخيرات",
+        "overtimeHours": "الساعات الإضافية"
+      }
+    },
+    "stock": {
+      "pageTitle": "التقارير — المخزون",
+      "pageDescription": "الحالة الحالية للمخزون التي تتطلب الانتباه.",
+      "kpis": {
+        "outOfStock": "أصناف نفدت",
+        "lowStock": "مخزون منخفض",
+        "expiringLots": "دفعات قاربة الانتهاء"
+      },
+      "viewStockAction": "عرض المخزون"
+    },
+    "error": {
+      "title": "تعذر تحميل التقارير.",
+      "retry": "إعادة المحاولة"
+    }
+  },
+  "parametres": {
+    "pageTitle": "الإعدادات",
+    "pageDescription": "هوية العيادة والخدمات والتهيئة التشغيلية.",
+    "nav": {
+      "navigationLabel": "تنقل الإعدادات",
+      "cabinet": "العيادة",
+      "services": "الخدمات والأسعار",
+      "horaires": "أوقات العمل",
+      "numerotation": "الترقيم"
+    },
+    "cabinet": {
+      "sectionTitle": "هوية العيادة",
+      "editAction": "تعديل",
+      "notSet": "غير محدد",
+      "currencyLabel": "العملة",
+      "timezoneLabel": "المنطقة الزمنية",
+      "logoLabel": "الشعار",
+      "logoPlaceholder": "تحميل الشعار — قريبًا",
+      "language": {
+        "fr": "الفرنسية",
+        "ar": "العربية"
+      },
+      "specialty": {
+        "generalMedicine": "الطب العام",
+        "dentistry": "طب الأسنان",
+        "physiotherapy": "العلاج الطبيعي",
+        "psychology": "علم النفس",
+        "nutrition": "التغذية",
+        "dermatology": "الأمراض الجلدية / التجميل",
+        "multiPractitioner": "عيادة متعددة الممارسين"
+      },
+      "form": {
+        "nameLabel": "اسم العيادة",
+        "specialtyLabel": "التخصص الرئيسي",
+        "phoneLabel": "الهاتف",
+        "emailLabel": "البريد الإلكتروني",
+        "addressLabel": "العنوان",
+        "cityLabel": "المدينة",
+        "languageLabel": "لغة العرض",
+        "fixedFieldsNote": "العملة (درهم مغربي) والمنطقة الزمنية ثابتتان ولا يمكن تعديلهما.",
+        "cancel": "إلغاء",
+        "save": "حفظ",
+        "requiredError": "هذا الحقل إلزامي.",
+        "invalidPhoneError": "رقم هاتف غير صالح.",
+        "invalidEmailError": "بريد إلكتروني غير صالح."
+      }
+    },
+    "services": {
+      "pageTitle": "الخدمات والأسعار",
+      "pageDescription": "الخدمات التي تقدمها العيادة، المدة والسعر.",
+      "addButton": "+ إضافة خدمة",
+      "editAction": "تعديل",
+      "emptyTitle": "لا توجد خدمة مهيأة.",
+      "emptyDescription": "ستظهر خدمات العيادة هنا.",
+      "durationValue": "{{minutes}} دقيقة",
+      "activeYes": "نشط",
+      "activeNo": "غير نشط",
+      "table": {
+        "service": "الخدمة",
+        "price": "السعر",
+        "duration": "المدة",
+        "schedulingMode": "نمط الموعد",
+        "active": "نشط",
+        "actions": "إجراءات"
+      },
+      "schedulingMode": {
+        "exact": "وقت محدد",
+        "window": "فترة زمنية"
+      },
+      "form": {
+        "addTitle": "إضافة خدمة",
+        "editTitle": "تعديل الخدمة",
+        "nameLabel": "اسم الخدمة",
+        "durationLabel": "المدة (دقائق)",
+        "priceLabel": "السعر (درهم)",
+        "schedulingModeLabel": "نمط الموعد",
+        "activeLabel": "خدمة نشطة",
+        "cancel": "إلغاء",
+        "save": "حفظ",
+        "close": "إغلاق",
+        "requiredError": "هذا الحقل إلزامي.",
+        "invalidNumberError": "قيمة رقمية غير صالحة."
+      }
+    },
+    "horaires": {
+      "pageTitle": "أوقات عمل العيادة",
+      "pageDescription": "أيام وساعات فتح العيادة.",
+      "editAction": "تعديل",
+      "closed": "مغلق",
+      "startLabel": "الفتح",
+      "endLabel": "الإغلاق",
+      "invalidError": "يجب أن يكون وقت الإغلاق بعد وقت الفتح لكل يوم مفتوح.",
+      "cancel": "إلغاء",
+      "save": "حفظ"
+    },
+    "numbering": {
+      "pageTitle": "الترقيم والمستندات",
+      "pageDescription": "تنسيق الترقيم الحالي لمستندات العيادة (للقراءة فقط).",
+      "readOnlyNote": "تتم إدارة الترقيم تلقائيًا وهو محمي من التكرار؛ لا يمكن تعديل إعداداته في هذا النموذج الأولي.",
+      "yearResetYes": "نعم",
+      "yearResetNo": "لا",
+      "table": {
+        "type": "النوع",
+        "prefix": "البادئة",
+        "yearReset": "إعادة تعيين سنوية",
+        "nextNumber": "الرقم التالي"
+      },
+      "sequence": {
+        "patient": "المرضى",
+        "employee": "الموظفون",
+        "invoice": "الفواتير",
+        "receipt": "الإيصالات"
+      }
+    },
+    "error": {
+      "title": "تعذر تحميل الإعدادات.",
+      "retry": "إعادة المحاولة"
+    }
+  },
   "admin": {
     "brand": "إدارة المنصة",
     "nav": {
