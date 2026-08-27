@@ -363,6 +363,39 @@ src/components/
             `movement-type.ts`, `movement-reason.ts`) mirror
             `expense-category.ts`/`cash-session-status.ts`'s exact
             label/icon/tone-registry split pattern.
+            `domain/communication/` (UI-009ABC) — the Communication Center
+            domain layer, replacing the generic Communication placeholder.
+            `types.ts`'s `CommunicationMessage` mirrors Spec #4 §24.2's
+            `communication_messages` row field-for-field, including its
+            own `queued`/`sent`/`delivered`/`failed` status ENUM — the
+            task's own model only hedged "pending" as a "Potential"
+            label and deferred to "the approved workflow." It
+            deliberately carries **no `direction` field**: the spec's
+            schema has none, every field it does define is inherently
+            outbound-shaped, and every message here is outbound by
+            construction (`docs/implementation/DECISIONS.md` ADR-007).
+            `patientId`/`appointmentId`/`invoiceId`/`installmentId` are
+            soft references resolved at render time by
+            `features/communication/messages.ts` against the *existing*
+            Patients/Agenda/Invoices fixtures — never a duplicate
+            universe. `CommunicationPurpose` (11 values, the union of
+            Spec #2 §39.1's template categories) is shared by both
+            `CommunicationMessage.purpose` and `MessageTemplate.purpose`
+            — one bounded vocabulary, not two independently drifting
+            ones. `MessageTemplate`/`CommunicationVariableKey` (a strict
+            10-key allowlist) back the pure `renderTemplate` function
+            (`features/communication/templates.ts`) — no `eval`, no
+            `dangerouslySetInnerHTML`; `MessageTemplate.variables` is
+            *derived* from `body`, never independently authored.
+            `AutomationRule` (7 fixed canonical `CommunicationEventType`s,
+            one per Spec #2 §40's own V1 rule list) exposes only an
+            active/inactive toggle in this prototype — the literal
+            reading of §40's own closing line, not a rule builder
+            (CLAUDE.md §3). Six registries (`channel.ts`,
+            `message-status.ts`, `purpose.ts`, `locale.ts`,
+            `variable.ts`, `event-type.ts`) mirror
+            `expense-category.ts`/`cash-session-status.ts`'s exact
+            label/icon/tone-registry split pattern.
 
 src/features/
   today/    Aujourd'hui screen composition (UI-001): `types.ts` (mock
@@ -1175,6 +1208,98 @@ src/features/
             cabinet Lots & Expirations browsing list) deliberately keeps
             it visible — two different, intentional views of the same
             underlying rows, not an inconsistency.
+
+  communication/
+            Communication Center (UI-009ABC), replacing the generic
+            Communication placeholder at `/app/communication` — Vue
+            d'ensemble/Messages/Modèles/Automatisations, executed as
+            three gates against one shared 14-message/10-template/
+            7-rule fixture universe (`mock-messages-data.ts`/
+            `mock-templates-data.ts`/`mock-automation-rules-data.ts`,
+            fixture-integrity tested for internal consistency and
+            cross-referenced against the *existing* Patients/Agenda/
+            Invoices fixtures — never a duplicate patient/appointment/
+            invoice universe). `communication.ts` (status-semantics
+            validity, channel/status filter matchers, newest-first
+            sort), `messages.ts` (patient/appointment/invoice row
+            resolution, search matching), `templates.ts` (variable
+            extraction, the pure `renderTemplate` substitution
+            function), `automations.ts` (rule sort/resolve/toggle),
+            `dashboard.ts` (KPI/attention-row derivation), `operations.ts`
+            (retry/send-message pure functions) are the pure function
+            layer every screen composes — no component computes a
+            status, a rendered message body, or a KPI inline.
+            `CommunicationNav` (Vue d'ensemble/Messages/Modèles/
+            Automatisations) mirrors `StockNav`'s exact
+            `usePathname`-prefix `Tabs` usage, grown one tab per gate
+            (Gate 1 shipped only "Messages"; Gate 2 added
+            Modèles/Automatisations; Gate 3 added Vue d'ensemble last,
+            once its own dashboard route existed — a nav never lists a
+            tab whose route doesn't exist yet). `messages-page.tsx`
+            (`/app/communication/messages`) opens a read-only
+            `MessageDetailDrawer` (`Dialog variant="drawer"`, mirrors
+            `PaymentDetailDrawer`) rather than navigating to a separate
+            detail page — its own Retry button stays dormant (no
+            `onRetry` handler) until Gate 3 wires it up, deliberately
+            matching the task's own "Retry becomes operational in Gate
+            3" instruction. `templates-page.tsx`
+            (`/app/communication/templates`) reproduces Spec #9 Screen
+            42's editor exactly (Nom/Canal/Langue/Message/VARIABLES/
+            APERÇU); its Add and Edit dialogs are two separate
+            `TemplateFormDialog` instances (only one ever has `open`
+            true), and the Edit instance is `key`-ed by the target
+            template's id so switching rows always remounts with fresh
+            `useState` initial values instead of leaking the
+            previously-selected template's own form state — a real bug caught by
+            the edit-flow test, not merely anticipated.
+            `automations-page.tsx` (`/app/communication/automations`)
+            renders the seven fixed `AutomationRule` rows with only an
+            active/inactive toggle editable. `communication-dashboard.tsx`
+            (`/app/communication`) composes the three KPIs, the
+            Failed/Pending attention sections, and the bounded Send
+            Message `Combobox`-driven compose dialog.
+
+            **The required cross-communication chain**, enforced by
+            construction and proven end to end by
+            `cross-communication-integrity.test.ts`:
+
+            ```text
+            CommunicationMessage[] (source of truth, Spec #4 §24.2)
+                    |
+                    +---------------------------+
+                    v                            v
+            dashboard.ts: computeCommunicationKpis   messages.ts: buildMessageRows
+              (failed/queued/recentVolume counts)       (patient/appointment/invoice
+                    |                                    resolution, shared by every
+                    v                                    screen — Messages workspace,
+            dashboard.ts: getFailedMessageRows /         dashboard attention sections)
+              getQueuedMessageRows
+              (same filter+sort as the KPI counts,
+               never a second derivation)
+                    |
+                    v
+            operations.ts: retryMessage / buildSentMessage
+              (the only two functions that ever mutate a message's own
+               status — retry re-queues, never fabricates "delivered";
+               a manual send always records "sent," never "delivered")
+                    |
+                    v
+            dashboard.ts: computeCommunicationKpis (recomputed)
+              (every KPI/attention-list update flows from the same
+               source array — no reconciliation step required)
+            ```
+
+            `MessageTemplate.purpose` and `CommunicationMessage.purpose`
+            share the single `CommunicationPurpose` vocabulary
+            (`components/domain/communication/purpose.ts`) rather than
+            two independently drifting enums — a message composed from
+            a template always inherits that template's own purpose
+            (`buildSentMessage`'s `template?.purpose ?? "custom_operational"`
+            fallback), and `AutomationRule.templateId` is proven, by a
+            dedicated integrity test, to always resolve to a real
+            template whose own `channel` matches the rule's `channel`
+            and whose own `active` flag agrees whenever the rule itself
+            is active.
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,

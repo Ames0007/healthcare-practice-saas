@@ -428,3 +428,98 @@ tell "deliberate default" from "accidental gap."
 ### Date
 
 2026-08-27
+
+------------------------------------------------------------------------
+
+## ADR-007 — UI-009ABC Communication Center: outbound-only messages, retry re-queues rather than fabricating success, and a 7-day volume window
+
+### Status
+
+Accepted
+
+### Decision
+
+Three related prototype-scoping decisions made while implementing the
+Communication Center module, recorded here per CLAUDE.md §1/§59:
+
+1.  **`CommunicationMessage` carries no `direction` field.** UI-009ABC's
+    own task instructions (§10) hedge direction as "Potential:
+    outbound/inbound" and explicitly say not to invent inbound WhatsApp
+    conversation management when V1 only requires outbound operational
+    communication. Spec #4 §24.2's own `communication_messages` schema
+    has no direction column at all — every field (`recipient`,
+    `resolved_body`, `template_id`) is inherently outbound-shaped. Every
+    message in this domain is therefore outbound by construction; adding
+    an always-`"outbound"` field would be a no-op enrichment with no
+    behavior behind it.
+2.  **Retry re-queues a failed message rather than marking it
+    sent/delivered.** `retryMessage` (`features/communication/operations.ts`)
+    moves a failed message back to `"queued"` and clears its failure
+    metadata — it never fabricates a successful outcome. UI-009ABC §12
+    is explicit that message status is prototype metadata only ("No real
+    provider acknowledgment exists... Do not claim real delivery"); a
+    retry action that jumped straight to "delivered" would violate that
+    rule on the one path a user can trigger interactively.
+3.  **`MESSAGE_VOLUME_WINDOW_DAYS = 7` is an explicit prototype
+    default**, distinct from Stock's own 30-day
+    `EXPIRY_WARNING_HORIZON_DAYS` (`features/communication/dashboard.ts`).
+    Neither UI-009ABC nor the specs name a volume-KPI window for
+    Communication; patient messaging happens at daily/hourly cadence
+    (appointment reminders, confirmations), not the weekly-to-monthly
+    cadence stock movements follow, so reusing Stock's 30-day constant
+    verbatim would make the KPI far less informative. A 7-day rolling
+    window is used as a documented placeholder, not a silently invented
+    one.
+
+### Context
+
+None of the three carries security/data-integrity risk (nothing persists
+past the browser session), so none met the CLAUDE.md §63 bar to stop and
+ask — but all three shape visible behavior (whether an inbound-conversation
+UI exists at all, what a retry click actually does, which messages count
+toward the dashboard's volume KPI), so recording them prevents a future
+contributor from mistaking a deliberate default for an oversight.
+
+A fourth, smaller scoping call from the same task — `AutomationRule`'s
+"bounded configuration prototype" (§11) exposes only an active/inactive
+toggle per canonical event type, with channel/template staying read-only
+— is a direct, literal reading of Spec #2 §40's own closing line ("Owner
+can configure whether each automation is active") rather than an
+independent judgment call, so it is noted here for completeness but not
+given its own numbered decision.
+
+### Alternatives
+
+1.  Add a `direction` field defaulting to `"outbound"` everywhere —
+    rejected: dead weight with no inbound code path to distinguish it
+    from, contradicting the task's own instruction not to invent one.
+2.  Have retry immediately mark the message `"delivered"` (the
+    optimistic, more visually satisfying outcome) — rejected: directly
+    contradicts §12's "do not claim real delivery" rule; a `"sent"`
+    outcome was also considered and rejected for the same reason — the
+    prototype has no real provider round-trip to justify claiming either
+    outcome, so re-queuing is the only honest representation.
+3.  Reuse Stock's existing 30-day window constant instead of a second
+    one — rejected: the two domains have genuinely different natural
+    cadences, and a 30-day communication-volume KPI would read as near-
+    constant for a small cabinet, defeating its own purpose as an
+    at-a-glance operational signal.
+4.  **Chosen:** implement all three as documented, reversible defaults.
+
+### Consequences
+
+- If a future real integration needs inbound messages (patient replies),
+  `direction` can be added at that point without touching any existing
+  outbound message — nothing in this prototype assumes the field's
+  absence beyond simply not reading it.
+- If the real retry semantics differ (e.g. an immediate synchronous
+  provider call that can genuinely confirm success/failure), only
+  `retryMessage` and its call sites change — the rest of the message
+  model is unaffected.
+- If a different volume window is adopted, only
+  `MESSAGE_VOLUME_WINDOW_DAYS` changes; the dashboard KPI is its only
+  consumer.
+
+### Date
+
+2026-08-27

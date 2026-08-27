@@ -2161,3 +2161,126 @@ All notable changes to this project are documented in this file.
   depleted lots, distinct from the dashboard's narrower actionable-alert
   subset). Backend regression (10 tests, 26 assertions, clean)
   unaffected — no backend files touched.
+
+- UI-009ABC — Communication Center: Message History, Templates &
+  Automation Rules, Communication Dashboard. Replaces the generic
+  Communication placeholder with a real cabinet communication prototype
+  at `/app/communication` (Vue d'ensemble/Messages/Modèles/
+  Automatisations, `CommunicationNav` mirroring `StockNav`'s exact
+  one-tab-per-gate growth history), executed as three sequential gates
+  against one shared 14-message/10-template/7-rule fixture universe —
+  no contradictory duplicate mock data anywhere, verified by
+  `cross-communication-integrity.test.ts`. `nav.communication` already
+  read "Communication" — no sidebar rename needed this time.
+
+  **Domain-wide discipline.** `CommunicationMessage`
+  (`components/domain/communication/types.ts`) mirrors Spec #4 §24.2's
+  `communication_messages` row field-for-field, including its own
+  `queued`/`sent`/`delivered`/`failed` status ENUM — the task's own
+  model only hedged "pending" as a "Potential" label and explicitly
+  deferred to "the approved workflow," which the spec names as
+  `queued`. The type deliberately carries **no `direction` field**:
+  the spec's own schema has none, every field it does define
+  (`recipient`/`resolved_body`/`template_id`) is inherently
+  outbound-shaped, and the task itself warns not to invent inbound
+  WhatsApp conversation management when V1 only needs outbound
+  operational communication — recorded as `docs/implementation/DECISIONS.md`
+  ADR-007. Every `patientId`/`appointmentId`/`invoiceId`/`installmentId`
+  is a soft reference resolved at render time against the *existing*
+  Patients/Agenda/Invoices fixtures — never a duplicate universe
+  (CLAUDE.md §12). A pre-existing, already-documented split matters
+  here: Patients' own `Patient[]` and Agenda's separately-seeded
+  `AgendaAppointment[]` only agree on identity for `{pat-1..pat-5}`
+  (Ahmed/Sara/Fatima/Youssef/Karim); every fixture message pairing a
+  `patientId` with an `appointmentId` stays inside that safe range,
+  never crossing into the two fixture sets' diverging names beyond it.
+
+  **Gate 1 — Message History.** `CommunicationPurpose` (11 values, the
+  union of Spec #2 §39.1's template categories) drives the message
+  history table's "Type" column and doubles as `MessageTemplate.purpose`
+  in Gate 2 — one shared bounded vocabulary, never two independently
+  drifting ones. The Messages workspace (`/app/communication/messages`)
+  offers search (patient name/number/recipient phone, reusing the
+  existing `normalizePhoneDigits` helper) plus Canal/Statut filters —
+  matching Spec #9 Screen 41's own wireframe exactly, deliberately
+  *not* adding the task's own hedged, optional "Type" filter the spec
+  wireframe itself omits. Selecting a row opens a read-only detail
+  drawer (`Dialog variant="drawer"`, mirroring `PaymentDetailDrawer`'s
+  exact shape) showing channel/recipient/timestamps/body plus real
+  navigation into the patient's *existing* appointments/invoices tabs
+  and Patient 360° — never a duplicate view of any of them. 14
+  centralized synthetic messages demonstrate every status, both
+  channels, and every purpose category the task's own §13 names,
+  cross-linked to real `pat-1`/`pat-4`/`pat-9` invoices and real
+  `apt-2`/`apt-4`/`apt-5`/`apt-6`/`apt-7`/`apt-14` appointments.
+
+  **Gate 2 — Templates & Automation Rules.** `renderTemplate`
+  (`features/communication/templates.ts`) is a pure substitution
+  function over a strict 10-key variable allowlist (the union of the
+  task's own §26 list and Spec #2 §39.2's) — no `eval`, no
+  `dangerouslySetInnerHTML`, no arbitrary expression evaluation. A
+  known variable missing its context value renders a deterministic "—"
+  placeholder rather than an empty string that could misread as real
+  (but blank) content; an unrecognized `{{token}}` is left exactly as
+  written, never interpreted. `MessageTemplate.variables` is *derived*
+  from `body` (`extractVariablesFromBody`), never independently
+  authored, so a template's declared variables can never drift from
+  what its own body actually references. The Templates workspace
+  (`/app/communication/templates`) reproduces Spec #9 Screen 42's
+  editor exactly — Nom/Canal/Langue/Message, a clickable VARIABLES
+  reference list, and a live APERÇU rendered against a fixed sample
+  context — alongside a card-based list (Name/Channel/Locale/Active,
+  `[Modifier]`); the edit dialog is keyed by template id so switching
+  the edit target between rows always remounts with fresh form state
+  rather than leaking the previous target's values (a real bug caught
+  and fixed while writing the edit-flow test). `AutomationRule` (7
+  fixed canonical `CommunicationEventType`s, one per Spec #2 §40's own
+  V1 rule list) exposes only an active/inactive toggle per row — the
+  literal reading of §40's own closing line ("Owner can configure
+  whether each automation is active"), deliberately not a rule builder
+  that creates/deletes arbitrary event types (CLAUDE.md §3). 10
+  centralized template fixtures include an Arabic one (`tpl-3`,
+  reproducing Screen 42's own "تذكير بالموعد" / WhatsApp / AR example
+  verbatim) and one deliberately inactive template (`tpl-8`) whose sole
+  referencing automation rule is also inactive — proven coherent by a
+  dedicated integrity test rather than assumed.
+
+  **Gate 3 — Communication Dashboard & Operational Actions.**
+  `/app/communication` shows three KPIs — failed messages, queued
+  messages, and a 7-day send/deliver volume window
+  (`MESSAGE_VOLUME_WINDOW_DAYS`, an explicit prototype default distinct
+  from Stock's own 30-day window since patient messaging runs at
+  daily/hourly cadence, not weekly — ADR-007) — plus Failed/Pending
+  operational-attention sections, every figure reconciling exactly with
+  `cross-communication-integrity.test.ts`. Retry becomes operational
+  here on two surfaces sharing one pure function
+  (`retryMessage`): the dashboard's own inline Failed-section button,
+  and the Gate 1 detail drawer's own retry button, deliberately left
+  dormant (no `onRetry` handler passed) until this gate. Retrying
+  re-queues a failed message and clears its failure metadata — it
+  never fabricates a successful "sent"/"delivered" outcome, since no
+  real provider acknowledgment exists in this prototype (§12, ADR-007).
+  The bounded Send Message dialog composes exactly one message to one
+  existing patient via the existing searchable `Combobox` primitive;
+  selecting an active template renders its body against the *real*
+  selected patient's own identity/practitioner fields, while
+  appointment/invoice-specific tokens correctly render "—" since this
+  compose flow has no appointment/invoice picker (never a fabricated
+  value). Submitting records a synchronous local `"sent"` message —
+  never `"delivered"` — updating only local page state, no persistence.
+
+  No real WhatsApp/SMS provider, no Meta/Twilio/provider integration,
+  no message delivery network calls, no queues, no webhooks, no
+  Laravel integration, no database changes, no AI-generated patient
+  messaging, no marketing campaigns, no bulk/unsolicited messaging, no
+  LocalStorage/global persistence, no API calls. 134 net new tests
+  (1144 total, up from the UI-008ABCD baseline of 1010), typecheck,
+  lint and build pass on the first full-suite run after fixing several
+  self-caught issues while authoring targeted tests (several template
+  names were initially identical to their own purpose label, making
+  list rows ambiguous — renamed to distinct names; the edit-dialog
+  remount bug above; a destructuring mistake in the cross-integrity
+  test itself — `retryMessage` returns the *whole* array, not just the
+  retried message — caught by the test's own failure, not silently
+  passed). Backend regression (10 tests, 26 assertions, clean)
+  unaffected — no backend files touched.

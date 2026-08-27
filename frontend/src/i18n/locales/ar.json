@@ -1444,6 +1444,181 @@
       "retry": "إعادة المحاولة"
     }
   },
+  "communication": {
+    "nav": {
+      "navigationLabel": "تنقل التواصل",
+      "overview": "نظرة عامة",
+      "messages": "الرسائل",
+      "templates": "النماذج",
+      "automations": "الأتمتة"
+    },
+    "channel": {
+      "whatsapp": "واتساب",
+      "sms": "رسالة نصية"
+    },
+    "locale": {
+      "fr": "الفرنسية",
+      "ar": "العربية"
+    },
+    "variable": {
+      "patient_first_name": "الاسم الأول للمريض",
+      "patient_name": "اسم المريض",
+      "appointment_date": "تاريخ الموعد",
+      "appointment_time": "وقت الموعد",
+      "practitioner_name": "اسم الممارس",
+      "cabinet_name": "اسم العيادة",
+      "invoice_number": "رقم الفاتورة",
+      "amount_due": "المبلغ المستحق",
+      "remaining_balance": "الرصيد المتبقي",
+      "installment_due_date": "تاريخ استحقاق الدفعة"
+    },
+    "eventType": {
+      "appointment_confirmed": "تأكيد الموعد",
+      "appointment_reminder": "تذكير بالموعد",
+      "appointment_modified": "تعديل الموعد",
+      "appointment_cancelled": "إلغاء الموعد",
+      "payment_recorded": "تسجيل الدفع",
+      "installment_due": "دفعة مستحقة قريباً",
+      "installment_overdue": "دفعة متأخرة"
+    },
+    "status": {
+      "queued": "قيد الانتظار",
+      "sent": "أُرسلت",
+      "delivered": "تم التسليم",
+      "failed": "فشل"
+    },
+    "purpose": {
+      "appointment_confirmation": "تأكيد الموعد",
+      "appointment_reminder": "تذكير بالموعد",
+      "appointment_change": "تعديل الموعد",
+      "appointment_cancellation": "إلغاء الموعد",
+      "booking_request_response": "الرد على طلب الموعد",
+      "payment_confirmation": "تأكيد الدفع",
+      "installment_reminder": "تذكير بالدفعة",
+      "overdue_payment_reminder": "تذكير بتأخر الدفع",
+      "follow_up": "متابعة",
+      "next_session_reminder": "تذكير بالجلسة",
+      "custom_operational": "رسالة تشغيلية"
+    },
+    "messages": {
+      "pageTitle": "التواصل",
+      "pageDescription": "سجل الرسائل المرسلة إلى المرضى.",
+      "searchLabel": "البحث عن مريض / رقم / هاتف...",
+      "channelFilterLabel": "تصفية حسب القناة",
+      "channelFilterPlaceholder": "القناة: الكل",
+      "statusFilterLabel": "تصفية حسب الحالة",
+      "statusFilterPlaceholder": "الحالة: الكل",
+      "resultCount": "{{count}} رسالة",
+      "emptyAllTitle": "لا توجد رسائل حتى الآن.",
+      "emptyAllDescription": "سيظهر هنا سجل الرسائل المرسلة إلى المرضى.",
+      "searchEmptyTitle": "لا توجد رسالة مطابقة لمعاييرك.",
+      "filteredEmptyTitle": "لا توجد رسالة مطابقة لمعاييرك.",
+      "clearSearch": "مسح البحث",
+      "clearFilters": "مسح الفلاتر",
+      "view": "عرض",
+      "errorTitle": "تعذّر تحميل الرسائل.",
+      "errorRetry": "إعادة المحاولة",
+      "table": {
+        "patient": "المريض",
+        "type": "النوع",
+        "channel": "القناة",
+        "date": "التاريخ",
+        "status": "الحالة"
+      },
+      "drawer": {
+        "close": "إغلاق",
+        "channel": "القناة",
+        "recipient": "المستلم",
+        "created": "أُنشئت",
+        "sent": "أُرسلت",
+        "delivered": "تم التسليم",
+        "message": "الرسالة",
+        "relatedAppointment": "الموعد المرتبط",
+        "viewAppointment": "عرض الموعد",
+        "relatedInvoice": "الفاتورة المرتبطة",
+        "viewInvoice": "عرض الفاتورة",
+        "failureLabel": "فشل",
+        "openPatient": "فتح ملف المريض",
+        "retry": "إعادة المحاولة"
+      }
+    },
+    "templates": {
+      "pageTitle": "التواصل",
+      "pageDescription": "نماذج الرسائل المستخدمة في التواصل مع المرضى.",
+      "addButton": "+ نموذج جديد",
+      "edit": "تعديل",
+      "activeBadge": "نشط",
+      "inactiveBadge": "غير نشط",
+      "emptyTitle": "لا توجد نماذج حتى الآن.",
+      "emptyDescription": "أنشئ نموذجاً للبدء في إرسال رسائل نمطية.",
+      "errorTitle": "تعذّر تحميل النماذج.",
+      "errorRetry": "إعادة المحاولة",
+      "form": {
+        "addTitle": "نموذج جديد",
+        "editTitle": "تعديل النموذج",
+        "close": "إغلاق",
+        "nameLabel": "الاسم",
+        "purposeLabel": "النوع",
+        "channelLabel": "القناة",
+        "localeLabel": "اللغة",
+        "bodyLabel": "الرسالة",
+        "variablesTitle": "المتغيرات",
+        "previewTitle": "معاينة",
+        "previewEmpty": "أدخل نص الرسالة لعرض المعاينة.",
+        "cancel": "إلغاء",
+        "save": "حفظ",
+        "requiredError": "هذا الحقل إلزامي."
+      }
+    },
+    "automations": {
+      "pageTitle": "التواصل",
+      "pageDescription": "قواعد الإرسال التلقائي للرسائل.",
+      "activeBadge": "نشط",
+      "inactiveBadge": "غير نشط",
+      "noTemplate": "لا يوجد نموذج مرتبط",
+      "toggleLabel": "تفعيل أو تعطيل: {{name}}",
+      "timingDays": "قبل {{count}} يوم",
+      "timingHours": "قبل {{count}} ساعة",
+      "timingMinutes": "قبل {{count}} دقيقة",
+      "emptyTitle": "لا توجد أتمتة مُعدّة.",
+      "errorTitle": "تعذّر تحميل الأتمتة.",
+      "errorRetry": "إعادة المحاولة"
+    },
+    "dashboard": {
+      "pageTitle": "التواصل",
+      "pageDescription": "نظرة عامة على الرسائل والتنبيهات والإجراءات السريعة.",
+      "sendButton": "+ رسالة جديدة",
+      "errorTitle": "تعذّر تحميل لوحة التحكم.",
+      "errorRetry": "إعادة المحاولة",
+      "kpis": {
+        "failed": "رسائل فاشلة",
+        "queued": "رسائل قيد الانتظار",
+        "recentVolume": "الرسائل المرسلة (آخر 7 أيام)"
+      },
+      "failedSection": {
+        "title": "إخفاقات تحتاج إعادة محاولة",
+        "empty": "لا توجد رسائل فاشلة.",
+        "retry": "إعادة المحاولة"
+      },
+      "pendingSection": {
+        "title": "بانتظار الإرسال",
+        "empty": "لا توجد رسائل قيد الانتظار."
+      },
+      "sendForm": {
+        "title": "رسالة جديدة",
+        "close": "إغلاق",
+        "patientLabel": "المريض",
+        "patientEmpty": "لم يتم العثور على مريض.",
+        "templateLabel": "النموذج",
+        "templatePlaceholder": "بدون نموذج (رسالة حرة)",
+        "channelLabel": "القناة",
+        "bodyLabel": "الرسالة",
+        "cancel": "إلغاء",
+        "send": "إرسال",
+        "requiredError": "هذا الحقل إلزامي."
+      }
+    }
+  },
   "admin": {
     "brand": "إدارة المنصة",
     "nav": {

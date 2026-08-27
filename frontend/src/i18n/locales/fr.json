@@ -1444,6 +1444,181 @@
       "retry": "Réessayer"
     }
   },
+  "communication": {
+    "nav": {
+      "navigationLabel": "Navigation Communication",
+      "overview": "Vue d'ensemble",
+      "messages": "Messages",
+      "templates": "Modèles",
+      "automations": "Automatisations"
+    },
+    "channel": {
+      "whatsapp": "WhatsApp",
+      "sms": "SMS"
+    },
+    "locale": {
+      "fr": "Français",
+      "ar": "Arabe"
+    },
+    "variable": {
+      "patient_first_name": "Prénom du patient",
+      "patient_name": "Nom du patient",
+      "appointment_date": "Date du rendez-vous",
+      "appointment_time": "Heure du rendez-vous",
+      "practitioner_name": "Nom du praticien",
+      "cabinet_name": "Nom du cabinet",
+      "invoice_number": "Numéro de facture",
+      "amount_due": "Montant dû",
+      "remaining_balance": "Solde restant",
+      "installment_due_date": "Date d'échéance"
+    },
+    "eventType": {
+      "appointment_confirmed": "Rendez-vous confirmé",
+      "appointment_reminder": "Rappel de rendez-vous",
+      "appointment_modified": "Rendez-vous modifié",
+      "appointment_cancelled": "Rendez-vous annulé",
+      "payment_recorded": "Paiement enregistré",
+      "installment_due": "Échéance à venir",
+      "installment_overdue": "Échéance en retard"
+    },
+    "status": {
+      "queued": "En attente",
+      "sent": "Envoyé",
+      "delivered": "Livré",
+      "failed": "Échec"
+    },
+    "purpose": {
+      "appointment_confirmation": "Confirmation de rendez-vous",
+      "appointment_reminder": "Rappel de rendez-vous",
+      "appointment_change": "Modification de rendez-vous",
+      "appointment_cancellation": "Annulation de rendez-vous",
+      "booking_request_response": "Réponse à une demande de rendez-vous",
+      "payment_confirmation": "Confirmation de paiement",
+      "installment_reminder": "Rappel d'échéance",
+      "overdue_payment_reminder": "Rappel de retard de paiement",
+      "follow_up": "Suivi",
+      "next_session_reminder": "Rappel de séance",
+      "custom_operational": "Message opérationnel"
+    },
+    "messages": {
+      "pageTitle": "Communication",
+      "pageDescription": "Historique des messages envoyés aux patients.",
+      "searchLabel": "Rechercher patient / numéro / téléphone...",
+      "channelFilterLabel": "Filtrer par canal",
+      "channelFilterPlaceholder": "Canal : Tous",
+      "statusFilterLabel": "Filtrer par statut",
+      "statusFilterPlaceholder": "Statut : Tous",
+      "resultCount": "{{count}} message(s)",
+      "emptyAllTitle": "Aucun message pour le moment.",
+      "emptyAllDescription": "L'historique des messages envoyés aux patients apparaîtra ici.",
+      "searchEmptyTitle": "Aucun message ne correspond à vos critères.",
+      "filteredEmptyTitle": "Aucun message ne correspond à vos critères.",
+      "clearSearch": "Effacer la recherche",
+      "clearFilters": "Effacer les filtres",
+      "view": "Voir",
+      "errorTitle": "Impossible de charger les messages.",
+      "errorRetry": "Réessayer",
+      "table": {
+        "patient": "Patient",
+        "type": "Type",
+        "channel": "Canal",
+        "date": "Date",
+        "status": "Statut"
+      },
+      "drawer": {
+        "close": "Fermer",
+        "channel": "Canal",
+        "recipient": "Destinataire",
+        "created": "Créé",
+        "sent": "Envoyé",
+        "delivered": "Livré",
+        "message": "Message",
+        "relatedAppointment": "Rendez-vous associé",
+        "viewAppointment": "Voir le rendez-vous",
+        "relatedInvoice": "Facture associée",
+        "viewInvoice": "Voir la facture",
+        "failureLabel": "Échec",
+        "openPatient": "Ouvrir le patient",
+        "retry": "Réessayer"
+      }
+    },
+    "templates": {
+      "pageTitle": "Communication",
+      "pageDescription": "Modèles de messages utilisés pour les envois aux patients.",
+      "addButton": "+ Nouveau modèle",
+      "edit": "Modifier",
+      "activeBadge": "Actif",
+      "inactiveBadge": "Inactif",
+      "emptyTitle": "Aucun modèle pour le moment.",
+      "emptyDescription": "Créez un modèle pour commencer à envoyer des messages types.",
+      "errorTitle": "Impossible de charger les modèles.",
+      "errorRetry": "Réessayer",
+      "form": {
+        "addTitle": "Nouveau modèle",
+        "editTitle": "Modifier le modèle",
+        "close": "Fermer",
+        "nameLabel": "Nom",
+        "purposeLabel": "Type",
+        "channelLabel": "Canal",
+        "localeLabel": "Langue",
+        "bodyLabel": "Message",
+        "variablesTitle": "Variables",
+        "previewTitle": "Aperçu",
+        "previewEmpty": "Saisissez un message pour voir l'aperçu.",
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "requiredError": "Ce champ est obligatoire."
+      }
+    },
+    "automations": {
+      "pageTitle": "Communication",
+      "pageDescription": "Règles d'envoi automatique de messages.",
+      "activeBadge": "Actif",
+      "inactiveBadge": "Inactif",
+      "noTemplate": "Aucun modèle associé",
+      "toggleLabel": "Activer ou désactiver : {{name}}",
+      "timingDays": "{{count}} jour(s) avant",
+      "timingHours": "{{count}} heure(s) avant",
+      "timingMinutes": "{{count}} minute(s) avant",
+      "emptyTitle": "Aucune automatisation configurée.",
+      "errorTitle": "Impossible de charger les automatisations.",
+      "errorRetry": "Réessayer"
+    },
+    "dashboard": {
+      "pageTitle": "Communication",
+      "pageDescription": "Vue d'ensemble des messages, alertes et actions rapides.",
+      "sendButton": "+ Nouveau message",
+      "errorTitle": "Impossible de charger le tableau de bord.",
+      "errorRetry": "Réessayer",
+      "kpis": {
+        "failed": "Messages en échec",
+        "queued": "Messages en attente",
+        "recentVolume": "Messages envoyés (7 derniers jours)"
+      },
+      "failedSection": {
+        "title": "Échecs à relancer",
+        "empty": "Aucun message en échec.",
+        "retry": "Réessayer"
+      },
+      "pendingSection": {
+        "title": "En attente d'envoi",
+        "empty": "Aucun message en attente."
+      },
+      "sendForm": {
+        "title": "Nouveau message",
+        "close": "Fermer",
+        "patientLabel": "Patient",
+        "patientEmpty": "Aucun patient trouvé.",
+        "templateLabel": "Modèle",
+        "templatePlaceholder": "Aucun modèle (message libre)",
+        "channelLabel": "Canal",
+        "bodyLabel": "Message",
+        "cancel": "Annuler",
+        "send": "Envoyer",
+        "requiredError": "Ce champ est obligatoire."
+      }
+    }
+  },
   "admin": {
     "brand": "Platform Admin",
     "nav": {
