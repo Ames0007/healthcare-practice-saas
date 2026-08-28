@@ -733,3 +733,124 @@ accurate map of what the frontend prototype does — and does not — assume.
 ### Date
 
 2026-08-28
+
+------------------------------------------------------------------------
+
+## ADR-010 — UI-011ABC Subscription Lifecycle, Plans/Entitlements & Referral: two-tier plan catalog, deferred pricing, uniform entitlement booleans, and a page-scoped Blackout screen
+
+### Status
+
+Accepted
+
+### Decision
+
+Six related prototype-scoping decisions made while implementing the
+Subscription/Plans/Referral module, recorded here per CLAUDE.md §1/§59:
+
+1.  **Only two plans are modeled — `solo` and `cabinet` — never a third
+    "Cabinet+ / Pro" tier.** Spec #2 §50 names it only as "if needed,"
+    the sole mention anywhere, with zero concrete entitlement or pricing
+    data to back it. Inventing numbers for a third tier to fill a
+    comparison table would violate the task's own explicit "Do NOT
+    invent... usage limits... entitlement matrices" constraint.
+    `max_practitioners`/`max_staff` limits for the two real plans are not
+    invented either: Cabinet's (3/5) reproduce Spec #9 Screen 47's own
+    worked example verbatim; Solo's practitioner cap (1) is the plan's
+    own defining characteristic, not a commercial number.
+2.  **`PlanPrice.amount` is `undefined` on every row, for both plans and
+    both billing periods.** Spec #2 §50's own words: "Actual MAD prices
+    remain a commercial decision requiring market validation." The
+    Plans page renders "À définir" rather than either inventing a figure
+    or omitting the price row entirely — the row exists (matching the
+    real schema shape, Spec #4 §28.2) but honestly carries no number.
+3.  **Boolean entitlements (`inventory_enabled`/`hr_enabled`/
+    `commission_enabled`) are `true` on both plans.** Stock/Pharmacie
+    (UI-008), Équipe/HR (UI-007) and Commissions (UI-007CDEF) are already
+    fully built and reachable from the sidebar for every tenant
+    regardless of any subscription state — no existing screen in this
+    prototype actually gates on plan. Presenting a plan-differentiated
+    boolean here would contradict the rest of the application rather
+    than describe it; only the two wireframe/definition-evidenced
+    numeric limits (practitioners/staff) actually differ between Solo
+    and Cabinet.
+4.  **`storage_bytes` carries no `limitValue` on either plan.** Spec #9
+    Screen 47's own wireframe shows "Stockage ..." with a literal
+    ellipsis — no figure is given anywhere. `UsageRow`
+    (`features/subscription/components/usage-row.tsx`) renders a neutral
+    "Non défini dans ce prototype" placeholder instead of a 0%/invented
+    bar, which would visually assert a limit that does not exist.
+5.  **`SubscriptionHistoryEvent` excludes `subscription_payments`
+    entirely** (Spec #4 §28.5) — that table stores real
+    provider/amount/reference fields this prototype has no honest way to
+    populate, since no payment ever actually occurs here (task's hard
+    "NO real billing" constraint). History is bounded to the task's own
+    explicit list — trial started/activated/renewed/plan changed — plus
+    `referral_reward_applied`, the one cross-domain event Gate 3's own
+    reconciliation requires.
+6.  **The Blackout screen (Spec #9 Screen 49: "No operational sidebar")
+    is a presentational state of `/app/abonnement` itself, not a global
+    app-shell gate.** `SubscriptionPage` renders the full takeover layout
+    (no `PageHeader`/`SubscriptionNav`/Usage/History) when its own
+    `subscription.status === "blackout"`, but the *global* sidebar
+    (`AppShell`/`NAV_ITEMS`) is untouched — wiring a site-wide
+    subscription check into every route is exactly the "repository-wide
+    enforcement" the task explicitly defers to "later
+    integration/hardening" (task §31/§9: frontend entitlement UX is
+    never authoritative; the future Laravel backend, not this
+    prototype's navigation, is what must actually block operational
+    routes during blackout, per WF-56's own "Backend must block APIs,
+    not only frontend navigation").
+
+### Context
+
+None of the six carries security/data-integrity risk on its own — they
+are all product-scope/invention-boundary calls, the same category as
+UI-010ABC's "no invented confirmation rate" and UI-010BC's "no invented
+tenant fields" (ADR-008 §context, ADR-009). All six shape what a reader
+might mistake for a real commercial policy (a price, a limit, a payment
+record, a global access gate) if left undocumented, so recording them
+here matters more than usual for this particular module.
+
+### Alternatives
+
+1.  Invent plausible MAD prices / a third plan tier to make the
+    comparison table feel commercially complete — rejected outright: the
+    task's own hard constraint list names "plan names" and "prices"
+    explicitly, and Spec #2 §50 explicitly defers pricing to a future
+    "market validation" decision.
+2.  Differentiate boolean entitlements between Solo and Cabinet (e.g.
+    `hr_enabled: false` for Solo) to give the Feature-Lock UX (task §31)
+    more to demonstrate — rejected: no other part of this prototype
+    actually restricts Stock/HR/Commissions by plan, so doing it only
+    here would be a contradiction, not a preview of real behavior. The
+    practitioner-limit-exceeded scenario (Solo's real 1-practitioner cap
+    against the real fixture's 2 active practitioners) already gives
+    `EntitlementLimitNotice` a genuine, non-fabricated case to render.
+3.  Suppress the global `AppShell` sidebar when the demo subscription is
+    blackout — rejected: no subscription-state context exists anywhere
+    else in the app to drive that (every other route renders
+    independently), and building one purely to hide a sidebar during a
+    single demo state would be exactly the "repository-wide
+    refactor"/"retrofit every existing screen" scope creep the task
+    explicitly warns against.
+
+### Consequences
+
+- If a future task adds real pricing, `PlanPrice.amount` gains real
+  numbers at that point — the field/UI seam already exists and needs no
+  shape change, just population.
+- If a future task makes any existing module genuinely plan-gated (e.g.
+  Commissions becomes Cabinet-only), `getPlanEntitlementsMockData` is the
+  one place to flip that boolean — no scattered `if (plan === ...)`
+  checks exist anywhere else to hunt down and update (Spec #5 §39).
+- If a future task builds a real public-booking submission flow, Gate
+  1's own Rendez-vous-style reasoning applies again: only add a setting
+  once a real consumer exists for it.
+- If backend subscription-blackout middleware ships, the frontend's own
+  global route-blocking behavior is a new, separate task — this ADR's
+  point 6 is the explicit record that `/app/abonnement`'s own
+  presentation was never meant to substitute for it.
+
+### Date
+
+2026-08-28

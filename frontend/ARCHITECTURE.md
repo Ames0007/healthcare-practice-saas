@@ -440,6 +440,29 @@ src/components/
             the three introduces a bounded-vocabulary field beyond types
             already covered elsewhere (`AppointmentSchedulingType`,
             `PaymentMethod`, `PreferredLanguage`).
+            `domain/subscription/` (UI-011ABC) — `Subscription`
+            (6-status lifecycle, CLAUDE.md §11/Spec #4 §28.4 verbatim),
+            `SubscriptionPlan`/`PlanPrice`/`PlanEntitlement` (Spec #4
+            §28.1-28.3). Deliberately separate from `domain/settings/`:
+            Subscription is the platform-tenant commercial relationship,
+            never operational cabinet configuration (task §8). Only two
+            `PlanCode` values exist (`solo`/`cabinet` — no invented
+            "Cabinet+" tier, ADR-010 §1); `PlanPrice.amount` is always
+            `undefined` (pricing is an explicitly deferred commercial
+            decision, ADR-010 §2). `SubscriptionHistoryEvent` is a
+            read-model row bounded to 5 event types — deliberately
+            excludes Spec #4 §28.5 `subscription_payments` (ADR-010 §5).
+            `domain/referral/` (UI-011ABC) — `Referral`/`ReferralReward`
+            (Spec #4 §29, all 6 `ReferralStatus` values). A separate
+            SaaS-domain concept from `domain/subscription/`, related only
+            through `ReferralReward` feeding one `SubscriptionHistoryEvent`
+            (proven by `cross-subscription-integrity.test.ts`, never a
+            shared entity). `ReferralRewardType` has exactly one value
+            anywhere in the approved specifications
+            (`free_subscription_time`) — never an invented cash/discount
+            type. `Referral.referredTenantName` is a frontend read-model
+            enrichment (no second-tenant record exists to join against in
+            this prototype), documented as such in its own doc comment.
 
 src/features/
   today/    Aujourd'hui screen composition (UI-001): `types.ts` (mock
@@ -1421,6 +1444,57 @@ src/features/
             `method` matches Finance's own payment fixtures' `method`,
             and that the Documents footer derives live from the Cabinet
             profile fixture.
+
+  subscription/
+            SaaS Subscription Lifecycle & Plans/Entitlements (UI-011ABC
+            Gates 1-2), replacing the generic catch-all placeholder at
+            `/app/abonnement` (already a real sidebar entry,
+            `lib/nav-config.ts` — never a competing route). `SubscriptionNav`
+            (Abonnement/Plans/Parrainage) is never added to the global
+            sidebar itself (task §45) — mirrors `ParametresNav`'s own
+            one-sidebar-entry-many-internal-tabs shape.
+            `mock-subscription-data.ts`'s `buildSubscriptionFixture`
+            builds every one of the 6 lifecycle states from one base plus
+            `addDaysIso` offsets — never an independently typed date
+            literal — so e.g. the grace fixture's own
+            `graceEndsAt = currentPeriodEnd + GRACE_PERIOD_DAYS` is
+            provably consistent with `subscription-lifecycle.ts`'s own
+            spec-derived constant, proven by `mock-subscription-data.test.ts`.
+            `entitlements.ts` (`hasEntitlement`/`getEntitlementLimit`/
+            `getUsageState`) is the *only* place any component reads plan
+            access — no component compares a plan code/name string
+            directly (Spec #5 §39). `usage.ts` derives real usage from
+            Équipe's own `TeamMember` fixtures (`countActivePractitioners`/
+            `countActiveStaff`) rather than hardcoding a numerator (task
+            §27). `subscription-page.tsx` renders Screen 49's Blackout
+            takeover as one of its own conditional branches (no
+            `PageHeader`/nav/Usage/History) — a page-scoped presentational
+            state, not a global app-shell gate (ADR-010 §6).
+            `plans-page.tsx`'s `EntitlementLimitNotice`
+            (`components/entitlement-limit-notice.tsx`) has one real,
+            non-fabricated case to render: Solo's own 1-practitioner limit
+            against the real fixture's 2 active practitioners. Both
+            "Renouveler" and "Choisir ce plan" open the same informational
+            `ConfirmDialog` — neither ever mutates `Subscription` state
+            (task §20/§29: no fake payment, no local checkout simulation).
+
+  referral/
+            Parrainage (UI-011ABC Gate 3), `/app/abonnement/parrainage`.
+            `referral-code.ts`'s `buildReferralCode`/`buildReferralLink`
+            are deterministic (not cryptographically random — a real
+            backend generator is a future concern) and reproduce Spec #9
+            Screen 50's own `app.ma/r/{code}` format exactly.
+            `mock-referral-data.ts`'s referral code derives from the same
+            Cabinet profile fixture Cabinet Settings/Documents already
+            read (`getCabinetProfileMockData`) — never an independently
+            invented code. `rewards.ts`'s `computeAppliedRewardMonths`/
+            `findRewardForReferral` are the only functions that read
+            `ReferralReward` — `referral-page.tsx` composes a qualified
+            referral's status badge with its own real applied reward's
+            "+N mois" rather than inventing a 7th status label for
+            "qualified and rewarded." The page's Copy action uses the real
+            Clipboard API (`navigator.clipboard.writeText`) with a `Toast`
+            confirmation — no tracking network call, no fake share flow.
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,

@@ -1865,6 +1865,126 @@
       "retry": "إعادة المحاولة"
     }
   },
+  "abonnement": {
+    "nav": {
+      "navigationLabel": "تنقل الاشتراك",
+      "abonnement": "الاشتراك",
+      "plans": "الخطط",
+      "parrainage": "الإحالة"
+    },
+    "pageTitle": "اشتراكي",
+    "pageDescription": "حالة اشتراكك والاستخدام والسجل.",
+    "daysRemaining": "(متبقي {{count}} يوم)",
+    "status": {
+      "trialing": "تجريبي",
+      "active": "نشط",
+      "expired": "منتهي",
+      "grace": "مهلة سماح",
+      "blackout": "موقوف",
+      "cancelled": "ملغى"
+    },
+    "billingPeriod": {
+      "monthly": "شهري",
+      "annual": "سنوي"
+    },
+    "plan": {
+      "planLabel": "الخطة",
+      "statusLabel": "الحالة",
+      "periodLabel": "الفترة",
+      "renewalLabel": "التجديد القادم",
+      "trialEndLabel": "نهاية الفترة التجريبية",
+      "expiredAtLabel": "انتهى في",
+      "graceEndLabel": "الإيقاف المتوقع في",
+      "cancelledAtLabel": "أُلغي في"
+    },
+    "banner": {
+      "expiringSoon": "ينتهي اشتراكك خلال {{count}} يوم.",
+      "grace": "انتهى اشتراكك. تبقى {{count}} يوم قبل الإيقاف."
+    },
+    "actions": {
+      "renew": "تجديد / إدارة"
+    },
+    "renewDialog": {
+      "title": "تجديد الاشتراك",
+      "description": "سيتم ربط تغيير الخطة بالفوترة الخاصة بالمنصة لاحقًا.",
+      "cancel": "إلغاء",
+      "confirm": "فهمت"
+    },
+    "toast": {
+      "acknowledged": "تم أخذ الرسالة بعين الاعتبار."
+    },
+    "usage": {
+      "sectionTitle": "الاستخدام",
+      "practitioners": "الممارسون",
+      "staff": "الموظفون",
+      "storage": "التخزين",
+      "undefinedLimit": "غير محدد في هذا النموذج الأولي",
+      "overLimitNote": "تم تجاوز حد الخطة — انتقل إلى خطة أعلى."
+    },
+    "history": {
+      "sectionTitle": "السجل",
+      "event": {
+        "trial_started": "بدأت الفترة التجريبية",
+        "activated": "تم تفعيل الاشتراك",
+        "renewed": "تم تجديد الاشتراك",
+        "plan_changed": "تغيير الخطة",
+        "referral_reward_applied": "تم تطبيق مكافأة الإحالة (+{{count}} شهر)"
+      }
+    },
+    "blackout": {
+      "title": "انتهى اشتراكك",
+      "description": "تم إيقاف وصولك التشغيلي.",
+      "dataPreserved": "تبقى بياناتك محفوظة.",
+      "renewAction": "تجديد اشتراكي",
+      "supportAction": "الاتصال بالدعم",
+      "logoutAction": "تسجيل الخروج"
+    },
+    "plans": {
+      "pageTitle": "الخطط",
+      "pageDescription": "قارن بين الخطط المتاحة.",
+      "currentUsage": "الاستخدام الحالي: {{practitioners}} ممارس نشط، {{staff}} موظف نشط.",
+      "priceTbd": "سيُحدد لاحقًا",
+      "included": "مُدرج",
+      "notIncluded": "غير مُدرج",
+      "currentPlan": "الخطة الحالية",
+      "choosePlan": "اختر هذه الخطة",
+      "limitBlocksSelection": "غير متاح: {{used}} ممارس نشط يتجاوز حد هذه الخطة ({{limit}}).",
+      "row": {
+        "price": "السعر",
+        "inventory_enabled": "الصيدلية والمخزون",
+        "hr_enabled": "الموارد البشرية / الفريق",
+        "commission_enabled": "العمولات"
+      }
+    },
+    "parrainage": {
+      "pageTitle": "الإحالة",
+      "pageDescription": "ادعُ زميلًا. عندما يصبح مشتركًا، تكسب شهرًا مجانيًا.",
+      "codeLabel": "رمزك",
+      "linkLabel": "رابطك",
+      "copyAction": "نسخ الرابط",
+      "listTitle": "إحالاتك",
+      "emptyTitle": "لا توجد إحالات حتى الآن.",
+      "emptyDescription": "شارك رابطك لدعوة زميل.",
+      "unknownTenant": "عيادة غير معروفة",
+      "monthUnit": "شهر",
+      "toast": {
+        "copied": "تم نسخ الرابط.",
+        "copyFailed": "تعذر نسخ الرابط."
+      },
+      "status": {
+        "attributed": "مدعو",
+        "trial": "تجريبي",
+        "paid_pending_validation": "قيد التحقق",
+        "qualified": "مؤهَّل",
+        "rejected": "مرفوض",
+        "voided": "ملغى"
+      }
+    },
+    "error": {
+      "title": "تعذر تحميل الاشتراك.",
+      "retry": "إعادة المحاولة"
+    }
+  },
   "admin": {
     "brand": "إدارة المنصة",
     "nav": {

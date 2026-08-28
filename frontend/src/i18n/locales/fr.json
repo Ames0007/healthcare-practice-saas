@@ -1865,6 +1865,126 @@
       "retry": "Réessayer"
     }
   },
+  "abonnement": {
+    "nav": {
+      "navigationLabel": "Navigation Abonnement",
+      "abonnement": "Abonnement",
+      "plans": "Plans",
+      "parrainage": "Parrainage"
+    },
+    "pageTitle": "Mon abonnement",
+    "pageDescription": "Statut de votre abonnement, utilisation et historique.",
+    "daysRemaining": "({{count}} jour(s) restant(s))",
+    "status": {
+      "trialing": "Essai",
+      "active": "Actif",
+      "expired": "Expiré",
+      "grace": "Délai de grâce",
+      "blackout": "Suspendu",
+      "cancelled": "Annulé"
+    },
+    "billingPeriod": {
+      "monthly": "Mensuel",
+      "annual": "Annuel"
+    },
+    "plan": {
+      "planLabel": "Plan",
+      "statusLabel": "Statut",
+      "periodLabel": "Période",
+      "renewalLabel": "Prochain renouvellement",
+      "trialEndLabel": "Fin de l'essai",
+      "expiredAtLabel": "Expiré le",
+      "graceEndLabel": "Suspension prévue le",
+      "cancelledAtLabel": "Annulé le"
+    },
+    "banner": {
+      "expiringSoon": "Votre abonnement expire dans {{count}} jour(s).",
+      "grace": "Votre abonnement a expiré. Il reste {{count}} jour(s) avant la suspension."
+    },
+    "actions": {
+      "renew": "Renouveler / Gérer"
+    },
+    "renewDialog": {
+      "title": "Renouveler l'abonnement",
+      "description": "Le changement de plan sera connecté à la facturation SaaS ultérieurement.",
+      "cancel": "Annuler",
+      "confirm": "Compris"
+    },
+    "toast": {
+      "acknowledged": "Message pris en compte."
+    },
+    "usage": {
+      "sectionTitle": "Utilisation",
+      "practitioners": "Praticiens",
+      "staff": "Personnel",
+      "storage": "Stockage",
+      "undefinedLimit": "Non défini dans ce prototype",
+      "overLimitNote": "Limite du plan dépassée — passez à un plan supérieur."
+    },
+    "history": {
+      "sectionTitle": "Historique",
+      "event": {
+        "trial_started": "Essai démarré",
+        "activated": "Abonnement activé",
+        "renewed": "Abonnement renouvelé",
+        "plan_changed": "Changement de plan",
+        "referral_reward_applied": "Récompense de parrainage appliquée (+{{count}} mois)"
+      }
+    },
+    "blackout": {
+      "title": "Votre abonnement a expiré",
+      "description": "Votre accès opérationnel est suspendu.",
+      "dataPreserved": "Vos données restent conservées.",
+      "renewAction": "Renouveler mon abonnement",
+      "supportAction": "Contacter le support",
+      "logoutAction": "Se déconnecter"
+    },
+    "plans": {
+      "pageTitle": "Plans",
+      "pageDescription": "Comparez les plans disponibles.",
+      "currentUsage": "Utilisation actuelle : {{practitioners}} praticien(s) actif(s), {{staff}} membre(s) du personnel actif(s).",
+      "priceTbd": "À définir",
+      "included": "Inclus",
+      "notIncluded": "Non inclus",
+      "currentPlan": "Plan actuel",
+      "choosePlan": "Choisir ce plan",
+      "limitBlocksSelection": "Non disponible : {{used}} praticien(s) actif(s) dépasse la limite de ce plan ({{limit}}).",
+      "row": {
+        "price": "Prix",
+        "inventory_enabled": "Pharmacie & Stock",
+        "hr_enabled": "RH / Équipe",
+        "commission_enabled": "Commissions"
+      }
+    },
+    "parrainage": {
+      "pageTitle": "Parrainage",
+      "pageDescription": "Invitez un confrère. Lorsqu'il devient abonné, vous gagnez 1 mois gratuit.",
+      "codeLabel": "Votre code",
+      "linkLabel": "Votre lien",
+      "copyAction": "Copier le lien",
+      "listTitle": "Vos parrainages",
+      "emptyTitle": "Aucun parrainage pour le moment.",
+      "emptyDescription": "Partagez votre lien pour inviter un confrère.",
+      "unknownTenant": "Cabinet inconnu",
+      "monthUnit": "mois",
+      "toast": {
+        "copied": "Lien copié.",
+        "copyFailed": "Impossible de copier le lien."
+      },
+      "status": {
+        "attributed": "Invité",
+        "trial": "Essai",
+        "paid_pending_validation": "En validation",
+        "qualified": "Validé",
+        "rejected": "Rejeté",
+        "voided": "Annulé"
+      }
+    },
+    "error": {
+      "title": "Impossible de charger l'abonnement.",
+      "retry": "Réessayer"
+    }
+  },
   "admin": {
     "brand": "Platform Admin",
     "nav": {

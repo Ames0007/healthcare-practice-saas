@@ -2427,3 +2427,71 @@ All notable changes to this project are documented in this file.
   from the UI-010ABC baseline of 1267), typecheck, lint and build pass on
   the first full-suite run. Backend regression (10 tests, 26 assertions,
   clean) unaffected — no backend files touched.
+
+- UI-011ABC — Subscription Lifecycle, Plans/Entitlements & Referral
+  Program. Replaces the generic catch-all placeholder at `/app/abonnement`
+  (already a real sidebar entry) with the full SaaS-commercial module —
+  Abonnement/Plans/Parrainage, `SubscriptionNav` (never added to the
+  global sidebar, per the task's own explicit rule). New domain layers
+  `components/domain/subscription/` and `components/domain/referral/`,
+  deliberately separate from `domain/settings/` — Subscription is the
+  commercial platform-tenant relationship, not cabinet configuration.
+  Every commercial figure either traces to the approved specifications or
+  is deliberately left undefined rather than invented (ADR-010): only two
+  plans exist (Solo/Cabinet, no invented "Cabinet+" tier), Cabinet's
+  practitioner/staff limits (3/5) reproduce Spec #9 Screen 47's own
+  worked example verbatim, every `PlanPrice.amount` is `undefined`
+  (Spec #2 §50 explicitly defers pricing to "market validation"), and
+  storage carries no limit at all (Screen 47's own literal "...").
+
+  **Gate 1 — Subscription Lifecycle.** All 6 approved statuses
+  (`trialing/active/expired/grace/blackout/cancelled`, CLAUDE.md §11)
+  built from one base fixture plus `addDaysIso` offsets — never
+  independently typed dates — so the grace fixture's own
+  `graceEndsAt = currentPeriodEnd + 3 days` is provably consistent with
+  the spec's own 3-day grace constant, not coincidental. The default
+  Active/Cabinet fixture reproduces Screen 47's exact renewal date
+  ("23 septembre 2026," exactly one month after `MOCK_BUSINESS_DATE`). No
+  trial *duration* is ever stated anywhere — only a real `trialEndsAt`
+  date and a live-computed days-remaining figure. Blackout renders
+  Screen 49's own full takeover (no header/nav/usage/history) as a
+  page-scoped presentational state only; the global sidebar is
+  untouched — real access blocking is the future backend's job
+  (WF-56: "Backend must block APIs, not only frontend navigation").
+  "Renouveler" opens a purely informational dialog and never mutates
+  subscription state — no fake payment anywhere. Usage rows are derived
+  live from Équipe's own real `TeamMember` fixtures (2 active
+  practitioners, 4 active staff), never independently hardcoded.
+
+  **Gate 2 — Plans & Entitlements.** Centralized `hasEntitlement`/
+  `getEntitlementLimit`/`getUsageState` resolvers — no component compares
+  a plan code/name string directly anywhere. The Plans comparison shows
+  "À définir" for price rather than an invented MAD figure. The Feature-
+  Lock UX pattern (`EntitlementLimitNotice`) has one genuine, non-
+  fabricated case: Solo's real 1-practitioner limit against the real
+  fixture's 2 active practitioners blocks that selection with an
+  explanatory message — WF-74's own scenario, using real derived data.
+
+  **Gate 3 — Referral.** `Referral`/`ReferralReward` implement all 6
+  approved statuses and the one approved reward type
+  (`free_subscription_time`, always exactly 1 month — Spec #2 §51.2/
+  WF-59's own "+1 free subscription month," never a cash/discount
+  reward). Code/link derive deterministically from the Cabinet profile
+  fixture (`app.ma/r/{code}`, the wireframe's own format, never a real
+  domain); Copy uses the real Clipboard API with a toast confirmation.
+  A qualified referral's "+1 mois" is composed from a real, matching
+  *applied* reward — never an invented 7th status label.
+
+  `cross-subscription-integrity.test.ts` proves the full chain end to
+  end: Subscription→Plan→Entitlements→Usage reconciles, and
+  Referral→Qualification→Reward→Subscription-benefit reconciles (the
+  history event's month count and date always equal the real reward's
+  own fields, never independently duplicated).
+
+  No Stripe/payment-gateway integration, no real checkout, no Laravel/API
+  calls, no database changes, no LocalStorage/global persistence, no real
+  subscription enforcement, no coupon engine, no affiliate payout system.
+  92 net new tests (1392 total, up from the UI-010BC baseline of 1300),
+  typecheck, lint and build pass on the first full-suite run. Backend
+  regression (10 tests, 26 assertions, clean) unaffected — no backend
+  files touched.
