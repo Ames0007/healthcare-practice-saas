@@ -36,6 +36,13 @@ describe("WorkingHoursPage", () => {
     expect(screen.getByRole("link", { name: "Horaires" })).toHaveAttribute("aria-current", "page");
   });
 
+  it("also renders HorairesNav with Horaires habituels active (UI-AGENDA-X)", () => {
+    renderPage("fr");
+
+    expect(screen.getByRole("link", { name: "Horaires habituels" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Calendrier & exceptions" })).not.toHaveAttribute("aria-current");
+  });
+
   it("renders the loading skeleton", () => {
     renderPage("fr", { state: "loading" });
     expect(screen.queryByText("Lundi")).not.toBeInTheDocument();

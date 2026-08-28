@@ -111,6 +111,63 @@ export interface CabinetWorkingHoursFormDay {
 }
 
 /**
+ * Cabinet calendar exceptions (UI-AGENDA-X) — date-specific overrides to
+ * `CabinetWorkingHoursDay`'s own recurring weekly pattern. Has **zero
+ * backing in the approved specifications** (grep-confirmed: no
+ * "holiday"/"exception"/"fermeture" concept exists anywhere in Specs
+ * #1-10) — implemented per this task's own explicit instructions
+ * (CLAUDE.md §1: task instructions outrank specs), grounded in the
+ * closest approved precedent, Spec #4 §12.3's `availability_exceptions`
+ * (`date`/`start_time`/`end_time`/`type`/`reason` — practitioner-scoped
+ * there, cabinet-scoped here, mirroring `CabinetWorkingHoursDay`'s own
+ * already-documented cabinet-vs-practitioner scoping gap). Deliberately
+ * a richer 5-type registry than that spec row's own 2-value
+ * `unavailable`/`custom_available` ENUM, since this task's own §5
+ * explicitly names 5 distinct real-world cabinet scenarios (see ADR-013).
+ */
+export type CalendarExceptionType =
+  | "public_holiday"
+  | "exceptional_closure"
+  | "rest_day"
+  | "modified_hours"
+  | "exceptional_opening";
+
+/** "HH:mm" pair — a deliberately separate, minimal shape from Équipe's own `WorkInterval` (which carries `id`/`teamMemberId`/`weekday`, none of which apply to a one-off cabinet date), per this task's own explicit "reuse validation, never merge the domain types" instruction. */
+export interface CalendarExceptionInterval {
+  startTime: string;
+  endTime: string;
+}
+
+/**
+ * One date-specific cabinet availability override. `intervals` is always
+ * empty for the three "closed" types (`public_holiday`/
+ * `exceptional_closure`/`rest_day`) and always non-empty for the two
+ * "open" types (`modified_hours`/`exceptional_opening`) — enforced by
+ * `validateCalendarExceptionForm`. There is deliberately no separate
+ * `allDay` field: "closed all day" is exactly "type is a closed type",
+ * always derivable from `type` via `CALENDAR_EXCEPTION_TYPE_MAP`, never
+ * a second, independently-settable flag that could contradict `type`.
+ */
+export interface CabinetCalendarException {
+  id: string;
+  /** ISO date, e.g. "2026-11-06". */
+  date: string;
+  type: CalendarExceptionType;
+  reason?: string;
+  intervals: CalendarExceptionInterval[];
+  createdAt: string;
+  active: boolean;
+}
+
+/** Bounded add/edit form (UI-AGENDA-X) — numeric-like time fields stay strings while edited, mirroring every other `*FormValues` convention (e.g. `WorkDayFormValues`). `intervals` is a plain editable array (add/remove), unlike `CabinetWorkingHoursFormDay`'s fixed single interval. */
+export interface CalendarExceptionFormValues {
+  date: string;
+  type: CalendarExceptionType;
+  reason: string;
+  intervals: CalendarExceptionInterval[];
+}
+
+/**
  * Read-only numbering/document configuration summary (UI-010ABC §18, Spec
  * #2 §47, Spec #4 §27.2 `numbering_sequences`). Deliberately READ-ONLY:
  * concurrency-safe sequence allocation ("lock sequence row during

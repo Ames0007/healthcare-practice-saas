@@ -453,6 +453,21 @@ src/components/
             the three introduces a bounded-vocabulary field beyond types
             already covered elsewhere (`AppointmentSchedulingType`,
             `PaymentMethod`, `PreferredLanguage`).
+            UI-AGENDA-X adds `CabinetCalendarException` — deliberately
+            **separate** from `CabinetWorkingHoursDay` (recurring weekly
+            pattern) and from `domain/team/`'s `WorkInterval`
+            (per-employee) and `LeaveRequest` (employee-specific
+            absence): a `CabinetCalendarException` is a one-off,
+            date-specific override to the *cabinet's* own availability,
+            never merged with either. Has zero backing in the approved
+            specifications (ADR-013) — grounded in Spec #4 §12.3's
+            practitioner-scoped `availability_exceptions` shape, extended
+            cabinet-scoped to 5 types (`calendar-exception-type.ts`'s
+            `CALENDAR_EXCEPTION_TYPE_MAP`: `public_holiday`/
+            `exceptional_closure`/`rest_day` always closed,
+            `modified_hours`/`exceptional_opening` always carry ≥1
+            interval — no separate `allDay` field, closed-ness is always
+            derived from `type`).
             `domain/subscription/` (UI-011ABC) — `Subscription`
             (6-status lifecycle, CLAUDE.md §11/Spec #4 §28.4 verbatim),
             `SubscriptionPlan`/`PlanPrice`/`PlanEntitlement` (Spec #4
@@ -1478,6 +1493,45 @@ src/features/
             `method` matches Finance's own payment fixtures' `method`,
             and that the Documents footer derives live from the Cabinet
             profile fixture.
+            UI-AGENDA-X extends Horaires only, additively: a second real
+            route `/app/parametres/horaires/exceptions` ("Calendrier &
+            exceptions") alongside the unchanged `/app/parametres/
+            horaires` ("Horaires habituelles"), both rendering
+            `HorairesNav` beneath `ParametresNav` — mirrors
+            `AccessGovernanceNav` exactly, both navs on both routes
+            (applying the UI-011X-FIX lesson). `calendar-exceptions.ts`
+            holds every pure function: `resolveEffectiveCabinetAvailability`
+            (the single centralized resolver — an exception always
+            *replaces* the weekly schedule outright, never a union,
+            ADR-013 §3), `findConflictingAppointments` (real, never
+            fabricated — reads Agenda's own `getAgendaMockAppointments()`
+            directly, never mutates a single appointment),
+            `validateCalendarExceptionForm`/`hasActiveExceptionForDate`
+            (at most one active exception per date, ADR-013 §4),
+            `isPastException` (a date strictly before `MOCK_BUSINESS_DATE`
+            is read-only history; the business date itself stays
+            editable), and `groupExceptionsByMonth` (the month-grouped
+            list presentation, task's own explicit "do not install a
+            large calendar dependency" — no calendar library added).
+            `mock-calendar-exceptions-data.ts`'s conflict-relevant
+            fixtures reuse Agenda's own real appointment ids rather than
+            an invented count (`cross-calendar-exceptions-integrity.test.ts`
+            proves the reconciliation); both `public_holiday` fixtures
+            are real Moroccan national dates. The task's own optional
+            Agenda banner (§26) was not implemented — conditional on
+            specification support that does not exist (ADR-013 §7).
+
+            **Future availability engine (documented, not implemented,
+            task §25):** the eventual production chain this task's own
+            cabinet layer feeds into is `CabinetWorkingHoursDay` →
+            `CabinetCalendarException` → effective cabinet hours →
+            practitioner `WorkInterval` → practitioner `LeaveRequest`/
+            absence → existing `Appointment`s → service duration →
+            bookable slots. This task implements only the first three
+            links (`resolveEffectiveCabinetAvailability`); Public
+            Booking (UI-012) is the eventual consumer and remains
+            entirely unimplemented here (no public booking page, no
+            public availability API, no slot reservation).
 
   subscription/
             SaaS Subscription Lifecycle & Plans/Entitlements (UI-011ABC

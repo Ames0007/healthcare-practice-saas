@@ -1830,7 +1830,65 @@
       "endLabel": "الإغلاق",
       "invalidError": "يجب أن يكون وقت الإغلاق بعد وقت الفتح لكل يوم مفتوح.",
       "cancel": "إلغاء",
-      "save": "حفظ"
+      "save": "حفظ",
+      "nav": {
+        "navigationLabel": "تنقل أوقات العمل",
+        "usual": "الأوقات المعتادة",
+        "exceptions": "التقويم والاستثناءات"
+      },
+      "exceptions": {
+        "pageTitle": "التقويم والاستثناءات",
+        "pageDescription": "الأعياد الرسمية والإغلاقات وأوقات العمل الاستثنائية للعيادة.",
+        "addButton": "إضافة استثناء",
+        "emptyTitle": "لا توجد استثناءات في التقويم.",
+        "emptyDescription": "ستظهر هنا الأعياد الرسمية والإغلاقات وأوقات العمل الاستثنائية.",
+        "closedLabel": "مغلق",
+        "pastNotice": "استثناء سابق — للقراءة فقط.",
+        "editAction": "تعديل",
+        "removeAction": "حذف",
+        "type": {
+          "publicHoliday": "عيد رسمي",
+          "exceptionalClosure": "إغلاق استثنائي",
+          "restDay": "يوم راحة",
+          "modifiedHours": "أوقات عمل معدّلة",
+          "exceptionalOpening": "فتح استثنائي"
+        },
+        "form": {
+          "addTitle": "إضافة استثناء",
+          "editTitle": "تعديل الاستثناء",
+          "close": "إغلاق",
+          "dateLabel": "التاريخ",
+          "typeLabel": "النوع",
+          "reasonLabel": "السبب",
+          "reasonPlaceholder": "مثال: تكوين الفريق",
+          "intervalsHeading": "الأوقات",
+          "startLabel": "البداية",
+          "endLabel": "النهاية",
+          "addInterval": "إضافة فترة",
+          "removeInterval": "إزالة",
+          "dateRequiredError": "التاريخ إلزامي.",
+          "duplicateDateError": "يوجد بالفعل استثناء لهذا التاريخ. عدّله بدلاً من إنشاء استثناء جديد.",
+          "intervalsRequiredError": "يجب إدخال فترة زمنية واحدة على الأقل لهذا النوع من الاستثناء.",
+          "intervalsInvalidError": "تحقق من الأوقات: يجب أن يكون وقت النهاية بعد وقت البداية وألا تتداخل الفترات.",
+          "normalHeading": "الأوقات المعتادة",
+          "effectiveHeading": "الأوقات الفعلية",
+          "conflictWarning": "يوجد {{count}} موعد مسبق خلال هذه الفترة.",
+          "viewAppointments": "عرض المواعيد",
+          "cancel": "إلغاء",
+          "save": "حفظ"
+        },
+        "delete": {
+          "title": "هل تريد حذف هذا الاستثناء؟",
+          "description": "سيعود اليوم إلى الأوقات المعتادة للعيادة.",
+          "confirm": "حذف",
+          "cancel": "إلغاء"
+        },
+        "toast": {
+          "created": "تمت إضافة الاستثناء.",
+          "updated": "تم تعديل الاستثناء.",
+          "removed": "تم حذف الاستثناء."
+        }
+      }
     },
     "numbering": {
       "pageTitle": "الترقيم والمستندات",

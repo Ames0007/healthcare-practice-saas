@@ -17,6 +17,7 @@ import {
   type CabinetWorkingHoursFormValues,
 } from "./working-hours";
 import { ParametresNav } from "./components/parametres-nav";
+import { HorairesNav } from "./components/horaires-nav";
 import { SettingsSkeleton } from "./components/settings-skeleton";
 
 export type WorkingHoursPageState = "loading" | "loaded" | "error";
@@ -98,6 +99,8 @@ export function WorkingHoursPage({ days: providedDays, state = "loaded", onRetry
       />
 
       <ParametresNav />
+
+      <HorairesNav />
 
       <Card>
         {!editing ? (

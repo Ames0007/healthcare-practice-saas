@@ -1830,7 +1830,65 @@
       "endLabel": "Fermeture",
       "invalidError": "L'heure de fermeture doit être après l'heure d'ouverture pour chaque jour ouvert.",
       "cancel": "Annuler",
-      "save": "Enregistrer"
+      "save": "Enregistrer",
+      "nav": {
+        "navigationLabel": "Navigation Horaires",
+        "usual": "Horaires habituels",
+        "exceptions": "Calendrier & exceptions"
+      },
+      "exceptions": {
+        "pageTitle": "Calendrier & exceptions",
+        "pageDescription": "Jours fériés, fermetures et horaires exceptionnels du cabinet.",
+        "addButton": "Ajouter une exception",
+        "emptyTitle": "Aucune exception au calendrier.",
+        "emptyDescription": "Les jours fériés, fermetures et horaires exceptionnels apparaîtront ici.",
+        "closedLabel": "Fermé",
+        "pastNotice": "Exception passée — lecture seule.",
+        "editAction": "Modifier",
+        "removeAction": "Supprimer",
+        "type": {
+          "publicHoliday": "Jour férié",
+          "exceptionalClosure": "Fermeture exceptionnelle",
+          "restDay": "Jour de repos",
+          "modifiedHours": "Horaires exceptionnels",
+          "exceptionalOpening": "Ouverture exceptionnelle"
+        },
+        "form": {
+          "addTitle": "Ajouter une exception",
+          "editTitle": "Modifier l'exception",
+          "close": "Fermer",
+          "dateLabel": "Date",
+          "typeLabel": "Type",
+          "reasonLabel": "Motif",
+          "reasonPlaceholder": "Ex. Formation de l'équipe",
+          "intervalsHeading": "Horaires",
+          "startLabel": "Début",
+          "endLabel": "Fin",
+          "addInterval": "Ajouter un horaire",
+          "removeInterval": "Retirer",
+          "dateRequiredError": "La date est obligatoire.",
+          "duplicateDateError": "Une exception existe déjà pour cette date. Modifiez-la plutôt que d'en créer une nouvelle.",
+          "intervalsRequiredError": "Au moins un horaire est requis pour ce type d'exception.",
+          "intervalsInvalidError": "Vérifiez les horaires : l'heure de fin doit être après l'heure de début et les horaires ne doivent pas se chevaucher.",
+          "normalHeading": "Horaires normaux",
+          "effectiveHeading": "Horaires effectifs",
+          "conflictWarning": "{{count}} rendez-vous existant(s) sur cette période.",
+          "viewAppointments": "Voir les rendez-vous",
+          "cancel": "Annuler",
+          "save": "Enregistrer"
+        },
+        "delete": {
+          "title": "Supprimer cette exception ?",
+          "description": "Le jour retrouvera les horaires habituels du cabinet.",
+          "confirm": "Supprimer",
+          "cancel": "Annuler"
+        },
+        "toast": {
+          "created": "Exception ajoutée.",
+          "updated": "Exception modifiée.",
+          "removed": "Exception supprimée."
+        }
+      }
     },
     "numbering": {
       "pageTitle": "Numérotation & documents",

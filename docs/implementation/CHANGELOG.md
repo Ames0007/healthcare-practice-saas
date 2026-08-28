@@ -2623,3 +2623,47 @@ All notable changes to this project are documented in this file.
   total, up from the UI-011X-FIX baseline of 1538), typecheck, lint and
   build pass. Backend regression (10 tests, 26 assertions, clean)
   unaffected — no backend files touched.
+
+- UI-AGENDA-X — Dynamic Cabinet Calendar & Availability Exceptions.
+  Additive to the existing weekly `CabinetWorkingHoursDay` (UI-010ABC,
+  unchanged) — a new `CabinetCalendarException` model for date-specific
+  overrides: public holiday, exceptional closure, rest day, modified
+  hours, exceptional opening. Has zero backing in the approved
+  specifications (grep-confirmed, same reasoning already applied to
+  Delegation, ADR-011 §2) — grounded in the closest real precedent,
+  Spec #4 §12.3's practitioner-scoped `availability_exceptions`,
+  extended to 5 cabinet-scoped types per the task's own explicit
+  instructions (ADR-013).
+
+  New `/app/parametres/horaires/exceptions` route — a real,
+  URL-addressable second tab (`HorairesNav`: Horaires habituelles /
+  Calendrier & exceptions), nested beneath `ParametresNav` exactly like
+  `AccessGovernanceNav`, both navs rendering on every Horaires route —
+  directly applying the lesson from the recent UI-011X-FIX regression
+  repair. `resolveEffectiveCabinetAvailability` is the single
+  centralized pure resolver every consumer reads: an active exception
+  always *replaces* the weekly schedule outright, never unions with it.
+  At most one active exception per date; editing replaces it in place.
+  A date strictly before the prototype's own fixed "today" is past,
+  read-only history — no Modifier/Supprimer renders for it; "today"
+  itself stays editable.
+
+  Real, never-fabricated appointment-conflict detection
+  (`findConflictingAppointments`): filters Agenda's own actual
+  appointment fixtures by date and non-terminal status against the
+  resolved effective hours, shown as a warning in the Add/Edit dialog —
+  never mutates, cancels or reschedules a single appointment.
+  `cross-calendar-exceptions-integrity.test.ts` proves the fixtures'
+  own conflict claims trace to real Agenda ids, not invented counts.
+  Both public-holiday fixtures are real Moroccan national dates (Fête
+  du Trône, Marche Verte), correctly ordered past/future.
+
+  The task's own optional Agenda banner (§26, explicitly conditional on
+  specification support) was deliberately not implemented — the
+  specifications do not support it, so the condition is false; this is
+  a documented scope decision, not a gap (ADR-013 §7). No Public
+  Booking, no Laravel/API calls, no database, no LocalStorage/
+  persistence. 60 net new tests (1608 total, up from the UI-FIX
+  baseline of 1548), typecheck, lint and build pass. Backend regression
+  (10 tests, 26 assertions, clean) unaffected — no backend files
+  touched.

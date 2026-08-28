@@ -1082,3 +1082,122 @@ or hard-disabled with no explanation.
 ### Date
 
 2026-08-28
+
+---
+
+## ADR-013 — UI-AGENDA-X Dynamic Cabinet Calendar: a task-instructed 5-type exception model with zero spec backing, one-active-exception-per-date, override-not-union precedence, and skipping the optional Agenda banner
+
+### Status
+
+Accepted
+
+### Context
+
+`CabinetCalendarException` (date-specific overrides to
+`CabinetWorkingHoursDay`'s own recurring weekly pattern) has **zero
+backing in the approved specifications** — grep-confirmed across all 10
+spec files: no "holiday"/"jour férié"/"fermeture exceptionnelle"/
+"exception" availability concept exists anywhere. The closest real
+precedent is Spec #4 §12.3's `availability_exceptions`
+(`date`/`start_time NULL`/`end_time NULL`/`type ENUM(unavailable,
+custom_available)`/`reason`) — but that row is **practitioner**-scoped,
+not cabinet-scoped, and carries only 2 type values against this task's
+own explicit 5-type list (`public_holiday`/`exceptional_closure`/
+`rest_day`/`modified_hours`/`exceptional_opening`).
+
+### Decision
+
+1.  **Implemented per the task's own explicit instructions** (CLAUDE.md
+    §1: task instructions outrank specifications), mirroring exactly the
+    reasoning already applied to Delegation (ADR-011 §2) — grounded in
+    the closest approved precedent's field shape
+    (`date`/`start_time`/`end_time`/`type`/`reason`) even though this
+    task's own 5-type registry is intentionally richer than that spec
+    row's 2-value ENUM, since the task's own §5 names 5 distinct
+    real-world cabinet scenarios explicitly.
+2.  **No separate `allDay` field.** "Closed all day" is always exactly
+    "`type` is one of the 3 closed types" (`public_holiday`/
+    `exceptional_closure`/`rest_day`), derived via
+    `CALENDAR_EXCEPTION_TYPE_MAP[type].isClosed` — never a second,
+    independently-settable boolean that could contradict `type` or
+    `intervals`. The 2 "open" types (`modified_hours`/
+    `exceptional_opening`) always carry ≥1 interval; the 3 closed types
+    always carry zero.
+3.  **A date-specific exception always *replaces* the weekly schedule
+    outright, never unions with it** (task §7: "the date exception
+    wins"). `resolveEffectiveCabinetAvailability` is the single
+    centralized pure resolver every consumer reads (the Add/Edit dialog's
+    NORMAL/EXCEPTION preview, the conflict-detection check) — never
+    reimplemented inline in a component.
+4.  **At most one active exception per date** (task §10) —
+    `hasActiveExceptionForDate` enforced by
+    `validateCalendarExceptionForm`; editing an existing exception
+    replaces it in place (same `id`), it is never possible to stack a
+    second active exception on an already-covered date.
+5.  **A date strictly before `MOCK_BUSINESS_DATE` is past, read-only
+    history** (task §20's own "prefer not to casually delete historical
+    past closures") — `MOCK_BUSINESS_DATE` itself remains editable (an
+    admin can still record/adjust *today's* own exception same-day). Past
+    exceptions render with no Modifier/Supprimer action anywhere.
+6.  **Conflict detection (task §22-24) is real, never fabricated** —
+    `findConflictingAppointments` filters Agenda's own actual
+    `getAgendaMockAppointments()` fixtures by date and non-terminal
+    status, checking each against the resolved effective intervals. It
+    never mutates, cancels or reschedules a single appointment; creation/
+    editing of an exception always remains possible regardless of any
+    conflict found (task's own explicit "creation may remain possible").
+7.  **The optional Agenda banner (task §26) was deliberately NOT
+    implemented.** The task's own text is explicitly conditional: "If
+    the specifications support it, Agenda may display a restrained
+    banner." The specifications do not support it (same zero-backing
+    finding as the core model itself) — the condition is false, so the
+    banner is correctly out of scope here, not a gap. This also avoids
+    adding new cross-module fixture-loading surface area to Agenda
+    (UI-002), an already large, fully-tested, completed module, for a
+    feature the task itself frames as optional.
+8.  **`/app/parametres/horaires/exceptions` is a second, real,
+    URL-addressable route** (not a same-route JS-only tab toggle) —
+    matches every other nested-nav precedent in this codebase
+    (`AccessGovernanceNav`, `SubscriptionNav`, `CommunicationNav`, all
+    genuine `<nav>`+real-`<Link>` navigation, per `Tabs`'s own doc
+    comment: "each tab is a genuine URL"). `HorairesNav` renders
+    alongside `ParametresNav` on both Horaires routes — applying the
+    UI-011X-FIX lesson directly: every nested Paramètres page must
+    render **both** navigation levels, never one alone.
+
+### Alternatives considered
+
+- **A same-route, JS-only Habituelles/Exceptions toggle** (no second
+  URL) — rejected: every other nested-nav surface in this app uses real
+  URLs; a same-route toggle here would be the one inconsistent exception
+  with no clear benefit.
+- **Reusing Équipe's own `WorkInterval`/fixed 2-slot interval-editor
+  pattern verbatim** — rejected: `WorkInterval` carries
+  `id`/`teamMemberId`/`weekday`, none of which apply to a one-off
+  cabinet date, and the task explicitly asks for free add/remove
+  intervals, not a fixed interval1/interval2 pair. Only the pure
+  validation helpers (`isValidWorkInterval`/`intervalsAreSequential`/
+  `getWeekdayFromIso`) are reused — the domain types stay separate, per
+  the task's own explicit instruction.
+- **Implementing the Agenda banner anyway, since it's a small addition**
+  — rejected per point 7 above; the task's own conditional wording
+  already resolves this without guessing.
+
+### Consequences
+
+- If a future task formalizes a real Moroccan public-holiday calendar
+  import, only `mock-calendar-exceptions-data.ts`'s own two
+  `public_holiday` fixtures need replacing — the resolver/validation/UI
+  layer is entirely calendar-source-agnostic.
+- If a future task builds Public Booking (UI-012), it consumes
+  `resolveEffectiveCabinetAvailability` directly as the cabinet-level
+  layer of the documented future availability chain (`frontend/
+  ARCHITECTURE.md`) — no rework of this task's own resolver is
+  anticipated.
+- If a future task decides the Agenda banner should ship after all, it
+  can call the same `resolveEffectiveCabinetAvailability` this task
+  already built against `selectedDate`, adding only presentation.
+
+### Date
+
+2026-08-28
