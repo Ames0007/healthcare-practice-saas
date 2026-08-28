@@ -13,6 +13,10 @@ import { getCabinetServicesMockData } from "./mock-cabinet-services-data";
 import { getCabinetWorkingHoursMockData } from "./mock-cabinet-working-hours-data";
 import { buildInitialWorkingHoursFormValues, buildWorkingHoursFromFormValues } from "./working-hours";
 import { computeNumberingSummary } from "./numbering";
+import { getAppointmentSettingsMockData } from "./mock-appointment-settings-data";
+import { getPaymentMethodRows } from "./mock-payment-methods-data";
+import { buildDefaultDocumentFooter } from "./document-settings";
+import { getDocumentSettingsMockData } from "./mock-document-settings-data";
 
 /**
  * Proves every Paramètres figure traces back to its own source, and that
@@ -70,5 +74,32 @@ describe("Cross-configuration integrity", () => {
       .filter((value): value is string => value != null && value.startsWith("REC-2026-"))
       .map((value) => Number(value.split("-")[2]));
     expect(recNext).toBeGreaterThan(Math.max(...existingRecNumbers));
+  });
+
+  it("Rendez-vous: the default scheduling mode matches the majority mode actually configured across Services (never an arbitrary invented default)", () => {
+    const services = getCabinetServicesMockData();
+    const appointmentSettings = getAppointmentSettingsMockData();
+    const exactCount = services.filter((service) => service.schedulingMode === "exact").length;
+    const windowCount = services.filter((service) => service.schedulingMode === "window").length;
+    const majorityMode = exactCount >= windowCount ? "exact" : "window";
+
+    expect(appointmentSettings.defaultSchedulingMode).toBe(majorityMode);
+  });
+
+  it("Paiements: the configured payment method is the exact literal Finance's own Payment.method fixtures use (no disconnected method list)", () => {
+    const rows = getPaymentMethodRows();
+    const payments = getPaymentsMockData();
+
+    expect(rows).toHaveLength(1);
+    expect(payments.every((payment) => payment.method === rows[0].method)).toBe(true);
+  });
+
+  it("Documents: the footer default is derived live from the Cabinet profile fixture, not an independently hardcoded string", () => {
+    const profile = getCabinetProfileMockData();
+    const documentSettings = getDocumentSettingsMockData();
+
+    expect(documentSettings.footerText).toBe(buildDefaultDocumentFooter(profile));
+    expect(documentSettings.footerText).toContain(profile.name);
+    expect(documentSettings.documentLanguage).toBe(profile.preferredLanguage);
   });
 });

@@ -1714,7 +1714,10 @@
       "cabinet": "العيادة",
       "services": "الخدمات والأسعار",
       "horaires": "أوقات العمل",
-      "numerotation": "الترقيم"
+      "rendezVous": "المواعيد",
+      "paiements": "المدفوعات",
+      "numerotation": "الترقيم",
+      "documents": "المستندات"
     },
     "cabinet": {
       "sectionTitle": "هوية العيادة",
@@ -1818,6 +1821,43 @@
         "employee": "الموظفون",
         "invoice": "الفواتير",
         "receipt": "الإيصالات"
+      }
+    },
+    "rendezVous": {
+      "pageTitle": "المواعيد",
+      "pageDescription": "نمط الموعد والمدة الافتراضية المقترحة عند إنشاء خدمة جديدة.",
+      "editAction": "تعديل",
+      "form": {
+        "schedulingModeLabel": "نمط الموعد الافتراضي",
+        "durationLabel": "المدة الافتراضية",
+        "cancel": "إلغاء",
+        "save": "حفظ",
+        "invalidNumberError": "قيمة رقمية غير صالحة."
+      }
+    },
+    "paiements": {
+      "pageTitle": "المدفوعات",
+      "pageDescription": "وسائل الدفع التي تدعمها العيادة.",
+      "readOnlyNote": "لا يدعم هذا النموذج الأولي سوى الدفع نقدًا (CLAUDE.md §23). تتطلب البطاقة البنكية والتحويل والشيك تكاملاً مع بوابة دفع غير مشمول في هذا النموذج الأولي.",
+      "method": {
+        "cash": "نقدًا"
+      },
+      "table": {
+        "method": "وسيلة الدفع",
+        "active": "نشط"
+      }
+    },
+    "documents": {
+      "pageTitle": "المستندات",
+      "pageDescription": "تذييل الصفحة وملاحظة الترويسة ولغة المستندات المُنشأة.",
+      "editAction": "تعديل",
+      "form": {
+        "footerLabel": "تذييل الصفحة",
+        "headerLabel": "ملاحظة الترويسة",
+        "languageLabel": "لغة المستندات",
+        "cancel": "إلغاء",
+        "save": "حفظ",
+        "requiredError": "هذا الحقل إلزامي."
       }
     },
     "error": {

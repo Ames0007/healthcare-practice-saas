@@ -1,4 +1,5 @@
 import type { AppointmentSchedulingType } from "@/components/domain/appointments/types";
+import type { PaymentMethod } from "@/components/domain/finance/types";
 import type { Weekday } from "@/components/domain/team/types";
 
 /**
@@ -127,4 +128,72 @@ export interface NumberingSequenceRow {
   prefix: string;
   yearReset: boolean;
   nextNumber: string;
+}
+
+/**
+ * Rendez-vous / appointment defaults (UI-010BC Gate 2, Spec #2 §46:
+ * "Appointment durations/defaults. Exact-time/window mode."). Deliberately
+ * narrow: a cabinet-wide default that pre-fills the "Ajouter un service"
+ * form (`buildInitialServiceFormValues` still accepts no argument for
+ * create — a later task may thread this through as its default, this task
+ * only establishes the setting itself, per its own "no repository-wide
+ * refactor of existing modules to consume these settings" constraint). No
+ * public-booking horizon/enabled toggle here: `/book` (Spec #7 §31) is
+ * still a documented visual placeholder with no real request flow, so a
+ * toggle controlling it would configure a feature that does not exist yet.
+ */
+export interface AppointmentSettings {
+  defaultSchedulingMode: AppointmentSchedulingType;
+  defaultDurationMinutes: number;
+}
+
+/** Bounded edit form (UI-010BC §12) — numeric field is a string while edited, mirroring `CabinetServiceFormValues`'s own convention. */
+export interface AppointmentSettingsFormValues {
+  defaultSchedulingMode: AppointmentSchedulingType;
+  defaultDurationMinutes: string;
+}
+
+/**
+ * Payment methods (UI-010BC Gate 2, Spec #4 §26.1 `payment_method` is one
+ * of the master-data categories). Deliberately reuses Finance's own
+ * `PaymentMethod` type verbatim rather than an independent broader list:
+ * Finance's `Payment.method` (`components/domain/finance/types.ts`) is
+ * typed as exactly `"cash"`, whose own doc comment already states "V1
+ * patient payments are cash-only (CLAUDE.md §23) — no card/online method."
+ * A settings page offering card/bank-transfer/cheque toggles would
+ * advertise processing capability Finance cannot actually provide, so
+ * every row here is informational (`active` always `true`), never an
+ * editable toggle — mirrors `NumberingSequenceRow`'s own read-only-by-
+ * design precedent.
+ */
+export interface PaymentMethodRow {
+  method: PaymentMethod;
+  labelKey: string;
+  active: boolean;
+}
+
+/**
+ * Document presentation (UI-010BC Gate 2, Spec #2 §47: "Header/footer.
+ * Language."). Deliberately excludes "Invoice template"/"Prescription
+ * template" selection (no real document-rendering system exists in this
+ * prototype — task's own explicit "NO production document generation";
+ * a template picker with no visible effect would misrepresent capability)
+ * and "Tax display" (`Invoice`, `components/domain/finance/types.ts`, has
+ * no tax field anywhere — there is nothing to toggle the display of).
+ * `documentLanguage` is deliberately separate from `CabinetProfile.
+ * preferredLanguage` (the UI language) — CLAUDE.md §40's own text:
+ * "Generated documents may have a language independent of current UI
+ * language."
+ */
+export interface DocumentSettings {
+  footerText: string;
+  headerNote?: string;
+  documentLanguage: PreferredLanguage;
+}
+
+/** Bounded edit form (UI-010BC §15) — `headerNote` is optional, mirrors `CabinetProfileFormValues`'s own optional-field convention. */
+export interface DocumentSettingsFormValues {
+  footerText: string;
+  headerNote: string;
+  documentLanguage: PreferredLanguage;
 }

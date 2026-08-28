@@ -2384,3 +2384,46 @@ All notable changes to this project are documented in this file.
   1144), typecheck, lint and build pass on the first full-suite run.
   Backend regression (10 tests, 26 assertions, clean) unaffected — no
   backend files touched.
+
+- UI-010BC — Cabinet Settings & Operational Configuration: Rendez-vous,
+  Paiements, Documents. Completes the Paramètres IA list left open by
+  UI-010ABC (`ParametresNav` extended from 4 to 7 tabs, in order: Cabinet/
+  Services & tarifs/Horaires/Rendez-vous/Paiements/Numérotation/
+  Documents). **Gate 1 — Cabinet Settings** required no code change:
+  Spec #4 §5.1 (`tenants`) and Spec #2 §44 define only a single `address`/
+  `city` pair — no `legalName`, split address, `postalCode`, `country`, or
+  structured `logoMetadata` field exists anywhere in the approved domain
+  model, so the already-shipped `CabinetProfile`/`CabinetSettingsPage`
+  satisfy the spec exactly; the task's own conceptual field list is
+  illustrative, not literal ("Use specification fields where different"),
+  recorded as ADR-009 §1. **Gate 2 — Operational Configuration** adds
+  three new sections (Services/Horaires/Numérotation preserved unchanged):
+  Rendez-vous (`/app/parametres/rendez-vous`) is a single-record view/edit
+  toggle bounded to `defaultSchedulingMode`/`defaultDurationMinutes` — the
+  only two concerns Spec #2 §46 actually names — with no public-booking
+  toggle, since `/book` remains a documented visual placeholder with no
+  real request-submission flow (ADR-009 §3). Paiements
+  (`/app/parametres/paiements`) is a **read-only** one-row table reusing
+  Finance's own `PaymentMethod` type verbatim (typed as exactly `"cash"`,
+  per that type's own doc comment citing CLAUDE.md §23) rather than an
+  editable card/virement/chèque toggle list Finance cannot actually
+  process (ADR-009 §2). Documents (`/app/parametres/documents`) is a
+  single-record view/edit toggle for footer text/header note/document
+  language — deliberately omits invoice/prescription template selection
+  (no real document-rendering system exists, task's own explicit "NO
+  production document generation") and tax display (`Invoice` carries no
+  tax field at all); `footerText`/`documentLanguage` derive by default
+  from the same Cabinet profile fixture (`buildDefaultDocumentFooter`),
+  never an independently invented example string (ADR-009 §4).
+  `cross-configuration-integrity.test.ts` gains 3 new reconciliation
+  checks proving the Rendez-vous default mode matches Services' own
+  majority scheduling mode, the Paiements row matches Finance's own
+  payment fixtures' `method`, and the Documents footer derives live from
+  the Cabinet profile fixture.
+
+  No Laravel integration, no API calls, no database changes, no
+  LocalStorage, no persistence, no accounting engine, no payment gateway,
+  no production document generation. 33 net new tests (1300 total, up
+  from the UI-010ABC baseline of 1267), typecheck, lint and build pass on
+  the first full-suite run. Backend regression (10 tests, 26 assertions,
+  clean) unaffected — no backend files touched.

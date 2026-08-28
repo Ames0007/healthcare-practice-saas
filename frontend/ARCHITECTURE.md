@@ -427,6 +427,19 @@ src/components/
             (`specialty.ts`) mirrors the established label-registry
             pattern for `CabinetSpecialty`'s 7 values (CLAUDE.md's own
             "Primary initial specialties" list verbatim).
+            UI-010BC adds three narrow types to the same file:
+            `AppointmentSettings` (bounded to
+            `defaultSchedulingMode`/`defaultDurationMinutes` — the only
+            two concerns Spec #2 §46 names for Rendez-vous, ADR-009 §3);
+            `PaymentMethodRow` reuses `PaymentMethod` from
+            `domain/finance/` verbatim (typed as exactly `"cash"`) rather
+            than an invented broader method list (ADR-009 §2);
+            `DocumentSettings` (`footerText`/`headerNote`/
+            `documentLanguage` — deliberately no template-selection or
+            tax-display field, ADR-009 §4). No new registries: none of
+            the three introduces a bounded-vocabulary field beyond types
+            already covered elsewhere (`AppointmentSchedulingType`,
+            `PaymentMethod`, `PreferredLanguage`).
 
 src/features/
   today/    Aujourd'hui screen composition (UI-001): `types.ts` (mock
@@ -1360,36 +1373,54 @@ src/features/
 
   parametres/
             Cabinet Settings & Operational Configuration (UI-010ABC Gates
-            2-3), replacing the generic Paramètres placeholder at
-            `/app/parametres` — Cabinet/Services & tarifs/Horaires/
-            Numérotation. `ParametresNav` grew one tab per gate exactly
-            like `CommunicationNav` (Gate 2 shipped only "Cabinet"; Gate
-            3 added the other three). `cabinet-settings-page.tsx` and
-            `working-hours-page.tsx` are both single-record view/edit
-            toggles (a "Modifier" button reveals an inline form; there is
-            exactly one `CabinetProfile` and one weekly schedule, so
-            neither needed a list+dialog pattern). `services-page.tsx`
+            2-3, extended by UI-010BC Gate 2), replacing the generic
+            Paramètres placeholder at `/app/parametres` — Cabinet/
+            Services & tarifs/Horaires/Rendez-vous/Paiements/
+            Numérotation/Documents. `ParametresNav` grew one or more tabs
+            per gate exactly like `CommunicationNav` (UI-010ABC Gate 2
+            shipped only "Cabinet"; Gate 3 added Services/Horaires/
+            Numérotation; UI-010BC Gate 2 added Rendez-vous/Paiements/
+            Documents to reach the full 7-tab IA list). `cabinet-
+            settings-page.tsx`, `working-hours-page.tsx`, `appointment-
+            settings-page.tsx` and `document-settings-page.tsx` are all
+            single-record view/edit toggles (a "Modifier" button reveals
+            an inline form; there is exactly one record of each kind, so
+            none needed a list+dialog pattern). `services-page.tsx`
             is the one list+dialog surface in this directory —
             `ServiceFormDialog`'s Add instance stays permanently mounted
             (`open={isAddDialogOpen}`) while its Edit instance is
             conditionally rendered with `key={editingService.id}`,
             mirroring `TemplateFormDialog`'s own documented stale-
             `useState` fix (UI-009ABC) rather than reintroducing the same
-            bug. `numbering-page.tsx` renders `computeNumberingSummary`'s
-            rows with no interactive controls at all (`domain/settings/`'s
-            own `NumberingSequenceRow` doc comment explains why). Every
-            page's edits are local `useState` only — `mock-cabinet-
-            profile-data.ts`, `mock-cabinet-services-data.ts` and
-            `mock-cabinet-working-hours-data.ts` are the only three
-            `mock-*-data.ts` files in this directory, one per genuinely
-            new fixture; `numbering.ts` and the Activité/Finance report
-            modules deliberately have none, reading other directories'
-            fixtures instead. `cross-configuration-integrity.test.ts`
-            proves `CabinetService.name` values trace back to Agenda's
-            own `SERVICES` array and that `computeNumberingSummary`'s
-            PAT/EMP rows reconcile exactly with `generatePatientNumber`/
-            `generateEmployeeNumber`, the same generators Patients'/
-            Équipe's own create flows already call.
+            bug. `numbering-page.tsx` and `payment-methods-page.tsx`
+            both render read-only tables with no interactive controls at
+            all (`domain/settings/`'s own `NumberingSequenceRow`/
+            `PaymentMethodRow` doc comments explain why — the latter
+            because Finance's own `PaymentMethod` type supports only
+            `"cash"`, ADR-009 §2). Every page's edits are local
+            `useState` only — `mock-cabinet-profile-data.ts`,
+            `mock-cabinet-services-data.ts`, `mock-cabinet-working-hours-
+            data.ts`, `mock-appointment-settings-data.ts`,
+            `mock-payment-methods-data.ts` and `mock-document-settings-
+            data.ts` are the `mock-*-data.ts` files in this directory,
+            one per genuinely new fixture; `numbering.ts` and the
+            Activité/Finance report modules deliberately have none,
+            reading other directories' fixtures instead.
+            `mock-document-settings-data.ts` is the one fixture that
+            reads *another* fixture in this same directory
+            (`getCabinetProfileMockData`) rather than inventing its own
+            footer text — `buildDefaultDocumentFooter`
+            (`document-settings.ts`) derives it live. `cross-
+            configuration-integrity.test.ts` proves `CabinetService.name`
+            values trace back to Agenda's own `SERVICES` array, that
+            `computeNumberingSummary`'s PAT/EMP rows reconcile exactly
+            with `generatePatientNumber`/`generateEmployeeNumber` (the
+            same generators Patients'/Équipe's own create flows already
+            call), that Rendez-vous' default scheduling mode matches
+            Services' own majority mode, that the Paiements row's
+            `method` matches Finance's own payment fixtures' `method`,
+            and that the Documents footer derives live from the Cabinet
+            profile fixture.
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,

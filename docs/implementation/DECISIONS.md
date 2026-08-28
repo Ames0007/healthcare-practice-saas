@@ -630,3 +630,106 @@ numbered decision.
 ### Date
 
 2026-08-28
+
+------------------------------------------------------------------------
+
+## ADR-009 — UI-010BC Cabinet Settings & Operational Configuration: no invented tenant fields, cash-only Paiements, and a bounded Documents scope
+
+### Status
+
+Accepted
+
+### Decision
+
+Four related prototype-scoping decisions made while completing the
+Paramètres module (Rendez-vous, Paiements, Documents; Cabinet Settings
+verified against spec), recorded here per CLAUDE.md §1/§59:
+
+1.  **`CabinetProfile` deliberately does not gain `legalName`,
+    `addressLine1`/`addressLine2`, `postalCode`, `country`, or a
+    structured `logoMetadata` field**, despite the task's own conceptual
+    field list naming them. Spec #4 §5.1 (`tenants`) and Spec #2 §44
+    ("Settings — Cabinet") both define only a single `address`/`city`
+    pair and a `logo_file_id` — no split address, no legal-name column,
+    no country column exists anywhere in the approved domain model. The
+    task's own text anticipates this: "Use specification fields where
+    different... Do not model backend tenant/security settings." Adding
+    fields the backend schema does not have would misrepresent what a
+    future Laravel integration can actually persist. Gate 1 therefore
+    required no code change — `CabinetProfile`/`CabinetSettingsPage`
+    (UI-010ABC) already satisfy Spec #4 §5.1 exactly.
+2.  **Paiements (`/app/parametres/paiements`) lists exactly one payment
+    method, informational only, never an editable multi-method toggle
+    list.** Finance's own `Payment.method` (`components/domain/finance/
+    types.ts`) is typed as exactly `"cash"`, whose own doc comment
+    already states "V1 patient payments are cash-only (CLAUDE.md §23) —
+    no card/online method." `PaymentMethodRow` reuses that literal type
+    verbatim; offering card/bank-transfer/cheque toggles would advertise
+    processing capability Finance cannot provide, and CLAUDE.md §50
+    explicitly excludes payment-gateway integration from V1 non-scope.
+3.  **Rendez-vous (`/app/parametres/rendez-vous`) is bounded to
+    `defaultSchedulingMode`/`defaultDurationMinutes`**, the only two
+    concerns Spec #2 §46 actually names ("Appointment durations/
+    defaults. Exact-time/window mode."). No public-booking-enabled or
+    booking-horizon toggle was added: `/book` (Spec #7 §31) remains a
+    documented visual placeholder with no real request-submission flow
+    (`frontend/src/app/book/page.tsx`'s own doc comment: "proves the
+    charter-approved visual treatment only, not real booking
+    functionality"), so a setting that configures it would control a
+    feature that does not exist yet.
+4.  **Documents (`/app/parametres/documents`) omits "Invoice
+    template"/"Prescription template" selection and "Tax display"**,
+    both named in Spec #2 §47. No real document-rendering system exists
+    in this prototype (the task's own explicit "NO production document
+    generation"), so a template picker would have no visible effect and
+    would misrepresent capability. `Invoice`
+    (`components/domain/finance/types.ts`) carries no tax field at all —
+    there is nothing for a tax-display toggle to control. `footerText`/
+    `documentLanguage` instead derive by default from the Cabinet
+    profile fixture itself (`buildDefaultDocumentFooter`,
+    `features/parametres/document-settings.ts`) rather than an
+    independently invented example string — the same "derive, never
+    duplicate" discipline `features/rapports` applies to KPIs.
+
+### Context
+
+None of the four carries security/data-integrity risk, so none met the
+CLAUDE.md §63 bar to stop and ask. All four are direct applications of
+CLAUDE.md §3 ("do not invent requirements") to the Settings module: every
+omission traces to either a field the approved schema does not have, or
+a capability another already-shipped module does not actually provide.
+Recording them prevents a future contributor from mistaking a deliberate
+boundary for an oversight, and gives the eventual Laravel integration an
+accurate map of what the frontend prototype does — and does not — assume.
+
+### Alternatives
+
+1.  Add `legalName`/split-address/`country` fields to `CabinetProfile`
+    to match the task's own conceptual list literally — rejected: no
+    backing column exists in Spec #4 §5.1, and the fields would have no
+    consumer anywhere else in the prototype (no document/invoice
+    currently renders a legal name or a formatted multi-line address).
+2.  Build an editable Paiements list seeded with common Moroccan payment
+    methods (card, virement, chèque) marked "coming soon" — rejected:
+    even disabled, a multi-row list visually implies near-term
+    capability Finance's own data model does not support, which is more
+    misleading than a single, honestly-labeled cash row.
+3.  Add a "public booking enabled" toggle to Rendez-vous now, ahead of a
+    real public-booking flow — rejected: the toggle would control
+    nothing (`/book` never reads any Settings state), which is the same
+    "advertises a fake capability" problem as (2).
+
+### Consequences
+
+- If a future task gives `/book` a real request-submission flow, Rendez-
+  vous can then gain a `publicBookingEnabled`/booking-horizon field with
+  a real consumer, rather than a placeholder wired to nothing.
+- If a future task adds tax handling to `Invoice`, Documents' "Tax
+  display" can be reconsidered at that point.
+- If the eventual Laravel `tenants` migration ever adds `legal_name`/
+  split-address columns, `CabinetProfile` gains them then — this ADR
+  documents why they are absent now, not a permanent prohibition.
+
+### Date
+
+2026-08-28

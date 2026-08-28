@@ -1714,7 +1714,10 @@
       "cabinet": "Cabinet",
       "services": "Services & tarifs",
       "horaires": "Horaires",
-      "numerotation": "Numérotation"
+      "rendezVous": "Rendez-vous",
+      "paiements": "Paiements",
+      "numerotation": "Numérotation",
+      "documents": "Documents"
     },
     "cabinet": {
       "sectionTitle": "Identité du cabinet",
@@ -1818,6 +1821,43 @@
         "employee": "Employés",
         "invoice": "Factures",
         "receipt": "Reçus"
+      }
+    },
+    "rendezVous": {
+      "pageTitle": "Rendez-vous",
+      "pageDescription": "Mode de rendez-vous et durée par défaut proposés lors de la création d'un service.",
+      "editAction": "Modifier",
+      "form": {
+        "schedulingModeLabel": "Mode de rendez-vous par défaut",
+        "durationLabel": "Durée par défaut",
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "invalidNumberError": "Valeur numérique invalide."
+      }
+    },
+    "paiements": {
+      "pageTitle": "Paiements",
+      "pageDescription": "Moyens de paiement pris en charge par le cabinet.",
+      "readOnlyNote": "Ce prototype ne prend en charge que les paiements en espèces (CLAUDE.md §23). Carte bancaire, virement et chèque nécessitent une intégration de passerelle de paiement non couverte par ce prototype.",
+      "method": {
+        "cash": "Espèces"
+      },
+      "table": {
+        "method": "Moyen de paiement",
+        "active": "Actif"
+      }
+    },
+    "documents": {
+      "pageTitle": "Documents",
+      "pageDescription": "Pied de page, en-tête et langue des documents générés par le cabinet.",
+      "editAction": "Modifier",
+      "form": {
+        "footerLabel": "Pied de page",
+        "headerLabel": "Note d'en-tête",
+        "languageLabel": "Langue des documents",
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "requiredError": "Ce champ est obligatoire."
       }
     },
     "error": {
