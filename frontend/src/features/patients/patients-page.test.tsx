@@ -236,6 +236,73 @@ describe("PatientsPage — create/edit (UI-003B)", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
+  it("shows CIN and social-coverage fields inside the complementary section, with the régime select appearing only while covered", () => {
+    renderPatients();
+    fireEvent.click(screen.getByRole("button", { name: "+ Nouveau patient" }));
+    fireEvent.click(screen.getByRole("button", { name: "Informations complémentaires" }));
+
+    expect(screen.getByLabelText("CIN")).toBeInTheDocument();
+    expect(screen.getByText("Couvert socialement ?")).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "Non" })).toBeChecked();
+    expect(screen.queryByLabelText("Régime *")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("radio", { name: "Oui" }));
+    expect(screen.getByLabelText("Régime *")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("radio", { name: "Non" }));
+    expect(screen.queryByLabelText("Régime *")).not.toBeInTheDocument();
+  });
+
+  it("requires a régime only when socially covered, and persists CIN/régime on create", () => {
+    renderPatients();
+    fireEvent.click(screen.getByRole("button", { name: "+ Nouveau patient" }));
+    fillMainFields({ firstName: "Sanae", lastName: "Fassi", phone: "0677001122" });
+    fireEvent.click(screen.getByRole("button", { name: "Informations complémentaires" }));
+    fireEvent.change(screen.getByLabelText("CIN"), { target: { value: "AB123456" } });
+    fireEvent.click(screen.getByRole("radio", { name: "Oui" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Créer le patient" }));
+    expect(screen.getByText("Ce champ est requis.")).toBeInTheDocument();
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("Régime *"), { target: { value: "amo_cnops" } });
+    fireEvent.click(screen.getByRole("button", { name: "Créer le patient" }));
+    expect(screen.getByText("Patient créé.")).toBeInTheDocument();
+
+    fireEvent.click(editButtonFor("Sanae Fassi"));
+    expect(screen.getByLabelText("CIN")).toHaveValue("AB123456");
+    expect(screen.getByRole("radio", { name: "Oui" })).toBeChecked();
+    expect(screen.getByLabelText("Régime *")).toHaveValue("amo_cnops");
+  });
+
+  it("never persists a stray régime when the patient is switched back to not covered before saving", () => {
+    renderPatients();
+    fireEvent.click(screen.getByRole("button", { name: "+ Nouveau patient" }));
+    fillMainFields({ firstName: "Rita", lastName: "Ouahbi", phone: "0677002233" });
+    fireEvent.click(screen.getByRole("button", { name: "Informations complémentaires" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Oui" }));
+    fireEvent.change(screen.getByLabelText("Régime *"), { target: { value: "amo_tns" } });
+    fireEvent.click(screen.getByRole("radio", { name: "Non" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Créer le patient" }));
+    expect(screen.getByText("Patient créé.")).toBeInTheDocument();
+
+    fireEvent.click(editButtonFor("Rita Ouahbi"));
+    fireEvent.click(screen.getByRole("button", { name: "Informations complémentaires" }));
+    expect(screen.getByRole("radio", { name: "Non" })).toBeChecked();
+    expect(screen.queryByLabelText("Régime *")).not.toBeInTheDocument();
+  });
+
+  it("prefills CIN and social coverage from existing patient data on edit (Ahmed El Mansouri)", () => {
+    renderPatients();
+
+    fireEvent.click(editButtonFor("Ahmed El Mansouri"));
+
+    expect(screen.getByLabelText("CIN")).toHaveValue("BE482910");
+    expect(screen.getByRole("radio", { name: "Oui" })).toBeChecked();
+    expect(screen.getByLabelText("Régime *")).toHaveValue("amo_cnss");
+  });
+
   it("creates a patient that immediately appears in the list, is searchable, gets a generated number, and respects the practitioner filter (5/6/7/8/9)", () => {
     renderPatients();
     fireEvent.click(screen.getByRole("button", { name: "+ Nouveau patient" }));
@@ -369,5 +436,12 @@ describe("PatientsPage — create/edit (UI-003B)", () => {
     expect(screen.getByLabelText("الاسم الأول *")).toBeInTheDocument();
     expect(screen.getByLabelText("الهاتف *")).toBeInTheDocument();
     expect(container.querySelector('[dir="rtl"]')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "معلومات إضافية" }));
+    expect(screen.getByLabelText("رقم البطاقة الوطنية (CIN)")).toBeInTheDocument();
+    expect(screen.getByText("مستفيد من التغطية الاجتماعية؟")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("radio", { name: "نعم" }));
+    expect(screen.getByLabelText("النظام *")).toBeInTheDocument();
   });
 });

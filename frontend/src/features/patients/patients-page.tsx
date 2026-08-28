@@ -123,6 +123,9 @@ export function PatientsPage({ patients: providedPatients, state = "loaded", onR
         address: patient.address ?? "",
         emergencyContactName: patient.emergencyContactName ?? "",
         emergencyContactPhone: patient.emergencyContactPhone ?? "",
+        cin: patient.cin ?? "",
+        isSociallyCovered: patient.isSociallyCovered ?? false,
+        insuranceRegime: patient.insuranceRegime ?? "",
       },
     });
     setFormDialogKey((key) => key + 1);
@@ -151,6 +154,9 @@ export function PatientsPage({ patients: providedPatients, state = "loaded", onR
       address: values.address || null,
       emergencyContactName: values.emergencyContactName || null,
       emergencyContactPhone: values.emergencyContactPhone || null,
+      cin: values.cin || null,
+      isSociallyCovered: values.isSociallyCovered,
+      insuranceRegime: values.isSociallyCovered ? values.insuranceRegime || null : null,
     };
 
     if (editingId) {

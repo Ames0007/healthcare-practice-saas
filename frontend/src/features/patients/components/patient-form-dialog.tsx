@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useId, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { useLocale } from "@/i18n/locale-provider";
@@ -11,7 +11,17 @@ import { Select } from "@/components/ui/select";
 import { cn } from "@/lib/cn";
 import { getPatientFullName } from "@/features/patients/format";
 import { isValidEmail, isValidMoroccanPhone, isBirthDateNotFuture, getTodayIso } from "@/features/patients/patient-form-validation";
-import type { PatientDuplicateMatch, PatientFormValues } from "@/features/patients/types";
+import type { InsuranceRegime, PatientDuplicateMatch, PatientFormValues } from "@/features/patients/types";
+
+const INSURANCE_REGIME_ORDER: InsuranceRegime[] = [
+  "amo_cnss",
+  "amo_cnops",
+  "amo_tns",
+  "amo_tadamon",
+  "amo_achamil",
+  "amo_students",
+  "other",
+];
 
 export interface PatientFormResult {
   ok: boolean;
@@ -40,12 +50,22 @@ const EMPTY_VALUES: PatientFormValues = {
   address: "",
   emergencyContactName: "",
   emergencyContactPhone: "",
+  cin: "",
+  isSociallyCovered: false,
+  insuranceRegime: "",
 };
 
 function hasComplementaryValue(values?: Partial<PatientFormValues>): boolean {
   if (!values) return false;
   return Boolean(
-    values.birthDate || values.email || values.city || values.address || values.emergencyContactName || values.emergencyContactPhone,
+    values.birthDate ||
+      values.email ||
+      values.city ||
+      values.address ||
+      values.emergencyContactName ||
+      values.emergencyContactPhone ||
+      values.cin ||
+      values.isSociallyCovered,
   );
 }
 
@@ -68,6 +88,7 @@ export function PatientFormDialog({
 }: PatientFormDialogProps) {
   const { t } = useLocale();
   const values = { ...EMPTY_VALUES, ...initialValues };
+  const coverageRadioName = useId();
 
   const [firstName, setFirstName] = useState(values.firstName);
   const [lastName, setLastName] = useState(values.lastName);
@@ -81,6 +102,9 @@ export function PatientFormDialog({
   const [address, setAddress] = useState(values.address);
   const [emergencyContactName, setEmergencyContactName] = useState(values.emergencyContactName);
   const [emergencyContactPhone, setEmergencyContactPhone] = useState(values.emergencyContactPhone);
+  const [cin, setCin] = useState(values.cin);
+  const [isSociallyCovered, setIsSociallyCovered] = useState(values.isSociallyCovered);
+  const [insuranceRegime, setInsuranceRegime] = useState<InsuranceRegime | "">(values.insuranceRegime);
   const [showComplementary, setShowComplementary] = useState(() => hasComplementaryValue(initialValues));
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [duplicates, setDuplicates] = useState<PatientDuplicateMatch[] | null>(null);
@@ -97,6 +121,9 @@ export function PatientFormDialog({
       address: address.trim(),
       emergencyContactName: emergencyContactName.trim(),
       emergencyContactPhone: emergencyContactPhone.trim(),
+      cin: cin.trim(),
+      isSociallyCovered,
+      insuranceRegime: isSociallyCovered ? insuranceRegime : "",
     };
   }
 
@@ -120,6 +147,9 @@ export function PatientFormDialog({
     }
     if (emergencyContactPhone.trim() && !isValidMoroccanPhone(emergencyContactPhone)) {
       nextErrors.emergencyContactPhone = t("patients.form.phoneError");
+    }
+    if (isSociallyCovered && !insuranceRegime) {
+      nextErrors.insuranceRegime = required;
     }
 
     return nextErrors;
@@ -230,6 +260,7 @@ export function PatientFormDialog({
                 value={address}
                 onChange={(event) => setAddress(event.target.value)}
               />
+              <Input label={t("patients.form.cinLabel")} value={cin} onChange={(event) => setCin(event.target.value)} />
 
               <div className="flex flex-col gap-4 rounded-md border border-border p-4">
                 <h4 className="text-xs font-medium text-text-muted">{t("patients.form.emergencyContactTitle")}</h4>
@@ -245,6 +276,54 @@ export function PatientFormDialog({
                   onChange={(event) => setEmergencyContactPhone(event.target.value)}
                   error={errors.emergencyContactPhone}
                 />
+              </div>
+
+              <div className="flex flex-col gap-4 rounded-md border border-border p-4">
+                <h4 className="text-xs font-medium text-text-muted">{t("patients.form.socialCoverageTitle")}</h4>
+                <fieldset className="flex flex-col gap-2">
+                  <legend className="text-sm font-medium text-text-secondary">
+                    {t("patients.form.sociallyCoveredLabel")}
+                  </legend>
+                  <div className="flex items-center gap-4">
+                    <label className="flex items-center gap-2 text-sm text-text">
+                      <input
+                        type="radio"
+                        name={coverageRadioName}
+                        checked={isSociallyCovered}
+                        onChange={() => setIsSociallyCovered(true)}
+                        className="h-4 w-4 accent-primary"
+                      />
+                      {t("patients.form.sociallyCoveredYes")}
+                    </label>
+                    <label className="flex items-center gap-2 text-sm text-text">
+                      <input
+                        type="radio"
+                        name={coverageRadioName}
+                        checked={!isSociallyCovered}
+                        onChange={() => {
+                          setIsSociallyCovered(false);
+                          setInsuranceRegime("");
+                        }}
+                        className="h-4 w-4 accent-primary"
+                      />
+                      {t("patients.form.sociallyCoveredNo")}
+                    </label>
+                  </div>
+                </fieldset>
+
+                {isSociallyCovered && (
+                  <Select
+                    label={t("patients.form.insuranceRegimeLabel")}
+                    required
+                    value={insuranceRegime}
+                    onChange={(event) => setInsuranceRegime(event.target.value as InsuranceRegime)}
+                    error={errors.insuranceRegime}
+                    options={INSURANCE_REGIME_ORDER.map((regime) => ({
+                      value: regime,
+                      label: t(`patients.form.insuranceRegimeOptions.${regime}`),
+                    }))}
+                  />
+                )}
               </div>
             </div>
           )}

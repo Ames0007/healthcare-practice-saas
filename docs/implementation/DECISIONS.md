@@ -1201,3 +1201,83 @@ own explicit 5-type list (`public_holiday`/`exceptional_closure`/
 ### Date
 
 2026-08-28
+
+## ADR-014 — Patient CIN & social coverage: an administrative data field, not the excluded AMO workflow
+
+### Status
+
+Accepted
+
+### Context
+
+A task-supplied wireframe asked for two additions to the existing
+patient create/edit form (`PatientFormDialog`, UI-003B): a `CIN`
+(national ID card number) field, and a "Couverture sociale" block
+(covered yes/no + a régime picker: AMO-CNSS/AMO-CNOPS/AMO-TNS/
+AMO-TADAMON/AMO-ACHAMIL/AMO-Étudiants/Autre). Grep across all 10
+approved specification files confirms **zero backing** — no
+"CIN"/"couverture sociale"/AMO concept exists anywhere in the specs.
+CLAUDE.md §50 explicitly excludes "Insurance/AMO workflows" from V1
+unless formally approved, which raises a real boundary question: does
+storing a patient's declared AMO régime count as an "AMO workflow"?
+
+### Decision
+
+1.  **Implemented as a single administrative identifier field, not a
+    workflow.** §50's exclusion targets claims submission,
+    reimbursement calculation, eligibility verification and insurer
+    billing integration — none of which this task adds. Recording
+    which régime a patient has declared is the same category of fact
+    as `city`/`address`/`emergencyContactName`, already present on
+    `Patient` with zero workflow behind them. No claims, no
+    reimbursement math, no insurer API — only a categorical field.
+2.  **`cin` and `insuranceRegime` are optional, format-unvalidated
+    strings/enum values** — mirrors `city`'s own precedent (a loosely
+    formatted string with no validation) rather than inventing an
+    unconfirmed Moroccan CIN regex (CLAUDE.md §3: do not invent
+    requirements).
+3.  **`insuranceRegime` is only meaningful, and only required, when
+    `isSociallyCovered` is `true`.** Switching back to "Non" clears any
+    already-picked régime in the submitted values, so a stale régime
+    can never persist against an uncovered patient — mirrors this
+    task's own explicit exception-type "closed types always carry zero
+    intervals" discipline (ADR-013 §2): derive, never let two fields
+    silently disagree.
+4.  **No separate `allDay`-style redundancy** was introduced; the
+    wireframe's own "Sexe" field (shown but not marked `← NEW`) was
+    **not** added — it does not exist anywhere in the current codebase,
+    and only fields explicitly marked new in the source wireframe were
+    implemented, per this task's own annotation convention.
+5.  Both fields follow the same "edit-form-only, never surfaced
+    read-only elsewhere" precedent already established by
+    `birthDate`/`email`/`city`/`address` — Patient 360°'s header and
+    overview cards remain metric-focused and are unchanged.
+
+### Alternatives considered
+
+- **Treating any AMO-related field as categorically out of scope**
+  — rejected: §50 excludes *workflows* (claims/reimbursement/insurer
+  integration), not a single demographic data point; refusing to store
+  what régime a patient belongs to would block a legitimate,
+  bounded, task-instructed request without a textual basis in CLAUDE.md
+  itself.
+- **A rigid Moroccan CIN format validator** — rejected: no confirmed
+  format exists in the specs, and inventing one risks rejecting real,
+  valid CIN numbers this prototype has no authority to validate against
+  (CLAUDE.md §3).
+- **Adding the wireframe's "Sexe" field too, since it appears in the
+  same block** — rejected: not marked `← NEW` in the source wireframe,
+  unlike `CIN` and `COUVERTURE SOCIALE`; adding it would be scope
+  invention rather than the requested addition.
+
+### Consequences
+
+- If a future task formalizes real AMO claims/reimbursement workflows,
+  `insuranceRegime` is the natural field to key off of — no rework of
+  this task's data shape is anticipated.
+- If Moroccan CIN format validation is later confirmed, it plugs into
+  the same optional `cin` field without a data-shape change.
+
+### Date
+
+2026-08-29

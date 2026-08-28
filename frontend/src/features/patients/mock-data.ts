@@ -23,6 +23,9 @@ export function getPatientsMockData(): Patient[] {
       nextAppointment: { date: "2026-08-27", time: "10:30", service: "Consultation" },
       outstandingBalance: 1500,
       birthDate: "1992-03-10",
+      cin: "BE482910",
+      isSociallyCovered: true,
+      insuranceRegime: "amo_cnss",
     },
     {
       id: "pat-2",
@@ -36,6 +39,8 @@ export function getPatientsMockData(): Patient[] {
       nextAppointment: null,
       outstandingBalance: 0,
       birthDate: "1998-11-02",
+      cin: "JT109345",
+      isSociallyCovered: false,
     },
     {
       id: "pat-3",

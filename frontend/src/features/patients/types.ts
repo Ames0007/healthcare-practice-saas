@@ -1,3 +1,17 @@
+/**
+ * Moroccan compulsory health insurance (AMO) regime — a single
+ * administrative identifier field, not the AMO claims/reimbursement
+ * workflow excluded from V1 (CLAUDE.md §50). See ADR-014.
+ */
+export type InsuranceRegime =
+  | "amo_cnss"
+  | "amo_cnops"
+  | "amo_tns"
+  | "amo_tadamon"
+  | "amo_achamil"
+  | "amo_students"
+  | "other";
+
 export interface PatientNextAppointment {
   date: string;
   time: string;
@@ -36,6 +50,12 @@ export interface Patient {
   address?: string | null;
   emergencyContactName?: string | null;
   emergencyContactPhone?: string | null;
+
+  /** Moroccan national ID card number — optional administrative field. */
+  cin?: string | null;
+  /** `false`/`undefined` means unknown or not covered; `insuranceRegime` only applies when `true`. */
+  isSociallyCovered?: boolean;
+  insuranceRegime?: InsuranceRegime | null;
 }
 
 /** Create/edit form model (UI-003B §12) — deliberately not the full future database entity. */
@@ -50,6 +70,9 @@ export interface PatientFormValues {
   address: string;
   emergencyContactName: string;
   emergencyContactPhone: string;
+  cin: string;
+  isSociallyCovered: boolean;
+  insuranceRegime: InsuranceRegime | "";
 }
 
 export interface PatientDuplicateMatch {

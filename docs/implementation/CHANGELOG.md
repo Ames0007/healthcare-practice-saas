@@ -2667,3 +2667,34 @@ All notable changes to this project are documented in this file.
   baseline of 1548), typecheck, lint and build pass. Backend regression
   (10 tests, 26 assertions, clean) unaffected — no backend files
   touched.
+
+- UI-003C — Patient CIN & Social Coverage. Additive extension of the
+  existing patient create/edit form (`PatientFormDialog`, UI-003B),
+  from a task-supplied wireframe: a `cin` field and a "Couverture
+  sociale" block (covered yes/no + AMO régime — CNSS/CNOPS/TNS/
+  TADAMON/ACHAMIL/Étudiants/Autre). Zero specification backing
+  (grep-confirmed across all 10 spec files) — implemented as a single
+  administrative identifier field, not the "Insurance/AMO workflows"
+  CLAUDE.md §50 excludes from V1: no claims, no reimbursement
+  calculation, no insurer integration (ADR-014).
+
+  `cin`/`insuranceRegime` are optional and format-unvalidated, mirroring
+  `city`'s own no-validation precedent rather than inventing an
+  unconfirmed Moroccan CIN format. The new "Couverture sociale" sub-card
+  mirrors the existing "Contact d'urgence" sub-card exactly, reusing the
+  established radio-group pattern from Agenda's `SchedulingFields`/
+  `CancelConfirmDialog` for the Oui/Non toggle; the régime `Select` only
+  renders, and is only required, while covered — switching back to
+  "Non" clears any already-picked régime before submit, so a stale
+  régime can never persist against an uncovered patient. Both fields
+  follow the same edit-form-only precedent as `birthDate`/`email`/
+  `city`/`address` — never surfaced read-only in Patient 360°'s header
+  or overview cards, which stay unchanged. The wireframe's own "Sexe"
+  field was deliberately not added — it was not marked new in the
+  source wireframe and does not exist anywhere in the current codebase.
+
+  No Laravel/API calls, no database, no persistence (mock data only). 4
+  net new tests (1612 total, up from the UI-AGENDA-X baseline of 1608)
+  plus 1 existing AR/RTL test extended, typecheck and lint pass. Backend
+  regression (10 tests, 26 assertions, clean) unaffected — no backend
+  files touched.
