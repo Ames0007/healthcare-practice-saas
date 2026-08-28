@@ -5,7 +5,13 @@ import { useLocale } from "@/i18n/locale-provider";
 import { LanguageSwitcher } from "@/components/app/language-switcher";
 import { Button } from "@/components/ui/button";
 
-export function AppTopbar() {
+export interface AppTopbarProps {
+  onOpenQuickCreate: () => void;
+  onNotifications: () => void;
+  onUserMenu: () => void;
+}
+
+export function AppTopbar({ onOpenQuickCreate, onNotifications, onUserMenu }: AppTopbarProps) {
   const { t } = useLocale();
 
   return (
@@ -23,14 +29,15 @@ export function AppTopbar() {
         />
       </div>
 
-      <Button variant="primary" size="sm" className="hidden sm:inline-flex">
+      <Button variant="primary" size="sm" onClick={onOpenQuickCreate} aria-label={t("topbar.quickCreate")}>
         <Plus className="h-4 w-4" aria-hidden="true" />
-        {t("topbar.quickCreate")}
+        <span className="hidden sm:inline">{t("topbar.quickCreate")}</span>
       </Button>
 
       <button
         type="button"
         aria-label={t("topbar.notifications")}
+        onClick={onNotifications}
         className="inline-flex h-9 w-9 items-center justify-center rounded-md text-text-secondary hover:bg-surface-subtle"
       >
         <Bell className="h-5 w-5" aria-hidden="true" />
@@ -41,6 +48,7 @@ export function AppTopbar() {
       <button
         type="button"
         aria-label={t("topbar.user")}
+        onClick={onUserMenu}
         className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-surface-subtle text-text-secondary hover:bg-border/60"
       >
         <UserRound className="h-5 w-5" aria-hidden="true" />

@@ -118,11 +118,19 @@ describe("SubscriptionPage", () => {
     expect(screen.queryByText("Utilisation")).not.toBeInTheDocument();
   });
 
-  it("Blackout: support and logout are visually present but disabled — no real functionality simulated", () => {
+  it("Blackout: support and logout remain accessible (CLAUDE.md §11) and surface a future-feature notice — no real support/auth system simulated", () => {
     renderPage("fr", { subscription: getBlackoutSubscriptionMockData() });
 
-    expect(screen.getByRole("button", { name: "Contacter le support" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "Se déconnecter" })).toBeDisabled();
+    const supportButton = screen.getByRole("button", { name: "Contacter le support" });
+    const logoutButton = screen.getByRole("button", { name: "Se déconnecter" });
+    expect(supportButton).not.toBeDisabled();
+    expect(logoutButton).not.toBeDisabled();
+
+    fireEvent.click(supportButton);
+    expect(screen.getByText("Disponible dans une prochaine étape.")).toBeInTheDocument();
+
+    fireEvent.click(logoutButton);
+    expect(screen.getByText("Disponible dans une prochaine étape.")).toBeInTheDocument();
   });
 
   it("Renouveler opens an informational dialog and never mutates subscription state — no fake payment", () => {

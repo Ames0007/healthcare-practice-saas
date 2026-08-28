@@ -73,7 +73,20 @@ src/components/
             No business knowledge.
   app/      Shell/domain-agnostic app components: AppShell, AppSidebar,
             AppTopbar, MobileNav, PageHeader, LanguageSwitcher,
-            FoundationBadge, AreaPlaceholder.
+            FoundationBadge, AreaPlaceholder, QuickCreateDialog
+            (UI-FIX — the global "+ Créer" launcher, reuses `Dialog`
+            `variant="modal"`; a pure navigation menu into each action's
+            own already-built creation workflow at `/app/agenda`,
+            `/app/patients`, `/app/stock/movements`,
+            `/app/communication`, `/app/finance/expenses` — never a
+            duplicate form, and deliberately omits "Nouvelle facture"/
+            "Nouvel encaissement" since neither has a reusable, context-
+            free existing workflow to link into, ADR-012). `AppShell`
+            owns the Quick Create dialog's open state and a single
+            shared future-feature `Toast` message, passed down to
+            `AppTopbar` (Créer/notifications/user-account) and
+            `MobileNav` (Plus) as callback props — one shared instance
+            of each across route navigation, not one per surface.
   domain/   Reusable components that know about one business concept but
             not about a specific screen (Spec #8 §85), e.g.
             `domain/appointments/` — `types.ts` (the full 11-state

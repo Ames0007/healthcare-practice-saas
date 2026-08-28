@@ -17,15 +17,42 @@
     "rapports": "Rapports",
     "parametres": "Paramètres",
     "abonnement": "Abonnement",
-    "plus": "Plus"
+    "plus": "Plus",
+    "plusFutureNotice": "Disponible dans une prochaine étape."
   },
   "topbar": {
     "practiceName": "Cabinet (exemple)",
     "searchPlaceholder": "Rechercher un patient, un numéro, une facture...",
     "quickCreate": "Créer",
     "notifications": "Notifications",
+    "notificationsFutureNotice": "Disponible dans une prochaine étape.",
     "language": "Langue",
-    "user": "Compte"
+    "user": "Compte",
+    "userFutureNotice": "Disponible dans une prochaine étape.",
+    "quickCreateMenu": {
+      "navigationLabel": "Créer",
+      "title": "Créer",
+      "appointment": {
+        "label": "Rendez-vous",
+        "description": "Planifier un nouveau rendez-vous"
+      },
+      "patient": {
+        "label": "Patient",
+        "description": "Ajouter un nouveau patient"
+      },
+      "stockMovement": {
+        "label": "Mouvement de stock",
+        "description": "Enregistrer une entrée ou sortie"
+      },
+      "message": {
+        "label": "Message",
+        "description": "Envoyer un message"
+      },
+      "expense": {
+        "label": "Décaissement",
+        "description": "Enregistrer une dépense"
+      }
+    }
   },
   "sidebar": {
     "navigation": "Navigation principale",
@@ -1938,7 +1965,9 @@
       "dataPreserved": "Vos données restent conservées.",
       "renewAction": "Renouveler mon abonnement",
       "supportAction": "Contacter le support",
-      "logoutAction": "Se déconnecter"
+      "supportNotice": "Disponible dans une prochaine étape.",
+      "logoutAction": "Se déconnecter",
+      "logoutNotice": "Disponible dans une prochaine étape."
     },
     "plans": {
       "pageTitle": "Plans",

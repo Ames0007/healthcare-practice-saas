@@ -1,10 +1,18 @@
 "use client";
 
+import Link from "next/link";
 import { useLocale } from "@/i18n/locale-provider";
 import { AppointmentCard } from "@/components/domain/appointments/appointment-card";
-import { Button } from "@/components/ui/button";
+import { Button, buttonClassNames } from "@/components/ui/button";
 import type { TodayAppointment } from "@/features/today/types";
 
+/**
+ * "Ouvrir" navigates to Agenda rather than a specific appointment (UI-FIX):
+ * `TodayAppointment.id` is its own reduced fixture id, not a real Agenda
+ * appointment id (Aujourd'hui "only ever assigns 6 of its 11 members to
+ * mock data" — its own doc comment) — deep-linking to a specific Agenda
+ * item here would be an unreliable guessed join, not a real derivation.
+ */
 export function NextAppointmentSection({
   appointment,
   onMarkArrived,
@@ -30,9 +38,9 @@ export function NextAppointmentSection({
         practitioner={appointment.practitioner}
         actions={
           <>
-            <Button variant="outline" size="sm">
+            <Link href="/app/agenda" className={buttonClassNames("outline", "sm")}>
               {t("aujourdhui.nextAppointment.open")}
-            </Button>
+            </Link>
             {canMarkArrived && (
               <Button size="sm" onClick={() => onMarkArrived(appointment.id)}>
                 {t("aujourdhui.nextAppointment.markArrived")}

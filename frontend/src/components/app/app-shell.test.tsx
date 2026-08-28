@@ -1,21 +1,38 @@
-import { describe, expect, it, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
-import { LocaleProvider } from "@/i18n/locale-provider";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import { LocaleProvider, useLocale } from "@/i18n/locale-provider";
+import type { Locale } from "@/i18n/config";
 import { AppShell } from "./app-shell";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/app",
 }));
 
-describe("AppShell", () => {
-  it("renders the sidebar, topbar and main content region", () => {
-    render(
-      <LocaleProvider initialLocale="fr">
+function DirRoot({ children }: { children: React.ReactNode }) {
+  const { direction } = useLocale();
+  return <div dir={direction}>{children}</div>;
+}
+
+function renderShell(locale: Locale = "fr") {
+  return render(
+    <LocaleProvider initialLocale={locale}>
+      <DirRoot>
         <AppShell>
           <p>Demo content</p>
         </AppShell>
-      </LocaleProvider>,
-    );
+      </DirRoot>
+    </LocaleProvider>,
+  );
+}
+
+afterEach(() => {
+  document.documentElement.removeAttribute("dir");
+  document.documentElement.removeAttribute("lang");
+});
+
+describe("AppShell", () => {
+  it("renders the sidebar, topbar and main content region", () => {
+    renderShell();
 
     // Sidebar navigation (desktop/tablet) — all primary modules present.
     // Scoped to the sidebar landmark: some items (Aujourd'hui/Agenda/
@@ -41,13 +58,7 @@ describe("AppShell", () => {
   });
 
   it("renders a structural mobile bottom nav with the four primary destinations", () => {
-    render(
-      <LocaleProvider initialLocale="fr">
-        <AppShell>
-          <p>Demo content</p>
-        </AppShell>
-      </LocaleProvider>,
-    );
+    renderShell();
 
     const mobileNav = screen.getByRole("navigation", { name: "Plus" });
     expect(mobileNav).toBeInTheDocument();
@@ -56,5 +67,102 @@ describe("AppShell", () => {
     // non-navigating placeholder button per Spec 06 TASK-003 §20/§28).
     expect(mobileNav.querySelectorAll("a")).toHaveLength(3);
     expect(mobileNav.querySelector("button")).toHaveTextContent("Plus");
+  });
+
+  /**
+   * UI-FIX regression guard for the originally-reported dead "Créer"
+   * topbar button — it must open a real Quick Create launcher listing
+   * only actions whose creation workflow already exists in the completed
+   * frontend (Spec #2 §4.3, Spec #7 §5), never a duplicate form.
+   */
+  describe("Quick Create (topbar Créer button)", () => {
+    it("opens the launcher listing only actions with an existing creation workflow", () => {
+      renderShell();
+
+      fireEvent.click(screen.getByRole("button", { name: "Créer" }));
+
+      const dialog = screen.getByRole("dialog", { name: "Créer" });
+      expect(within(dialog).getByRole("link", { name: /Rendez-vous/ })).toHaveAttribute("href", "/app/agenda");
+      expect(within(dialog).getByRole("link", { name: /Patient/ })).toHaveAttribute("href", "/app/patients");
+      expect(within(dialog).getByRole("link", { name: /Mouvement de stock/ })).toHaveAttribute(
+        "href",
+        "/app/stock/movements",
+      );
+      expect(within(dialog).getByRole("link", { name: /Message/ })).toHaveAttribute("href", "/app/communication");
+      expect(within(dialog).getByRole("link", { name: /Décaissement/ })).toHaveAttribute(
+        "href",
+        "/app/finance/expenses",
+      );
+
+      // No manual invoice-creation or context-free payment-capture workflow
+      // exists anywhere in the completed frontend — never exposed here.
+      expect(within(dialog).queryByText(/facture/i)).not.toBeInTheDocument();
+      expect(within(dialog).queryByText(/encaissement/i)).not.toBeInTheDocument();
+    });
+
+    it("selecting an action closes the launcher", () => {
+      renderShell();
+
+      fireEvent.click(screen.getByRole("button", { name: "Créer" }));
+      const dialog = screen.getByRole("dialog", { name: "Créer" });
+      fireEvent.click(within(dialog).getByRole("link", { name: /Patient/ }));
+
+      expect(screen.queryByRole("dialog", { name: "Créer" })).not.toBeInTheDocument();
+    });
+
+    it("Escape closes the launcher and returns focus to the Créer trigger", () => {
+      renderShell();
+
+      const trigger = screen.getByRole("button", { name: "Créer" });
+      trigger.focus();
+      fireEvent.click(trigger);
+      expect(screen.getByRole("dialog", { name: "Créer" })).toBeInTheDocument();
+
+      fireEvent.keyDown(document, { key: "Escape" });
+
+      expect(screen.queryByRole("dialog", { name: "Créer" })).not.toBeInTheDocument();
+      expect(document.activeElement).toBe(trigger);
+    });
+
+    it("renders the launcher in Arabic under RTL", () => {
+      renderShell("ar");
+
+      expect(document.querySelector("[dir='rtl']")).toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole("button", { name: "إنشاء" }));
+
+      const dialog = screen.getByRole("dialog", { name: "إنشاء" });
+      expect(within(dialog).getByRole("link", { name: /مريض/ })).toBeInTheDocument();
+    });
+  });
+
+  /**
+   * UI-FIX: the notification bell, user-account button and mobile "Plus"
+   * were visibly interactive controls with no handler at all. Each now
+   * surfaces the same established future-feature `Toast` notice already
+   * used across the app, rather than staying silently inert.
+   */
+  describe("future-feature notices", () => {
+    it("notifications button shows the future-feature notice", () => {
+      renderShell();
+
+      fireEvent.click(screen.getByRole("button", { name: "Notifications" }));
+      expect(screen.getByText("Disponible dans une prochaine étape.")).toBeInTheDocument();
+    });
+
+    it("user-account button shows the future-feature notice", () => {
+      renderShell();
+
+      fireEvent.click(screen.getByRole("button", { name: "Compte" }));
+      expect(screen.getByText("Disponible dans une prochaine étape.")).toBeInTheDocument();
+    });
+
+    it("mobile Plus button shows the future-feature notice", () => {
+      renderShell();
+
+      const mobileNav = screen.getByRole("navigation", { name: "Plus" });
+      fireEvent.click(within(mobileNav).getByRole("button", { name: "Plus" }));
+      expect(screen.getByText("Disponible dans une prochaine étape.")).toBeInTheDocument();
+    });
   });
 });

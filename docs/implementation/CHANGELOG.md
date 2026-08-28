@@ -2580,3 +2580,46 @@ All notable changes to this project are documented in this file.
   UI-011X baseline of 1516), typecheck, lint and build pass. Backend
   regression (10 tests, 26 assertions, clean) unaffected — no backend
   files touched.
+
+- UI-FIX — Dead Buttons & Interactive Actions Audit. The topbar's "+
+  Créer" (`AppTopbar`) had no `onClick`/`href` at all. Fixed by adding a
+  `QuickCreateDialog` (reuses the existing `Dialog` primitive) listing 5
+  of the specs' 6 recommended quick-create actions — Rendez-vous/
+  Patient/Mouvement de stock/Message/Décaissement — each a pure
+  navigation `Link` into that action's own already-built creation
+  workflow (`/app/agenda`, `/app/patients`, `/app/stock/movements`,
+  `/app/communication`, `/app/finance/expenses`), never a duplicate
+  form. "Nouvelle facture"/"Nouvel encaissement" deliberately omitted:
+  no manual invoice-creation workflow exists anywhere (invoices only
+  ever originate from an appointment/treatment/session), and payment
+  capture is hard-scoped to a specific patient+invoice with no safe
+  cabinet-wide entry point to deep-link into (ADR-012).
+
+  A static scan of every `<Button`/`<button` JSX tag missing `onClick`/
+  `type="submit"`/`htmlFor` across `frontend/src` surfaced 4 more dead
+  or mis-disabled controls, all fixed by reusing the codebase's own
+  established future-feature `Toast` convention (already used
+  pervasively for PDF/print/receipt downloads) instead of staying
+  silent: the topbar notification bell and user-account button,
+  `MobileNav`'s "Plus" (still a non-navigating placeholder — a
+  different, unrelated future feature, never repurposed as Create), and
+  `SubscriptionPage`'s Blackout "Contacter le support"/"Se déconnecter"
+  (previously hard-`disabled` with no explanation, contradicting
+  CLAUDE.md §11's "support/logout... remains accessible" during
+  blackout — now active). `AppShell` now owns the Quick Create dialog's
+  open state and the shared Toast message, passed to `AppTopbar`/
+  `MobileNav` as props — one shared instance, not one per surface.
+
+  Also fixed: Aujourd'hui's "Ouvrir" (`NextAppointmentSection`) had no
+  `onClick`/`href` — now a real `Link` to `/app/agenda` (not a specific
+  appointment: `TodayAppointment.id` is its own reduced fixture id with
+  no reliable join to a real Agenda appointment id, confirmed by
+  comparing both fixture sets directly — an unreliable guessed join was
+  rejected in favor of the safe, always-correct module-level
+  destination). Paramètres/Access Governance navigation hierarchy
+  (UI-011X-FIX) verified unaffected. No Laravel/API calls, no
+  LocalStorage/persistence, no new subsystem — no Notification Center,
+  User Menu or secondary-module sheet was built. 10 net new tests (1548
+  total, up from the UI-011X-FIX baseline of 1538), typecheck, lint and
+  build pass. Backend regression (10 tests, 26 assertions, clean)
+  unaffected — no backend files touched.

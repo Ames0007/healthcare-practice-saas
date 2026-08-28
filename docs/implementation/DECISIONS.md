@@ -985,3 +985,100 @@ describing *who may do what*.
 ### Date
 
 2026-08-28
+
+---
+
+## ADR-012 — UI-FIX Dead Buttons & Interactive Actions Audit: Quick Create's action list, and reusing the established future-feature Toast for shell chrome
+
+### Status
+
+Accepted
+
+### Context
+
+The global topbar's "+ Créer" button (`AppTopbar`) had no `onClick`/`href`
+at all — a confirmed dead control. Spec #2 §4.3 and Spec #7 §5 both
+describe a quick-create launcher, but their recommended action lists
+differ slightly and neither is binding verbatim (the task's own explicit
+instruction: "Do NOT blindly implement this exact list. Derive the list
+from... already implemented create workflows"). Auditing the rest of the
+completed frontend (`app-topbar.tsx`'s notification bell/user-account
+button, `MobileNav`'s "Plus", and `SubscriptionPage`'s Blackout support/
+logout buttons) surfaced four more controls that were either fully inert
+or hard-disabled with no explanation.
+
+### Decision
+
+1.  **Quick Create exposes exactly 5 of the specs' 6 recommended
+    actions — Rendez-vous, Patient, Mouvement de stock, Message,
+    Décaissement — each a pure navigation `Link` into that action's own
+    already-built creation workflow** (`/app/agenda`, `/app/patients`,
+    `/app/stock/movements`, `/app/communication`, `/app/finance/
+    expenses`). Never a duplicate `PatientForm`/`AppointmentForm`/etc.
+2.  **"Nouvelle facture" is omitted.** No manual invoice-creation
+    workflow exists anywhere in the completed frontend —
+    `GlobalInvoicesPage`'s own doc comment states "no invoice
+    creation... anywhere on this screen"; invoices only ever originate
+    from an appointment/treatment/session (CLAUDE.md §21). Inventing one
+    would be a new subsystem, not wiring an existing control.
+3.  **"Nouvel encaissement" is omitted.** `PatientPaymentCaptureDialog`
+    is hard-scoped to a specific patient's own `invoices`/
+    `localPayments` state, reachable only from Patient 360° → Paiements
+    — there is no safe, existing cabinet-wide patient-selection entry
+    point to deep-link into (the task's own explicit fallback for this
+    exact situation: "omit Payment from Quick Create").
+4.  **No query-param/deep-link auto-open plumbing was added anywhere.**
+    Zero precedent for `useSearchParams`-driven dialog auto-open exists
+    in this codebase; the task's own text explicitly allows "navigate to
+    **or** open" — plain navigation satisfies it without adding new
+    cross-page state-passing machinery to five already-shipped, already-
+    tested page components.
+5.  **The notification bell, user-account button, mobile bottom-nav
+    "Plus", and Blackout's "Contacter le support"/"Se déconnecter" now
+    reuse the exact same established future-feature `Toast` convention**
+    already used pervasively for PDF/print/receipt downloads (`t(...)`
+    → "Disponible dans une prochaine étape."), rather than staying
+    silently inert (bell/user-menu/Plus) or hard-`disabled` with no
+    explanation (support/logout — which CLAUDE.md §11 explicitly
+    requires to "remain accessible" during blackout). No Notification
+    Center, User Menu, secondary-module sheet, support channel or auth
+    system was built — only an honest, active acknowledgement.
+6.  **`AppShell` now owns the Quick Create dialog's `open` state and the
+    shared `Toast` message state**, passed down to `AppTopbar` and
+    `MobileNav` as callback props — one shared instance of each, not one
+    per surface, mirroring `Dialog`'s own "one focus-trap implementation"
+    precedent. `QuickCreateDialog` reuses the existing `Dialog` primitive
+    (`variant="modal"`) rather than a new floating-menu component.
+
+### Alternatives considered
+
+- **Auto-opening each target page's own create dialog via a query
+  param** (e.g. `/app/patients?create=1`) — rejected: no existing
+  precedent, requires new `useSearchParams` effects in five already-
+  complete, already-tested page components, and the task's own text
+  explicitly permits plain navigation as sufficient.
+- **Repurposing `MobileNav`'s "Plus" button as the mobile Quick Create
+  trigger** — rejected: "Plus" (`MoreHorizontal` icon, `nav.plus` =
+  "Plus"/"More") is a documented, unrelated placeholder for a future
+  secondary-module navigation sheet, not a create action; relabeling its
+  behavior would misrepresent what the icon/text tells the user.
+  Instead, the topbar's Créer button was made responsive (icon-only
+  below `sm`, same as `AppSidebar`'s own icon-collapse pattern) so it
+  remains reachable on every breakpoint, including mobile.
+- **Building a real Notification Center / User Menu** — rejected as
+  out of this audit's scope (task's own explicit "this is NOT a new
+  product phase"); no data model or spec detail exists for either.
+
+### Consequences
+
+- If a future task builds a real manual invoice-creation flow or a
+  cabinet-wide patient-selection step for payment capture, adding
+  "Nouvelle facture"/"Nouvel encaissement" to `QUICK_CREATE_ACTIONS` in
+  `quick-create-dialog.tsx` is a one-array-entry change, not a rewrite.
+- If a future task builds the mobile secondary-module sheet, `MobileNav`
+  already exposes the exact `onPlus` seam that sheet would replace the
+  Toast call with.
+
+### Date
+
+2026-08-28

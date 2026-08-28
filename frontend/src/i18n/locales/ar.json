@@ -17,15 +17,42 @@
     "rapports": "التقارير",
     "parametres": "الإعدادات",
     "abonnement": "الاشتراك",
-    "plus": "المزيد"
+    "plus": "المزيد",
+    "plusFutureNotice": "ستتوفر هذه الميزة في مرحلة لاحقة."
   },
   "topbar": {
     "practiceName": "العيادة (مثال)",
     "searchPlaceholder": "البحث عن مريض، رقم، فاتورة...",
     "quickCreate": "إنشاء",
     "notifications": "الإشعارات",
+    "notificationsFutureNotice": "ستتوفر هذه الميزة في مرحلة لاحقة.",
     "language": "اللغة",
-    "user": "الحساب"
+    "user": "الحساب",
+    "userFutureNotice": "ستتوفر هذه الميزة في مرحلة لاحقة.",
+    "quickCreateMenu": {
+      "navigationLabel": "إنشاء",
+      "title": "إنشاء",
+      "appointment": {
+        "label": "موعد",
+        "description": "تخطيط موعد جديد"
+      },
+      "patient": {
+        "label": "مريض",
+        "description": "إضافة مريض جديد"
+      },
+      "stockMovement": {
+        "label": "حركة مخزون",
+        "description": "تسجيل دخول أو خروج"
+      },
+      "message": {
+        "label": "رسالة",
+        "description": "إرسال رسالة"
+      },
+      "expense": {
+        "label": "مصروف",
+        "description": "تسجيل مصروف"
+      }
+    }
   },
   "sidebar": {
     "navigation": "التنقل الرئيسي",
@@ -1938,7 +1965,9 @@
       "dataPreserved": "تبقى بياناتك محفوظة.",
       "renewAction": "تجديد اشتراكي",
       "supportAction": "الاتصال بالدعم",
-      "logoutAction": "تسجيل الخروج"
+      "supportNotice": "ستتوفر هذه الميزة في مرحلة لاحقة.",
+      "logoutAction": "تسجيل الخروج",
+      "logoutNotice": "ستتوفر هذه الميزة في مرحلة لاحقة."
     },
     "plans": {
       "pageTitle": "الخطط",

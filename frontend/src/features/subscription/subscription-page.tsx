@@ -103,6 +103,13 @@ export function SubscriptionPage({
   }
 
   if (subscription.status === "blackout") {
+    // "Contacter le support"/"Se déconnecter" are real, active controls
+    // (CLAUDE.md §11: "only controlled subscription/support/logout
+    // functionality remains accessible" during blackout) — no support
+    // channel or auth/session exists yet in this prototype, so each
+    // surfaces the same established future-feature Toast every other
+    // deliberately-deferred control in the app already uses (UI-FIX),
+    // rather than staying hard-disabled with no explanation.
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 px-4 text-center">
         <h1 className="text-2xl font-semibold text-text">{t("abonnement.blackout.title")}</h1>
@@ -112,10 +119,10 @@ export function SubscriptionPage({
         <div className="flex flex-col items-center gap-3">
           <Button onClick={() => setRenewDialogOpen(true)}>{t("abonnement.blackout.renewAction")}</Button>
           <div className="flex gap-4 text-sm">
-            <Button variant="outline" size="sm" disabled>
+            <Button variant="outline" size="sm" onClick={() => setToastMessage(t("abonnement.blackout.supportNotice"))}>
               {t("abonnement.blackout.supportAction")}
             </Button>
-            <Button variant="outline" size="sm" disabled>
+            <Button variant="outline" size="sm" onClick={() => setToastMessage(t("abonnement.blackout.logoutNotice"))}>
               {t("abonnement.blackout.logoutAction")}
             </Button>
           </div>
