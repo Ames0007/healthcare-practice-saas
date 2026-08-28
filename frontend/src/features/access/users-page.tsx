@@ -15,6 +15,7 @@ import { getAccessRolesMockData } from "./mock-roles-data";
 import { getDelegationsMockData } from "./mock-delegations-data";
 import { buildUserRows } from "./users";
 import { MOCK_BUSINESS_DATE } from "@/features/today/mock-data";
+import { ParametresNav } from "@/features/parametres/components/parametres-nav";
 import { AccessGovernanceNav } from "./components/access-governance-nav";
 import { AccessSkeleton } from "./components/access-skeleton";
 import { UserAccessDrawer } from "./components/user-access-drawer";
@@ -91,6 +92,8 @@ export function UsersPage({
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title={t("access.users.pageTitle")} description={t("access.users.pageDescription")} />
+
+      <ParametresNav />
 
       <AccessGovernanceNav />
 

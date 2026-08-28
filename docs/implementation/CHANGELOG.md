@@ -2561,3 +2561,22 @@ All notable changes to this project are documented in this file.
   lint and build pass on the first full-suite run. Backend regression
   (10 tests, 26 assertions, clean) unaffected — no backend files
   touched.
+
+- UI-011X-FIX — restore Paramètres navigation hierarchy for Access
+  Governance (regression repair, no new functionality). All 5 Access
+  feature pages rendered only `AccessGovernanceNav`, silently dropping
+  `ParametresNav` — even though `ParametresNav` itself already carried
+  its correct 8th "Accès & permissions" tab since UI-011X. Fix: render
+  `ParametresNav` immediately above `AccessGovernanceNav` on each of the
+  5 pages, restoring the intended three-level hierarchy (main sidebar →
+  `ParametresNav`, "Accès & permissions" active → `AccessGovernanceNav`,
+  its own tab active) without touching any pre-existing Settings route
+  or Access Governance functionality. New `parametres-access-hierarchy.
+  test.tsx` (22 targeted tests) proves both nav levels render together
+  on every Access route, the 7 pre-existing `ParametresNav` hrefs are
+  unchanged, `AccessGovernanceNav` never leaks onto a non-Access
+  Settings route, and active-state resolves correctly at both levels
+  under both FR and AR/RTL. 22 net new tests (1538 total, up from the
+  UI-011X baseline of 1516), typecheck, lint and build pass. Backend
+  regression (10 tests, 26 assertions, clean) unaffected — no backend
+  files touched.

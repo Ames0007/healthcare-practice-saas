@@ -12,6 +12,7 @@ import type { AccessRole } from "@/components/domain/access/types";
 import { PERMISSION_DOMAIN_ORDER, getPermissionsByDomain } from "@/components/domain/access/permission-catalog";
 import { getAccessRolesMockData } from "./mock-roles-data";
 import { roleHasPermission, toggleRolePermission } from "./roles";
+import { ParametresNav } from "@/features/parametres/components/parametres-nav";
 import { AccessGovernanceNav } from "./components/access-governance-nav";
 import { AccessSkeleton } from "./components/access-skeleton";
 
@@ -68,6 +69,8 @@ export function RolesPage({ roles: providedRoles, state = "loaded", onRetry }: R
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title={t("access.roles.pageTitle")} description={t("access.roles.pageDescription")} />
+
+      <ParametresNav />
 
       <AccessGovernanceNav />
 

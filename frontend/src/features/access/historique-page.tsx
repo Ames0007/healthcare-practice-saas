@@ -10,6 +10,7 @@ import { getAccessAuditEventsMockData } from "./mock-audit-data";
 import { getTenantMembershipsMockData, getUserAccountsMockData } from "./mock-users-data";
 import { resolveAuditDetailLabel, sortAuditEventsDescending } from "./audit";
 import { formatDayMonthYear } from "@/features/patients/format";
+import { ParametresNav } from "@/features/parametres/components/parametres-nav";
 import { AccessGovernanceNav } from "./components/access-governance-nav";
 import { AccessSkeleton } from "./components/access-skeleton";
 
@@ -66,6 +67,8 @@ export function HistoriquePage({ events: providedEvents, users: providedUsers, m
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title={t("access.historique.pageTitle")} description={t("access.historique.pageDescription")} />
+
+      <ParametresNav />
 
       <AccessGovernanceNav />
 

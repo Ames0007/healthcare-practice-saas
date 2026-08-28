@@ -1523,7 +1523,17 @@ src/features/
             Rôles/Permissions/Délégations/Historique via its own nested
             `AccessGovernanceNav` (rendered alongside `ParametresNav`,
             which shows "Accès & permissions" as its 8th tab — mirrors
-            `TeamMemberDetailPage`'s own stacked-nav shape). Utilisateurs
+            `TeamMemberDetailPage`'s own stacked-nav shape: Main App Nav
+            -> Paramètres -> `ParametresNav` -> Accès & permissions ->
+            `AccessGovernanceNav`). Each of the 5 Access page components
+            renders both navs directly, one above the other — there is
+            no `layout.tsx` nesting anywhere in this app below the app
+            shell, so this follows the same inline-per-page convention
+            every other Paramètres page already uses, rather than
+            introducing a new architecture. (UI-011X's first landing
+            omitted `ParametresNav` from all 5 Access pages — fixed by
+            UI-011X-FIX with no functional change to Access Governance
+            itself.) Utilisateurs
             is the module's own root even though Rôles/Permissions were
             built first (Gate 1) — the task's own nav order, not build
             order, exactly like `ParametresNav`'s UI-010BC growth.

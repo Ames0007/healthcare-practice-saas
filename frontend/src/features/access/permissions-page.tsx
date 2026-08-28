@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import type { PermissionDefinition } from "@/components/domain/access/types";
 import { PERMISSION_DOMAIN_ORDER, getPermissionsByDomain } from "@/components/domain/access/permission-catalog";
 import { PERMISSION_SENSITIVITY_MAP } from "@/components/domain/access/permission-sensitivity";
+import { ParametresNav } from "@/features/parametres/components/parametres-nav";
 import { AccessGovernanceNav } from "./components/access-governance-nav";
 import { AccessSkeleton } from "./components/access-skeleton";
 
@@ -59,6 +60,8 @@ export function PermissionsPage({ permissions: providedPermissions, state = "loa
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title={t("access.permissions.pageTitle")} description={t("access.permissions.pageDescription")} />
+
+      <ParametresNav />
 
       <AccessGovernanceNav />
 

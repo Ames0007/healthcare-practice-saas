@@ -18,6 +18,7 @@ import { getDelegationsMockData } from "./mock-delegations-data";
 import { resolveDelegationStatus } from "./delegation-lifecycle";
 import { formatDayMonthYear } from "@/features/patients/format";
 import { MOCK_BUSINESS_DATE } from "@/features/today/mock-data";
+import { ParametresNav } from "@/features/parametres/components/parametres-nav";
 import { AccessGovernanceNav } from "./components/access-governance-nav";
 import { AccessSkeleton } from "./components/access-skeleton";
 import { CreateDelegationDialog } from "./components/create-delegation-dialog";
@@ -118,6 +119,8 @@ export function DelegationsPage({
           </Button>
         }
       />
+
+      <ParametresNav />
 
       <AccessGovernanceNav />
 
