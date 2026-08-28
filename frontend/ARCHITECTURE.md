@@ -463,6 +463,27 @@ src/components/
             type. `Referral.referredTenantName` is a frontend read-model
             enrichment (no second-tenant record exists to join against in
             this prototype), documented as such in its own doc comment.
+            `domain/access/` (UI-011X) — `PermissionDefinition`/
+            `AccessRole`/`UserAccount`/`TenantMembership`/`Delegation`/
+            `AccessAuditEvent`. Deliberately distinct from `domain/team/`
+            `TeamMember` (a person employed by the cabinet — may exist
+            with no `UserAccount` at all), `domain/subscription/`
+            `PlanEntitlement` (tenant-purchased capability, never
+            per-user), and real authentication (no password/MFA/session
+            fields on `UserAccount`). `PERMISSION_CATALOG`'s 16 core keys
+            (`permission-catalog.ts`) are copied verbatim from two
+            independently-confirming sources — Spec #4 §4.3
+            `membership_permissions` and CLAUDE.md §9's identical list —
+            rather than a deeper scheme; 7 keys extend it for modules
+            that postdate that list (Communication/Subscription/Access
+            Governance itself). `Delegation` has zero backing in the
+            approved specifications (grep-confirmed) — implemented per
+            the task's own explicit Gate 3 instructions, grounded in
+            Spec #4 §7.3's dormant `patient_access_grants` as the closest
+            real precedent (`docs/implementation/DECISIONS.md` ADR-011).
+            `EffectivePermissionEntry`/`PermissionSource` are a read-model
+            projection (mirrors `ActivityReportKpis`'s own precedent,
+            `features/rapports/`), never a fifth persisted entity.
 
 src/features/
   today/    Aujourd'hui screen composition (UI-001): `types.ts` (mock
@@ -1495,6 +1516,44 @@ src/features/
             "qualified and rewarded." The page's Copy action uses the real
             Clipboard API (`navigator.clipboard.writeText`) with a `Toast`
             confirmation — no tracking network call, no fake share flow.
+
+  access/
+            Access Governance, Roles, Permissions & Delegation of
+            Authority (UI-011X), `/app/parametres/access` — Utilisateurs/
+            Rôles/Permissions/Délégations/Historique via its own nested
+            `AccessGovernanceNav` (rendered alongside `ParametresNav`,
+            which shows "Accès & permissions" as its 8th tab — mirrors
+            `TeamMemberDetailPage`'s own stacked-nav shape). Utilisateurs
+            is the module's own root even though Rôles/Permissions were
+            built first (Gate 1) — the task's own nav order, not build
+            order, exactly like `ParametresNav`'s UI-010BC growth.
+            `effective-access.ts`'s `computeEffectivePermissions` (Role ∪
+            Grants ∪ active Delegations, minus Restrictions — restrictions
+            always win even over a delegation on the same key) is the
+            single resolver every consumer reads: the Rôles/Permissions
+            pages read the catalog directly, `UserAccessDrawer`'s
+            checklist and its own `EffectiveAccessSummary` (Gate 4's
+            "explanation UI") both read this same result, never a second
+            computation. `membership-access.ts`'s `toggleMembershipPermission`
+            is the sole mutation path for individual grants/restrictions —
+            one checkbox per permission (never two independent grant/
+            restrict controls) that maintains a provable invariant:
+            `individualRestrictions` only ever names a permission the
+            membership's own role actually grants (`docs/implementation/
+            DECISIONS.md` ADR-011 §4). `delegation-lifecycle.ts`'s
+            `resolveDelegationStatus` is a deliberate leaf module (no
+            other feature imports) so `effective-access.ts` can depend on
+            it without ever forming a cycle with `delegation-constraints.ts`
+            (which depends on `effective-access.ts` to enforce "the
+            delegator must currently hold what they're delegating").
+            `mock-audit-data.ts`'s events are static but every one traces
+            to a fact the current fixture state still holds — Meryem
+            Bakkali's own grant/restriction events name exactly the keys
+            her real `TenantMembership` still carries, and the
+            delegation-linked events reference real `Delegation` ids
+            whose own `createdAt`/`revokedAt` match exactly — proven by
+            `cross-governance-integrity.test.ts`, mirroring
+            `cross-subscription-integrity.test.ts`'s own discipline.
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,

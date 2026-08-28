@@ -1717,7 +1717,8 @@
       "rendezVous": "Rendez-vous",
       "paiements": "Paiements",
       "numerotation": "Numérotation",
-      "documents": "Documents"
+      "documents": "Documents",
+      "access": "Accès & permissions"
     },
     "cabinet": {
       "sectionTitle": "Identité du cabinet",
@@ -1982,6 +1983,212 @@
     },
     "error": {
       "title": "Impossible de charger l'abonnement.",
+      "retry": "Réessayer"
+    }
+  },
+  "access": {
+    "nav": {
+      "navigationLabel": "Navigation Accès & permissions",
+      "users": "Utilisateurs",
+      "roles": "Rôles",
+      "permissions": "Permissions",
+      "delegations": "Délégations",
+      "historique": "Historique"
+    },
+    "domain": {
+      "patients": "Patients",
+      "clinical": "Dossier santé",
+      "agenda": "Agenda",
+      "finance": "Finance",
+      "caisse": "Caisse",
+      "equipe": "Équipe",
+      "payroll": "Paie",
+      "commissions": "Commissions",
+      "inventory": "Pharmacie & Stock",
+      "communication": "Communication",
+      "reports": "Rapports",
+      "settings": "Paramètres",
+      "subscription": "Abonnement",
+      "access": "Accès & permissions"
+    },
+    "sensitivity": {
+      "normal": "Normal",
+      "sensitive": "Sensible",
+      "critical": "Critique"
+    },
+    "permission": {
+      "patients_view_admin": "Voir les informations administratives",
+      "patients_edit_admin": "Modifier les informations administratives",
+      "clinical_view": "Accéder au dossier santé",
+      "clinical_edit": "Modifier le dossier santé",
+      "appointments_manage": "Gérer les rendez-vous",
+      "invoices_view": "Voir les factures",
+      "invoices_create": "Créer des factures",
+      "payments_record": "Enregistrer des encaissements",
+      "expenses_manage": "Gérer les décaissements",
+      "caisse_manage": "Gérer la caisse",
+      "hr_manage": "Gérer l'équipe",
+      "payroll_view": "Voir la paie",
+      "commissions_manage": "Gérer les commissions",
+      "inventory_manage": "Gérer le stock",
+      "communication_view": "Voir les communications",
+      "communication_manage": "Envoyer des communications",
+      "reports_view": "Voir les rapports",
+      "settings_manage": "Gérer les paramètres",
+      "subscription_view": "Voir l'abonnement",
+      "subscription_manage": "Gérer l'abonnement",
+      "access_roles_manage": "Gérer les rôles",
+      "access_permissions_manage": "Gérer les permissions",
+      "access_delegations_manage": "Gérer les délégations"
+    },
+    "permissions": {
+      "pageTitle": "Permissions",
+      "pageDescription": "Catalogue des permissions disponibles, regroupées par domaine.",
+      "table": {
+        "permission": "Permission",
+        "sensitivity": "Sensibilité",
+        "delegatable": "Délégable"
+      },
+      "delegatableYes": "Oui",
+      "delegatableNo": "Non",
+      "footnote": "La sensibilité et la délégabilité sont des indications d'interface — l'application réelle des permissions reste à la charge du serveur."
+    },
+    "roles": {
+      "pageTitle": "Rôles",
+      "pageDescription": "Rôles disponibles et permissions associées.",
+      "systemRoleBadge": "Rôle système",
+      "save": "Enregistrer",
+      "toast": {
+        "saved": "Rôle « {{role}} » mis à jour."
+      },
+      "ownerAdmin": {
+        "name": "Propriétaire / Administrateur",
+        "description": "Accès complet à l'application, à la configuration et à l'abonnement."
+      },
+      "practitioner": {
+        "name": "Praticien",
+        "description": "Agenda et dossier santé des patients dont il est responsable."
+      },
+      "receptionist": {
+        "name": "Réceptionniste / Personnel",
+        "description": "Informations administratives des patients et rendez-vous."
+      }
+    },
+    "users": {
+      "pageTitle": "Utilisateurs",
+      "pageDescription": "Utilisateurs ayant accès à l'application et leur profil d'accès.",
+      "manageAction": "Gérer les accès",
+      "table": {
+        "name": "Nom",
+        "role": "Profil",
+        "status": "Statut",
+        "access": "Accès",
+        "actions": "Actions"
+      },
+      "status": {
+        "invited": "Invité",
+        "active": "Actif",
+        "disabled": "Désactivé",
+        "locked": "Verrouillé"
+      },
+      "accessSummary": {
+        "full": "Complet",
+        "customized": "Personnalisé",
+        "none": "Aucun"
+      },
+      "toast": {
+        "saved": "Accès mis à jour."
+      },
+      "drawer": {
+        "title": "{{name}} — Accès",
+        "close": "Fermer",
+        "roleLabel": "Rôle",
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "source": {
+          "role": "(rôle)",
+          "grant": "(individuel)",
+          "delegation": "(délégué)",
+          "restricted": "(restreint)"
+        },
+        "effectiveAccessTitle": "Accès effectif ({{count}} permissions)",
+        "effectiveAccessEmpty": "Aucune permission active."
+      }
+    },
+    "delegations": {
+      "pageTitle": "Délégations",
+      "pageDescription": "Transferts temporaires d'une permission spécifique entre utilisateurs.",
+      "addButton": "+ Nouvelle délégation",
+      "revokeAction": "Révoquer",
+      "emptyTitle": "Aucune délégation configurée.",
+      "emptyDescription": "Créez une délégation pour transférer temporairement une permission.",
+      "table": {
+        "from": "De",
+        "to": "À",
+        "permission": "Permission",
+        "period": "Période",
+        "status": "Statut",
+        "actions": "Actions"
+      },
+      "status": {
+        "scheduled": "Programmée",
+        "active": "Active",
+        "expired": "Expirée",
+        "revoked": "Révoquée"
+      },
+      "toast": {
+        "created": "Délégation créée.",
+        "revoked": "Délégation révoquée."
+      },
+      "revokeDialog": {
+        "title": "Révoquer la délégation",
+        "description": "L'utilisateur perdra immédiatement l'accès délégué. Cette action ne peut pas être annulée.",
+        "cancel": "Annuler",
+        "confirm": "Révoquer"
+      },
+      "form": {
+        "title": "Nouvelle délégation",
+        "close": "Fermer",
+        "delegatorLabel": "Délégué par",
+        "delegateLabel": "Délégué à",
+        "permissionLabel": "Permission",
+        "permissionPlaceholder": "Sélectionner une permission",
+        "startsAtLabel": "Début",
+        "endsAtLabel": "Fin",
+        "reasonLabel": "Motif (optionnel)",
+        "cancel": "Annuler",
+        "save": "Créer la délégation",
+        "noMatch": "Aucun résultat.",
+        "requiredError": "Ce champ est obligatoire.",
+        "sameMemberError": "Le délégué doit être différent du délégant.",
+        "notDelegatableError": "Cette permission ne peut pas être déléguée.",
+        "delegatorLacksPermissionError": "Le délégant ne possède pas actuellement cette permission.",
+        "endBeforeStartError": "La date de fin doit être postérieure à la date de début."
+      }
+    },
+    "historique": {
+      "pageTitle": "Historique",
+      "pageDescription": "Journal des changements d'accès (rôles, permissions, délégations).",
+      "emptyTitle": "Aucun changement d'accès enregistré.",
+      "table": {
+        "date": "Date",
+        "event": "Événement",
+        "actor": "Acteur",
+        "target": "Cible",
+        "detail": "Détail"
+      },
+      "event": {
+        "role_assigned": "Rôle attribué",
+        "role_removed": "Rôle retiré",
+        "permission_granted": "Permission accordée",
+        "permission_restricted": "Permission restreinte",
+        "delegation_created": "Délégation créée",
+        "delegation_revoked": "Délégation révoquée",
+        "user_deactivated": "Utilisateur désactivé"
+      }
+    },
+    "error": {
+      "title": "Impossible de charger les accès & permissions.",
       "retry": "Réessayer"
     }
   },

@@ -4,7 +4,15 @@ import { usePathname } from "next/navigation";
 import { useLocale } from "@/i18n/locale-provider";
 import { Tabs, type TabItem } from "@/components/ui/tabs";
 
-type ParametresSectionKey = "cabinet" | "services" | "horaires" | "rendezVous" | "paiements" | "numerotation" | "documents";
+type ParametresSectionKey =
+  | "cabinet"
+  | "services"
+  | "horaires"
+  | "rendezVous"
+  | "paiements"
+  | "numerotation"
+  | "documents"
+  | "access";
 
 /** Exact/path-aware matching (mirrors `StockNav`/`ReportsNav`): `/app/parametres` itself must only be active for the literal Cabinet route. */
 function resolveActiveSection(pathname: string): ParametresSectionKey {
@@ -14,6 +22,7 @@ function resolveActiveSection(pathname: string): ParametresSectionKey {
   if (pathname.startsWith("/app/parametres/paiements")) return "paiements";
   if (pathname.startsWith("/app/parametres/numerotation")) return "numerotation";
   if (pathname.startsWith("/app/parametres/documents")) return "documents";
+  if (pathname.startsWith("/app/parametres/access")) return "access";
   return "cabinet";
 }
 
@@ -22,9 +31,9 @@ function resolveActiveSection(pathname: string): ParametresSectionKey {
  * "Cabinet" (UI-010ABC Gate 2's own root); "Services & tarifs", "Horaires"
  * and "Numérotation" were added by UI-010ABC Gate 3; "Rendez-vous",
  * "Paiements" and "Documents" were added by UI-010BC Gate 2 to complete the
- * full IA list (task §9) — mirrors `CommunicationNav`'s own documented
- * one-tab-per-gate growth (a nav never lists a tab whose route doesn't
- * exist yet).
+ * full IA list (task §9); "Accès & permissions" was added by UI-011X
+ * (task §5) — mirrors `CommunicationNav`'s own documented one-tab-per-gate
+ * growth (a nav never lists a tab whose route doesn't exist yet).
  */
 export function ParametresNav() {
   const pathname = usePathname();
@@ -39,6 +48,7 @@ export function ParametresNav() {
     { key: "paiements", label: t("parametres.nav.paiements"), href: "/app/parametres/paiements" },
     { key: "numerotation", label: t("parametres.nav.numerotation"), href: "/app/parametres/numerotation" },
     { key: "documents", label: t("parametres.nav.documents"), href: "/app/parametres/documents" },
+    { key: "access", label: t("parametres.nav.access"), href: "/app/parametres/access" },
   ];
 
   return <Tabs ariaLabel={t("parametres.nav.navigationLabel")} activeKey={activeKey} items={items} />;

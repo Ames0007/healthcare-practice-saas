@@ -1717,7 +1717,8 @@
       "rendezVous": "المواعيد",
       "paiements": "المدفوعات",
       "numerotation": "الترقيم",
-      "documents": "المستندات"
+      "documents": "المستندات",
+      "access": "الوصول والصلاحيات"
     },
     "cabinet": {
       "sectionTitle": "هوية العيادة",
@@ -1982,6 +1983,212 @@
     },
     "error": {
       "title": "تعذر تحميل الاشتراك.",
+      "retry": "إعادة المحاولة"
+    }
+  },
+  "access": {
+    "nav": {
+      "navigationLabel": "تنقل الوصول والصلاحيات",
+      "users": "المستخدمون",
+      "roles": "الأدوار",
+      "permissions": "الصلاحيات",
+      "delegations": "التفويضات",
+      "historique": "السجل"
+    },
+    "domain": {
+      "patients": "المرضى",
+      "clinical": "الملف الصحي",
+      "agenda": "الأجندة",
+      "finance": "المالية",
+      "caisse": "الصندوق",
+      "equipe": "الفريق",
+      "payroll": "الأجور",
+      "commissions": "العمولات",
+      "inventory": "الصيدلية والمخزون",
+      "communication": "التواصل",
+      "reports": "التقارير",
+      "settings": "الإعدادات",
+      "subscription": "الاشتراك",
+      "access": "الوصول والصلاحيات"
+    },
+    "sensitivity": {
+      "normal": "عادي",
+      "sensitive": "حساس",
+      "critical": "حرج"
+    },
+    "permission": {
+      "patients_view_admin": "عرض المعلومات الإدارية",
+      "patients_edit_admin": "تعديل المعلومات الإدارية",
+      "clinical_view": "الوصول إلى الملف الصحي",
+      "clinical_edit": "تعديل الملف الصحي",
+      "appointments_manage": "إدارة المواعيد",
+      "invoices_view": "عرض الفواتير",
+      "invoices_create": "إنشاء فواتير",
+      "payments_record": "تسجيل المدفوعات",
+      "expenses_manage": "إدارة المصروفات",
+      "caisse_manage": "إدارة الصندوق",
+      "hr_manage": "إدارة الفريق",
+      "payroll_view": "عرض الأجور",
+      "commissions_manage": "إدارة العمولات",
+      "inventory_manage": "إدارة المخزون",
+      "communication_view": "عرض الاتصالات",
+      "communication_manage": "إرسال الاتصالات",
+      "reports_view": "عرض التقارير",
+      "settings_manage": "إدارة الإعدادات",
+      "subscription_view": "عرض الاشتراك",
+      "subscription_manage": "إدارة الاشتراك",
+      "access_roles_manage": "إدارة الأدوار",
+      "access_permissions_manage": "إدارة الصلاحيات",
+      "access_delegations_manage": "إدارة التفويضات"
+    },
+    "permissions": {
+      "pageTitle": "الصلاحيات",
+      "pageDescription": "كتالوج الصلاحيات المتاحة، مصنّفة حسب المجال.",
+      "table": {
+        "permission": "الصلاحية",
+        "sensitivity": "الحساسية",
+        "delegatable": "قابل للتفويض"
+      },
+      "delegatableYes": "نعم",
+      "delegatableNo": "لا",
+      "footnote": "الحساسية وإمكانية التفويض مؤشرات واجهة فقط — التطبيق الفعلي للصلاحيات يبقى من مسؤولية الخادم."
+    },
+    "roles": {
+      "pageTitle": "الأدوار",
+      "pageDescription": "الأدوار المتاحة والصلاحيات المرتبطة بها.",
+      "systemRoleBadge": "دور نظامي",
+      "save": "حفظ",
+      "toast": {
+        "saved": "تم تحديث دور «{{role}}»."
+      },
+      "ownerAdmin": {
+        "name": "المالك / المسؤول",
+        "description": "وصول كامل إلى التطبيق والتهيئة والاشتراك."
+      },
+      "practitioner": {
+        "name": "الممارس",
+        "description": "الأجندة والملف الصحي للمرضى الذين هو مسؤول عنهم."
+      },
+      "receptionist": {
+        "name": "الاستقبال / الموظفون",
+        "description": "المعلومات الإدارية للمرضى والمواعيد."
+      }
+    },
+    "users": {
+      "pageTitle": "المستخدمون",
+      "pageDescription": "المستخدمون الذين لديهم وصول إلى التطبيق ونمط وصولهم.",
+      "manageAction": "إدارة الوصول",
+      "table": {
+        "name": "الاسم",
+        "role": "الملف",
+        "status": "الحالة",
+        "access": "الوصول",
+        "actions": "إجراءات"
+      },
+      "status": {
+        "invited": "مدعو",
+        "active": "نشط",
+        "disabled": "معطّل",
+        "locked": "مقفل"
+      },
+      "accessSummary": {
+        "full": "كامل",
+        "customized": "مخصص",
+        "none": "لا شيء"
+      },
+      "toast": {
+        "saved": "تم تحديث الوصول."
+      },
+      "drawer": {
+        "title": "{{name}} — الوصول",
+        "close": "إغلاق",
+        "roleLabel": "الدور",
+        "cancel": "إلغاء",
+        "save": "حفظ",
+        "source": {
+          "role": "(دور)",
+          "grant": "(فردي)",
+          "delegation": "(مفوَّض)",
+          "restricted": "(مقيَّد)"
+        },
+        "effectiveAccessTitle": "الوصول الفعلي ({{count}} صلاحية)",
+        "effectiveAccessEmpty": "لا توجد صلاحية نشطة."
+      }
+    },
+    "delegations": {
+      "pageTitle": "التفويضات",
+      "pageDescription": "تحويلات مؤقتة لصلاحية محددة بين المستخدمين.",
+      "addButton": "+ تفويض جديد",
+      "revokeAction": "سحب",
+      "emptyTitle": "لا توجد تفويضات معدّة.",
+      "emptyDescription": "أنشئ تفويضًا لنقل صلاحية مؤقتًا.",
+      "table": {
+        "from": "من",
+        "to": "إلى",
+        "permission": "الصلاحية",
+        "period": "الفترة",
+        "status": "الحالة",
+        "actions": "إجراءات"
+      },
+      "status": {
+        "scheduled": "مجدولة",
+        "active": "نشطة",
+        "expired": "منتهية",
+        "revoked": "مسحوبة"
+      },
+      "toast": {
+        "created": "تم إنشاء التفويض.",
+        "revoked": "تم سحب التفويض."
+      },
+      "revokeDialog": {
+        "title": "سحب التفويض",
+        "description": "سيفقد المستخدم الوصول المفوَّض فورًا. لا يمكن التراجع عن هذا الإجراء.",
+        "cancel": "إلغاء",
+        "confirm": "سحب"
+      },
+      "form": {
+        "title": "تفويض جديد",
+        "close": "إغلاق",
+        "delegatorLabel": "المفوِّض",
+        "delegateLabel": "المفوَّض إليه",
+        "permissionLabel": "الصلاحية",
+        "permissionPlaceholder": "اختر صلاحية",
+        "startsAtLabel": "البداية",
+        "endsAtLabel": "النهاية",
+        "reasonLabel": "السبب (اختياري)",
+        "cancel": "إلغاء",
+        "save": "إنشاء التفويض",
+        "noMatch": "لا توجد نتائج.",
+        "requiredError": "هذا الحقل إلزامي.",
+        "sameMemberError": "يجب أن يكون المفوَّض إليه مختلفًا عن المفوِّض.",
+        "notDelegatableError": "لا يمكن تفويض هذه الصلاحية.",
+        "delegatorLacksPermissionError": "لا يملك المفوِّض هذه الصلاحية حاليًا.",
+        "endBeforeStartError": "يجب أن يكون تاريخ النهاية بعد تاريخ البداية."
+      }
+    },
+    "historique": {
+      "pageTitle": "السجل",
+      "pageDescription": "سجل تغييرات الوصول (الأدوار، الصلاحيات، التفويضات).",
+      "emptyTitle": "لم يُسجَّل أي تغيير في الوصول.",
+      "table": {
+        "date": "التاريخ",
+        "event": "الحدث",
+        "actor": "الفاعل",
+        "target": "الهدف",
+        "detail": "التفصيل"
+      },
+      "event": {
+        "role_assigned": "تم تعيين الدور",
+        "role_removed": "تم إزالة الدور",
+        "permission_granted": "تم منح الصلاحية",
+        "permission_restricted": "تم تقييد الصلاحية",
+        "delegation_created": "تم إنشاء التفويض",
+        "delegation_revoked": "تم سحب التفويض",
+        "user_deactivated": "تم تعطيل المستخدم"
+      }
+    },
+    "error": {
+      "title": "تعذر تحميل الوصول والصلاحيات.",
       "retry": "إعادة المحاولة"
     }
   },

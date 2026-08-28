@@ -2495,3 +2495,69 @@ All notable changes to this project are documented in this file.
   typecheck, lint and build pass on the first full-suite run. Backend
   regression (10 tests, 26 assertions, clean) unaffected — no backend
   files touched.
+
+- UI-011X — Access Governance, Roles, Permissions & Delegation of
+  Authority. Adds "Accès & permissions" as `ParametresNav`'s 8th tab,
+  `/app/parametres/access` (Utilisateurs/Rôles/Permissions/Délégations/
+  Historique via its own nested `AccessGovernanceNav`, never added to
+  the global sidebar). New domain layer `components/domain/access/`,
+  deliberately distinct from `TeamMember` (a person employed by the
+  cabinet — may exist with no `UserAccount`), `PlanEntitlement`
+  (tenant-purchased capability, never per-user), and real authentication
+  (no password/MFA/session fields anywhere). The permission catalog's 16
+  core keys are copied verbatim from two independently-confirming
+  sources — Spec #4 §4.3 `membership_permissions` and CLAUDE.md §9's
+  identical list — rather than the task's own deeper suggested scheme;
+  Screen 35's own single "CAISSE [x] Accéder" checkbox confirms the
+  coarser grain directly (ADR-011).
+
+  **Gate 1 — Roles & Permissions.** 23 permission keys across 14
+  domains; sensitivity (normal/sensitive/critical) is UI-warning-only,
+  never enforcement. Exactly the 3 V1 conceptual roles Spec #2 §29.1
+  defines — Owner/Admin holds every permission; Practitioner defaults to
+  agenda + own clinical + admin-patient-view + reports; Receptionist/
+  Staff defaults to admin-patient + appointments only, since "clinical
+  access should not be casually enabled." Rôles is a stacked, editable
+  domain-grouped checklist per role; Permissions is the read-only
+  catalog reference.
+
+  **Gate 2 — User Access.** `UserAccount`/`TenantMembership` link to 5
+  of 8 real Équipe fixtures — 3 deliberately have none, demonstrating
+  "a TeamMember may exist without a UserAccount." Meryem Bakkali's own
+  membership reproduces Screen 35's worked example exactly (role
+  defaults + 2 individual grants + 1 restriction). The effective-access
+  resolver (Role ∪ Grants ∪ Delegations minus Restrictions, restrictions
+  always winning) was built here as Gate 3/4's own prerequisite. The
+  Utilisateurs table reproduces Screen 46's own Nom/Profil/Statut/Accès
+  columns; "Gérer les accès" uses one unified per-permission toggle
+  (never two independent grant/restrict checkboxes) provably maintaining
+  the invariant that a restriction only ever names a role-granted key.
+
+  **Gate 3 — Delegation.** Has zero backing in the approved
+  specifications (grep-confirmed across all 10 spec files) — implemented
+  because the task's own Gate 3 instructions are explicit (CLAUDE.md §1:
+  task instructions outrank specs), kept minimal (one permission per
+  delegation) and grounded in the closest real precedent, Spec #4 §7.3's
+  dormant `patient_access_grants`. All 4 lifecycle states derive live
+  from dates; revocation always wins even mid-window. `caisse.manage`/
+  `subscription.manage`/every `access.*` permission is never delegatable
+  (physical-custody, WF-74, and privilege-escalation reasoning
+  respectively). Creating a delegation validates both the catalog's own
+  `delegatable` flag and that the delegator *currently* effectively
+  holds the permission — nobody can delegate authority they lack.
+
+  **Gate 4 — Effective Access & Audit.** A compact "what does this
+  person actually have, and why" summary sits inside the same drawer,
+  reading the identical resolver result the checklist already shows —
+  never a second computation. The audit history is a bounded, static,
+  read-only fixture where every event traces to a fact the current
+  fixture state still holds (never a fabricated log line).
+  `cross-governance-integrity.test.ts` proves the full chain end to end.
+
+  No Laravel authorization, no authentication implementation, no
+  security claims, no database, no API, no real enforcement across
+  existing modules, no LocalStorage/global persistence. 124 net new
+  tests (1516 total, up from the UI-011ABC baseline of 1392), typecheck,
+  lint and build pass on the first full-suite run. Backend regression
+  (10 tests, 26 assertions, clean) unaffected — no backend files
+  touched.

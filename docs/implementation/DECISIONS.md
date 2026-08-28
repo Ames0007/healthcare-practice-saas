@@ -854,3 +854,134 @@ here matters more than usual for this particular module.
 ### Date
 
 2026-08-28
+
+------------------------------------------------------------------------
+
+## ADR-011 — UI-011X Access Governance: the 16-key CLAUDE/spec permission catalog over the task's own deeper suggestion, Delegation as an explicit task-instructed extension with no spec backing, and a non-delegatable set
+
+### Status
+
+Accepted
+
+### Decision
+
+Four related prototype-scoping decisions made while implementing Access
+Governance, Roles, Permissions & Delegation of Authority, recorded here
+per CLAUDE.md §1/§59:
+
+1.  **The permission catalog's core 16 keys are copied verbatim from two
+    independently-confirming sources — Spec #4 §4.3
+    `membership_permissions`'s own "Examples:" list and CLAUDE.md §9's
+    identical list — rather than the deeper, more granular scheme the
+    task's own §6 sketches** (e.g. `clinical.profile.view`/`clinical.
+    history.view`/`clinical.consultation.manage` as three keys instead
+    of one `clinical.view`/`clinical.edit` pair; `caisse.view`/`caisse.
+    open`/`caisse.close`/`caisse.discrepancy.approve` instead of one
+    `caisse.manage`). The task's own text explicitly authorizes this:
+    "Do not blindly use this list. Inspect actual implemented
+    capabilities and governing specifications first." Spec #9 Screen
+    35's own worked example reinforces the coarser grain directly —
+    "CAISSE [x] Accéder" is one checkbox, not four. Seven keys extend
+    the base list for modules that postdate it (Communication,
+    Subscription, Access Governance itself have no representation in
+    Spec #4 §4.3/CLAUDE.md §9 at all) — each stays at the same coarse
+    grain as its neighbors rather than inventing a deeper scheme just
+    for the new modules.
+2.  **Delegation of Authority (Gate 3) has zero backing in the approved
+    specifications** — grep-confirmed across all 10 spec files, zero
+    matches for "delegat" or any close synonym. It is implemented
+    anyway because the task's own Gate 3 instructions are explicit
+    (CLAUDE.md §1: explicit current task instructions outrank
+    specifications), kept deliberately minimal per CLAUDE.md §3 ("do
+    not invent a large new subsystem") — bounded to exactly what the
+    task's own checklist enumerates (one permission per delegation, a
+    4-state lifecycle, a workspace, create, revoke, constraint
+    validation), reusing Gate 1's own `PermissionDefinition.delegatable`
+    flag as the sole catalog-level gate rather than inventing
+    additional business rules (approval workflows, escalation,
+    notification systems). The closest approved-spec precedent is Spec
+    #4 §7.3 `patient_access_grants` — a dormant, "future-ready"
+    time-bounded clinical-access-sharing grant with the identical
+    `starts_at`/`ends_at`/`status` shape `Delegation` generalizes to any
+    delegatable permission.
+3.  **`caisse.manage`, `subscription.manage`, and all three `access.*`
+    permissions are `delegatable: false`.** `caisse.manage`: physical
+    cash custody is tied to one accountable person (CLAUDE.md §26), and
+    temporarily transferring caisse-closing authority creates a real
+    physical-custody ambiguity beyond ordinary "cover for an absence"
+    delegation. `subscription.manage`: Spec #3 WF-74's own explicit
+    rule — "Staff should not be able to upgrade subscription unless
+    authorized." The three `access.*` keys: delegating the ability to
+    change permissions/roles/delegations is a direct privilege-
+    escalation path (a delegate could grant themselves more, or extend
+    their own delegation) — this is the one place a "temporary
+    coverage" framing does not apply at all.
+4.  **A single unified checkbox per permission in the "Gérer les accès"
+    drawer (task §12), not separate "grant" and "restrict" controls.**
+    Clicking a permission that is not currently effective adds an
+    individual grant (or lifts an existing restriction, whichever is
+    why it wasn't effective); clicking one that is currently effective
+    either removes the individual grant responsible for it, or — if the
+    membership's own role is the source — adds a restriction. This
+    maintains a real invariant proven by `membership-access.test.ts`
+    and `cross-governance-integrity.test.ts`: `individualRestrictions`
+    only ever names a permission the membership's own role actually
+    grants; `individualGrants` only ever names one the role does not.
+    Two independent checkboxes per permission would let an operator
+    create contradictory states (e.g. both granting and restricting the
+    same key) with no enforced relationship between them.
+
+### Context
+
+None of the four carries security/data-integrity risk on its own — every
+governance action here is presentational (task's own explicit "NO real
+enforcement across existing modules" boundary) — but all four shape what
+a reader might mistake for a settled product decision (the permission
+vocabulary, whether delegation is a real approved feature, which
+capabilities can ever be delegated) if left undocumented, so recording
+them matters more than usual for a module whose entire purpose is
+describing *who may do what*.
+
+### Alternatives
+
+1.  Implement the task's own deeper `domain.subarea.action` permission
+    scheme literally — rejected: it would silently diverge from the one
+    permission vocabulary two independent approved sources (CLAUDE.md
+    §9, Spec #4 §4.3) already define identically, and Screen 35's own
+    wireframe checkbox count would then no longer match the underlying
+    model.
+2.  Skip Delegation entirely and report the spec gap as a blocker
+    (CLAUDE.md §63) — rejected: the gap is a genuine product-scope
+    silence, not a security/data-integrity conflict, and the task's own
+    Gate 3 instructions are explicit and detailed enough to implement
+    responsibly within a bounded, minimal scope rather than warranting
+    a stop.
+3.  Make every permission delegatable, including `access.*` — rejected
+    outright: this would let a temporary delegate grant themselves
+    permanent broader access or indefinitely extend/recreate their own
+    delegation, defeating the entire point of "temporary."
+4.  Two independent grant/restrict checkboxes per permission — rejected:
+    would allow operator-created contradictions with no single source
+    of truth for "what does this checkbox state even mean," where the
+    unified toggle's one real state transition per click cannot.
+
+### Consequences
+
+- If a future task needs finer-grained permissions within an existing
+  coarse key (e.g. splitting `clinical.edit` into consultation-notes vs.
+  prescriptions), it extends the catalog additively — no existing role/
+  membership/delegation fixture needs to change shape, since they only
+  ever reference keys by string.
+- If backend Identity/Tenancy work (Spec #6 Phase 1) formalizes a real
+  `patient_access_grants` implementation, `Delegation` can be
+  reconciled with it directly — the shapes were deliberately kept
+  close (ADR-011 §2) specifically to make that reconciliation
+  straightforward rather than requiring a rewrite.
+- If product later decides `caisse.manage` or any `access.*` permission
+  should become delegatable after all, flipping one boolean in
+  `permission-catalog.ts` is sufficient — no other file encodes this
+  rule redundantly.
+
+### Date
+
+2026-08-28
