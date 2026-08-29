@@ -1,12 +1,24 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { LocaleProvider, useLocale } from "@/i18n/locale-provider";
 import type { Locale } from "@/i18n/config";
 import type { Invoice } from "@/components/domain/finance/types";
 import { PatientInvoicesContent } from "./patient-invoices-content";
+import { generateDocumentBlob, triggerBlobDownload } from "@/features/documents/download";
+import { getDocumentSettingsMockData } from "@/features/parametres/mock-document-settings-data";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/app/patients/pat-1/invoices",
+}));
+
+vi.mock("@/features/documents/download", () => ({
+  generateDocumentBlob: vi.fn().mockResolvedValue(new Blob(["pdf"], { type: "application/pdf" })),
+  triggerBlobDownload: vi.fn(),
+  triggerBlobPrint: vi.fn(),
+}));
+
+vi.mock("@/features/parametres/mock-document-settings-data", () => ({
+  getDocumentSettingsMockData: vi.fn(() => ({ footerText: "Cabinet (exemple) — 05 22 34 56 78", documentLanguage: "fr" })),
 }));
 
 function DirRoot({ children }: { children: React.ReactNode }) {
@@ -222,13 +234,30 @@ describe("PatientInvoicesContent", () => {
     expect(link).toHaveAttribute("href", "/app/patients/pat-1/payments");
   });
 
-  it("shows a future-feature notice for Télécharger PDF instead of generating a document (29)", async () => {
+  it("generates and downloads a real invoice PDF from Télécharger PDF (UI-DOCS-X)", async () => {
     renderContent("fr", { patientId: "pat-1", invoices: [PARTIAL_INVOICE] });
 
     fireEvent.click(screen.getByRole("button", { name: "Voir la facture" }));
     const dialog = await screen.findByRole("dialog");
     fireEvent.click(within(dialog).getByRole("button", { name: "Télécharger PDF" }));
-    expect(screen.getByText("La génération PDF sera connectée au moteur documentaire ultérieurement.")).toBeInTheDocument();
+
+    await waitFor(() => expect(generateDocumentBlob).toHaveBeenCalled());
+    expect(triggerBlobDownload).toHaveBeenCalledWith(expect.any(Blob), `Facture-${PARTIAL_INVOICE.invoiceNumber}.pdf`);
+  });
+
+  it("shows the Arabic-unavailable notice instead of generating a broken PDF when document language is Arabic (UI-DOCS-X §31, ADR-016)", async () => {
+    vi.mocked(generateDocumentBlob).mockClear();
+    vi.mocked(getDocumentSettingsMockData).mockReturnValueOnce({ footerText: "العيادة (مثال)", documentLanguage: "ar" });
+    renderContent("fr", { patientId: "pat-1", invoices: [PARTIAL_INVOICE] });
+
+    fireEvent.click(screen.getByRole("button", { name: "Voir la facture" }));
+    const dialog = await screen.findByRole("dialog");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Télécharger PDF" }));
+
+    expect(
+      await screen.findByText("La génération de documents PDF en arabe n'est pas encore disponible (limitation technique en cours de résolution). Le document reste consultable ci-contre."),
+    ).toBeInTheDocument();
+    expect(generateDocumentBlob).not.toHaveBeenCalled();
   });
 
   it("links to the related treatment plan (30)", async () => {

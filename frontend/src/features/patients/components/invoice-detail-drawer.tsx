@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useLocale } from "@/i18n/locale-provider";
 import { Dialog } from "@/components/ui/dialog";
@@ -10,6 +11,13 @@ import { InstallmentRow } from "@/components/domain/finance/installment-row";
 import type { Invoice } from "@/components/domain/finance/types";
 import { formatDayMonth, formatMad } from "@/features/patients/format";
 import { getTreatmentPlansMockData } from "@/features/patients/mock-treatments-data";
+import { getPatientsMockData } from "@/features/patients/mock-data";
+import { getCabinetProfileMockData } from "@/features/parametres/mock-cabinet-profile-data";
+import { getDocumentSettingsMockData } from "@/features/parametres/mock-document-settings-data";
+import { buildInvoiceDocument } from "@/features/documents/invoice-document";
+import { InvoiceDocumentPdf } from "@/features/documents/invoice-document-pdf";
+import { generateDocumentBlob, triggerBlobDownload, triggerBlobPrint } from "@/features/documents/download";
+import { isDocumentLanguageSupported } from "@/features/documents/capabilities";
 
 export interface InvoiceDetailDrawerProps {
   invoice: Invoice | null;
@@ -33,9 +41,11 @@ export interface InvoiceDetailDrawerProps {
  * Invoice detail (Spec #9 Screens 25-26/29, UI-004D §24-27). Reuses the
  * shared `Dialog` drawer unmodified — no accounting journal, no payment
  * form; "Encaisser" only navigates to the existing Payments tab (UI-004E
- * owns real collection), and "Télécharger PDF"/"Imprimer" only surface a
- * future-feature notice (§35), never generating a document. Shared
- * unmodified between Patient 360°'s Factures tab and Global Finance
+ * owns real collection). "Télécharger PDF"/"Imprimer" generate a real PDF
+ * from this exact `Invoice` (UI-DOCS-X) — this open drawer already serves
+ * as the document's preview surface, so no separate "Aperçu" dialog is
+ * added. `onFutureFeature` now only fires if generation itself fails.
+ * Shared unmodified between Patient 360°'s Factures tab and Global Finance
  * (UI-006B §21) — this component never assumed Patient 360° page
  * composition to begin with (only pre-resolved props), so the only change
  * needed was the additive `showPatientNavigation` prop above.
@@ -50,17 +60,60 @@ export function InvoiceDetailDrawer({
   showPatientNavigation = false,
 }: InvoiceDetailDrawerProps) {
   const { t, locale } = useLocale();
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
 
   if (!invoice) {
     return null;
   }
 
+  const currentInvoice = invoice;
   const statusMeta = INVOICE_STATUS_MAP[invoice.status];
   const canCollect = invoice.remainingAmount > 0 && invoice.status !== "cancelled";
   const treatmentPlan = invoice.treatmentPlanId
     ? getTreatmentPlansMockData().find((plan) => plan.id === invoice.treatmentPlanId)
     : undefined;
   const installmentsTotal = invoice.installments.reduce((sum, installment) => sum + installment.amount, 0);
+  const patientNumber = getPatientsMockData().find((candidate) => candidate.id === patientId)?.patientNumber ?? "";
+
+  async function generateInvoiceBlob() {
+    const documentSettings = getDocumentSettingsMockData();
+    const model = buildInvoiceDocument(currentInvoice, patientName, patientNumber, getCabinetProfileMockData(), documentSettings);
+    const blob = await generateDocumentBlob(<InvoiceDocumentPdf model={model} />);
+    return { blob, filename: model.filename };
+  }
+
+  async function handleDownload() {
+    if (!isDocumentLanguageSupported(getDocumentSettingsMockData().documentLanguage)) {
+      onFutureFeature(t("documents.languageUnsupportedNotice"));
+      return;
+    }
+    setIsDownloading(true);
+    try {
+      const { blob, filename } = await generateInvoiceBlob();
+      triggerBlobDownload(blob, filename);
+    } catch {
+      onFutureFeature(t("patientDetail.invoices.documentNotice"));
+    } finally {
+      setIsDownloading(false);
+    }
+  }
+
+  async function handlePrint() {
+    if (!isDocumentLanguageSupported(getDocumentSettingsMockData().documentLanguage)) {
+      onFutureFeature(t("documents.languageUnsupportedNotice"));
+      return;
+    }
+    setIsPrinting(true);
+    try {
+      const { blob } = await generateInvoiceBlob();
+      triggerBlobPrint(blob);
+    } catch {
+      onFutureFeature(t("patientDetail.invoices.documentNotice"));
+    } finally {
+      setIsPrinting(false);
+    }
+  }
 
   return (
     <Dialog open={open} onClose={onClose} variant="drawer" label={invoice.invoiceNumber} closeLabel={t("agenda.drawer.close")}>
@@ -182,18 +235,10 @@ export function InvoiceDetailDrawer({
         )}
 
         <div className="flex flex-wrap gap-3 border-t border-border pt-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onFutureFeature(t("patientDetail.invoices.documentNotice"))}
-          >
+          <Button variant="outline" size="sm" onClick={handleDownload} loading={isDownloading}>
             {t("patientDetail.invoices.downloadPdf")}
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onFutureFeature(t("patientDetail.invoices.documentNotice"))}
-          >
+          <Button variant="ghost" size="sm" onClick={handlePrint} loading={isPrinting}>
             {t("patientDetail.invoices.print")}
           </Button>
         </div>

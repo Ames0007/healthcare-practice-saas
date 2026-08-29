@@ -162,3 +162,38 @@ can actually be run.
 **Decision Required Before:** Any task that assumes Docker Compose is the
 local infrastructure mechanism (e.g. authoring CI service containers that
 mirror local dev, or onboarding a Docker-equipped developer).
+
+---
+
+### RISK-015
+
+**Topic:** Arabic-language PDF generation produces corrupted glyphs
+**Status:** OPEN (mitigated in UI — feature gated off, not shipped broken; ADR-016)
+**Affected Tasks:** UI-DOCS-X, any future task that generates PDF/printable
+documents
+**Description:** `@react-pdf/renderer` 4.9.0's Arabic text-shaping/layout
+pipeline intermittently drops or corrupts individual glyphs in real,
+visually-inspected generated PDFs (e.g. a leading hamza-bearing letter
+rendering as a disconnected floating mark; an internal "ف" vanishing
+entirely) — confirmed via an independent renderer (poppler `pdftoppm`),
+reproduced identically across two different embedded fonts (Noto Naskh
+Arabic, Noto Sans Arabic), and still present after pre-shaping the text
+into Arabic Presentation Forms via `arabic-reshaper` to bypass the
+library's own shaper. This rules out "wrong font" and "buggy contextual-
+substitution table" as the fixable cause and points at the library's
+lower-level glyph-positioning/bidi pipeline itself — outside what this
+task can fix from application code. UI-DOCS-X therefore ships French PDF
+generation only; `Télécharger`/`Imprimer` show a real translated notice
+instead of generating a corrupted file whenever
+`DocumentSettings.documentLanguage === "ar"` (`isDocumentLanguageSupported`,
+`frontend/src/features/documents/capabilities.ts`). The document
+builders/PDF components for Arabic are kept fully implemented and tested
+(`pdf-generation.test.ts`) so re-enabling is a one-line change once fixed.
+**Decision Required Before:** Any commitment to ship Arabic-language PDF
+documents to a real cabinet. Candidate next steps: (a) re-test against a
+future `@react-pdf/renderer` release, (b) evaluate a HarfBuzz-backed
+alternative (e.g. `pdf-lib` + a WASM HarfBuzz shaper) if this remains
+unfixed, or (c) move authoritative document rendering server-side
+(Laravel) with a more mature Arabic-shaping toolchain — consistent with
+the task's own documented "future production architecture may move
+authoritative document rendering to the backend" boundary.

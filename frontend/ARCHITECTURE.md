@@ -1287,6 +1287,63 @@ src/features/
             fixtures never demonstrated: two team members simultaneously
             on approved leave.
 
+  documents/
+            Shared document-generation architecture (UI-DOCS-X, ADR-016)
+            — activates real client-side PDF generation for the Invoice,
+            Receipt, Prescription and Payslip detail drawers/dialogs,
+            which previously only showed a future-feature toast for
+            "Télécharger PDF"/"Imprimer". A `GeneratedDocumentBase` shape
+            (`types.ts`) is projected from the existing domain record by
+            one pure `buildXDocument()` function per type
+            (`invoice-document.ts`/`receipt-document.ts`/
+            `prescription-document.ts`/`payslip-document.ts`) — every
+            amount/date is read directly off the existing `Invoice`/
+            `Payment`+`Receipt`/`Prescription`/`PayrollEntry`, never
+            recalculated with a second formula (proven by direct
+            reconciliation assertions in each builder's own test file).
+            One `<XDocumentPdf>` render component per type shares
+            `pdf-shell.tsx` (cabinet-identity header/footer) and
+            `pdf-styles.ts` (same hex palette as `design-system/
+            tokens.css`) — the calling drawer/dialog already IS the
+            document's Preview surface (task's own §9), so no second
+            "Aperçu" dialog exists anywhere. `download.ts` is the single
+            generate/download/print mechanism
+            (`generateDocumentBlob`/`triggerBlobDownload`/
+            `triggerBlobPrint`) every one of the four document types
+            shares — no per-feature duplication. `filename.ts` builds
+            sanitized, human-facing filenames (e.g.
+            `Facture-FAC-2026-00143.pdf`), never an internal id.
+
+            PDF technology is `@react-pdf/renderer` 4.9.0 (ADR-016) — it
+            renders structured primitives via `pdfkit`, not an HTML
+            rasterization shortcut, and is the only realistic option that
+            supports real embedded-font glyph shaping (jsPDF has no
+            Arabic contextual-shaping engine at all). Real end-to-end
+            generation is proven by `pdf-generation.test.ts` via
+            `renderToBuffer`, not just data-model unit tests, and the
+            resulting files were visually inspected through an
+            independent renderer (poppler `pdftoppm`) per the task's own
+            explicit visual-QA requirement.
+
+            **Arabic document generation is deliberately gated off, not
+            shipped** — `capabilities.ts`'s `isDocumentLanguageSupported`
+            blocks `Télécharger`/`Imprimer` whenever a cabinet's Document
+            language (`DocumentSettings.documentLanguage`, Paramètres →
+            Documents) is Arabic, showing a real translated notice
+            instead. Real visual QA of the rendered PDFs found
+            `@react-pdf/renderer`'s Arabic text-shaping pipeline drops or
+            corrupts individual glyphs, reproduced across two different
+            embedded fonts and even after pre-shaping into Arabic
+            Presentation Forms — the task's own explicit STOP-and-report
+            condition for an unfixable Arabic/RTL rendering defect (full
+            detail: ADR-016, RISK-015). The builder/PDF-component code
+            for Arabic is kept fully implemented and tested so
+            re-enabling it is a one-line change once the upstream defect
+            is fixed. `DocumentDetailDrawer`/`ExpenseDetailDrawer`
+            (uploaded attachments, not generated documents) are
+            deliberately untouched — no real file bytes exist anywhere in
+            this prototype's fixtures for them to download.
+
   stock/    Pharmacie & Stock (UI-008ABCD), replacing the generic Stock
             placeholder at `/app/stock` — Vue d'ensemble/Articles/
             Mouvements/Lots & expirations, executed as four gates

@@ -178,7 +178,7 @@ export function TeamMemberPayrollContent({ member, periods, entries, onEntriesCh
           member={member}
           period={period}
           entry={entry}
-          onDownload={() => setToastMessage(t("teamDetail.payroll.payslip.downloadNotice"))}
+          onDownload={(message) => setToastMessage(message)}
         />
       )}
 

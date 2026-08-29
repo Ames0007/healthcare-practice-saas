@@ -1381,3 +1381,126 @@ genuine interpretive questions arose while implementing this.
 ### Date
 
 2026-08-29
+
+---
+
+## ADR-016 — UI-DOCS-X Document Generation: @react-pdf/renderer as the shared PDF layer, and Arabic generation gated off after real visual QA found glyph corruption
+
+### Status
+
+Accepted
+
+### Context
+
+The task activates real client-side PDF generation for Invoice, Receipt,
+Prescription and Payslip, superseding the earlier prototype's "no PDF
+generation" instruction for these four completed workflows. No PDF
+dependency existed in the repo. The task explicitly requires: (a)
+justifying the chosen PDF technology, (b) verifying Arabic/RTL rendering
+with real generated files, not just unit tests, and (c) an explicit
+instruction to "STOP and report the limitation rather than shipping
+broken documents" if the chosen technology cannot correctly support
+Arabic/RTL.
+
+### Decision
+
+1.  **PDF technology: `@react-pdf/renderer` 4.9.0.** jsPDF (the smallest
+    alternative) has no Arabic contextual-shaping engine at all — it
+    would draw disconnected, unjoined Arabic letterforms, disqualified
+    outright by §31. `@react-pdf/renderer` builds PDFs from structured
+    primitives (`Document`/`Page`/`View`/`Text`) via `pdfkit`, not HTML
+    rasterization — satisfies "no unsafe HTML-to-PDF mechanisms" (§33)
+    cleanly, is React-idiomatic (fits this codebase's component
+    conventions), actively maintained, and runs both server- and
+    client-side. It ships fontkit-based custom-font embedding, which is
+    the only realistic path to real Arabic glyph shaping.
+2.  **French document language: fully implemented and shipped.**
+    `buildInvoiceDocument`/`buildReceiptDocument`/
+    `buildPrescriptionDocument`/`buildPayslipDocument` each project the
+    existing `Invoice`/`Payment`+`Receipt`/`Prescription`/`PayrollEntry`
+    record into a plain `GeneratedDocument` data model (task §4's own
+    suggested shape); a shared `pdf-styles.ts`/`pdf-shell.tsx` renders
+    the common cabinet-identity header/footer chrome, one PDF component
+    per document type owns its own body layout. `download.ts` centralizes
+    the actual generate/download/print mechanics (`generateDocumentBlob`,
+    `triggerBlobDownload`, `triggerBlobPrint`) — no per-feature
+    duplication of that plumbing (§4/§8). Real end-to-end generation
+    (not just data-model unit tests) is proven by
+    `pdf-generation.test.ts`, and the rendered files were visually
+    inspected (task §39/§40) via an independent renderer (poppler
+    `pdftoppm`) — professional layout, correct money/date formatting,
+    correct amount reconciliation confirmed on-page.
+3.  **Arabic document language: gated OFF at the UI layer
+    (`isDocumentLanguageSupported`, `capabilities.ts`), not shipped.**
+    Real visual QA — required by §39/§40, not skippable — found that
+    `@react-pdf/renderer`'s Arabic text-shaping/layout pipeline
+    intermittently drops or corrupts individual glyphs (a leading
+    hamza-bearing letter rendering as a disconnected floating mark; an
+    internal "ف" vanishing entirely; the exact corrupted glyph varying
+    unpredictably by position, not by letter identity). This was
+    reproduced identically across **two different embedded fonts** (Noto
+    Naskh Arabic, Noto Sans Arabic — both Google/Noto, both
+    professionally hinted, ruling out "bad font file") and **persisted
+    even after pre-shaping the text into Arabic Presentation Forms** via
+    the `arabic-reshaper` package to bypass the library's own contextual
+    shaper entirely (still corrupted a different glyph) — ruling out both
+    "wrong font" and "buggy contextual-substitution table" as the fixable
+    cause, and pointing at the library's lower-level glyph-positioning/
+    bidi-reordering pipeline itself. This is exactly the task's own
+    explicit STOP condition (§31): "If the selected PDF technology cannot
+    correctly support Arabic/RTL: STOP and report the limitation rather
+    than shipping broken documents." `Télécharger`/`Imprimer` show
+    `documents.languageUnsupportedNotice` (a real, translated UI message,
+    in the current UI locale, never a silent no-op — §37's dead-button
+    rule) instead of generating a corrupted file, whenever
+    `DocumentSettings.documentLanguage === "ar"`. The prototype's default
+    Document Settings language is French, so this boundary is reachable
+    only if a cabinet explicitly switches Document language to Arabic in
+    Paramètres → Documents.
+4.  **Font decision for the (currently gated-off) Arabic path: Noto Naskh
+    Arabic, embedded from Google Fonts (SIL Open Font License).** Kept
+    registered and the builder/PDF-component code kept fully working and
+    tested (`pdf-generation.test.ts` still generates real Arabic PDFs and
+    asserts file-level validity) so the feature activates with a one-line
+    change (removing the gate) once the upstream library bug is fixed or
+    an alternative shaping path is adopted — no rework of the document
+    models/layout needed.
+
+### Alternatives considered
+
+- **Ship Arabic PDFs anyway, since the corruption is "only one glyph."**
+  Rejected outright — the task's own §31 language is unambiguous, and a
+  cabinet-facing invoice/prescription with a silently wrong patient name
+  or a mis-rendered practitioner name is a real, unacceptable defect, not
+  a cosmetic one.
+- **Pre-shape Arabic text into Presentation Forms and ship that.**
+  Attempted and rejected — still produced a corrupted glyph in testing
+  (a different one than the unshaped path), so it does not actually fix
+  the defect; it would only ship a differently-broken document.
+- **jsPDF instead of `@react-pdf/renderer`.** Rejected before
+  implementation — no Arabic shaping engine at all, guaranteed-broken
+  Arabic output, and no French-side advantage significant enough to
+  justify losing the option of ever supporting Arabic once the shaping
+  issue is resolved upstream.
+- **HTML-to-PDF via `html2canvas` + `jsPDF`.** Rejected — rasterizes a
+  DOM screenshot into the PDF (poor text selection/accessibility inside
+  the PDF, larger files) and the task explicitly asks to avoid unsafe/
+  unconventional HTML-to-PDF mechanisms (§33).
+
+### Consequences
+
+- Arabic invoice/receipt/prescription/payslip download and print remain
+  visibly present but inert-with-explanation for `documentLanguage: "ar"`
+  cabinets until the upstream shaping defect is fixed or worked around —
+  tracked as an open item, not silently dropped.
+- Any future task re-enabling Arabic PDF generation should start by
+  re-running `pdf-generation.test.ts`'s Arabic case through the same
+  poppler-based visual QA before removing the `capabilities.ts` gate —
+  a passing unit test alone does not prove correct glyph shaping.
+- The four document builders/PDF components/`download.ts` plumbing are
+  fully reusable for any future generated-document type (e.g. a
+  cash-closing report, §19) without new architecture.
+
+### Date
+
+2026-08-29

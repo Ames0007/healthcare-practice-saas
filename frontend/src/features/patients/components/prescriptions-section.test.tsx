@@ -1,9 +1,16 @@
-import { describe, expect, it } from "vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { LocaleProvider, useLocale } from "@/i18n/locale-provider";
 import type { Locale } from "@/i18n/config";
 import type { ClinicalEncounter, Prescription } from "@/components/domain/clinical/types";
 import { PrescriptionsSection } from "./prescriptions-section";
+import { generateDocumentBlob, triggerBlobDownload } from "@/features/documents/download";
+
+vi.mock("@/features/documents/download", () => ({
+  generateDocumentBlob: vi.fn().mockResolvedValue(new Blob(["pdf"], { type: "application/pdf" })),
+  triggerBlobDownload: vi.fn(),
+  triggerBlobPrint: vi.fn(),
+}));
 
 function DirRoot({ children }: { children: React.ReactNode }) {
   const { direction } = useLocale();
@@ -123,7 +130,7 @@ describe("PrescriptionsSection", () => {
     expect(within(dialog).queryByRole("button", { name: /Supprimer/ })).not.toBeInTheDocument();
   });
 
-  it("PDF and print are future-feature notices only (29)", async () => {
+  it("generates and downloads a real prescription PDF from Télécharger PDF (UI-DOCS-X)", async () => {
     renderSection("fr", {
       patientId: "pat-1",
       practitionerId: "pr-1",
@@ -133,9 +140,9 @@ describe("PrescriptionsSection", () => {
     fireEvent.click(screen.getByRole("button", { name: "Voir" }));
     const dialog = await screen.findByRole("dialog", { name: "ORD-2026-0018" });
     fireEvent.click(within(dialog).getByRole("button", { name: "Télécharger PDF" }));
-    expect(
-      screen.getByText("La génération de l'ordonnance PDF sera connectée au moteur documentaire ultérieurement."),
-    ).toBeInTheDocument();
+
+    await waitFor(() => expect(generateDocumentBlob).toHaveBeenCalled());
+    expect(triggerBlobDownload).toHaveBeenCalledWith(expect.any(Blob), "Ordonnance-PAT-00281-2026-08-23.pdf");
   });
 
   it("opens the new-prescription form (19)", async () => {

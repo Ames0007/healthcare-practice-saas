@@ -1,11 +1,18 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { LocaleProvider, useLocale } from "@/i18n/locale-provider";
 import type { Locale } from "@/i18n/config";
 import { TeamMemberDetailPage } from "./team-member-detail-page";
+import { generateDocumentBlob, triggerBlobDownload } from "@/features/documents/download";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/app/equipe/team-3",
+}));
+
+vi.mock("@/features/documents/download", () => ({
+  generateDocumentBlob: vi.fn().mockResolvedValue(new Blob(["pdf"], { type: "application/pdf" })),
+  triggerBlobDownload: vi.fn(),
+  triggerBlobPrint: vi.fn(),
 }));
 
 function DirRoot({ children }: { children: React.ReactNode }) {
@@ -642,7 +649,7 @@ describe("TeamMemberDetailPage — Paie tab (UI-007CDEF Gate 3)", () => {
     expect(screen.getByText("5 050 MAD")).toBeInTheDocument(); // net: 5000 + 300 - 250
   });
 
-  it("opens the read-only payslip and shows the future-feature notice for the download action, never a real file", () => {
+  it("opens the read-only payslip and generates a real payslip PDF from Télécharger le bulletin (UI-DOCS-X)", async () => {
     renderDetail("fr", { memberId: "team-3", activeTab: "payroll" });
 
     fireEvent.click(screen.getByRole("button", { name: "Voir le bulletin" }));
@@ -650,7 +657,8 @@ describe("TeamMemberDetailPage — Paie tab (UI-007CDEF Gate 3)", () => {
     expect(screen.getByRole("heading", { level: 2, name: "Bulletin de paie" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Télécharger le bulletin" }));
 
-    expect(screen.getByText("La génération du bulletin PDF sera connectée au moteur documentaire ultérieurement.")).toBeInTheDocument();
+    await waitFor(() => expect(generateDocumentBlob).toHaveBeenCalled());
+    expect(triggerBlobDownload).toHaveBeenCalledWith(expect.any(Blob), "Bulletin-Paie-EMP-0003-2026-08.pdf");
   });
 
   it("shows the empty state for a member with no payroll entry in any period", () => {

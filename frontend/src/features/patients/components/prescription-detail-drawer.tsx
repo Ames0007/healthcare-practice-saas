@@ -1,10 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import { useLocale } from "@/i18n/locale-provider";
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import type { Prescription } from "@/components/domain/clinical/types";
-import { formatDayMonthYear } from "@/features/patients/format";
+import { formatDayMonthYear, getPatientFullName } from "@/features/patients/format";
+import { getPatientsMockData } from "@/features/patients/mock-data";
+import { getCabinetProfileMockData } from "@/features/parametres/mock-cabinet-profile-data";
+import { getDocumentSettingsMockData } from "@/features/parametres/mock-document-settings-data";
+import { buildPrescriptionDocument } from "@/features/documents/prescription-document";
+import { PrescriptionDocumentPdf } from "@/features/documents/prescription-document-pdf";
+import { generateDocumentBlob, triggerBlobDownload, triggerBlobPrint } from "@/features/documents/download";
+import { isDocumentLanguageSupported } from "@/features/documents/capabilities";
 
 export interface PrescriptionDetailDrawerProps {
   prescription: Prescription | null;
@@ -19,8 +27,10 @@ export interface PrescriptionDetailDrawerProps {
  * Read-only prescription detail (Spec #9-style drawer, UI-005D §30-31).
  * No Modifier/Supprimer anywhere — an issued prescription is not ordinary
  * CRUD; no cancellation workflow is implemented even though the model
- * supports the concept (§31). "Télécharger PDF"/"Imprimer" are prototype
- * affordances only — no real document is generated (§40).
+ * supports the concept (§31). "Télécharger PDF"/"Imprimer" generate a real
+ * PDF from this exact `Prescription` (UI-DOCS-X) — this open drawer already
+ * serves as the preview surface. `onFutureFeature` now only fires if
+ * generation itself fails.
  */
 export function PrescriptionDetailDrawer({
   prescription,
@@ -30,9 +40,58 @@ export function PrescriptionDetailDrawer({
   onFutureFeature,
 }: PrescriptionDetailDrawerProps) {
   const { t, locale } = useLocale();
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
 
   if (!prescription) {
     return null;
+  }
+
+  const currentPrescription = prescription;
+
+  async function generatePrescriptionBlob() {
+    const patient = getPatientsMockData().find((candidate) => candidate.id === currentPrescription.patientId);
+    const model = buildPrescriptionDocument(
+      currentPrescription,
+      patient ? getPatientFullName(patient) : "",
+      patient?.patientNumber ?? "",
+      getCabinetProfileMockData(),
+      getDocumentSettingsMockData(),
+    );
+    const blob = await generateDocumentBlob(<PrescriptionDocumentPdf model={model} />);
+    return { blob, filename: model.filename };
+  }
+
+  async function handleDownload() {
+    if (!isDocumentLanguageSupported(getDocumentSettingsMockData().documentLanguage)) {
+      onFutureFeature(t("documents.languageUnsupportedNotice"));
+      return;
+    }
+    setIsDownloading(true);
+    try {
+      const { blob, filename } = await generatePrescriptionBlob();
+      triggerBlobDownload(blob, filename);
+    } catch {
+      onFutureFeature(t("patientDetail.health.prescriptions.pdfNotice"));
+    } finally {
+      setIsDownloading(false);
+    }
+  }
+
+  async function handlePrint() {
+    if (!isDocumentLanguageSupported(getDocumentSettingsMockData().documentLanguage)) {
+      onFutureFeature(t("documents.languageUnsupportedNotice"));
+      return;
+    }
+    setIsPrinting(true);
+    try {
+      const { blob } = await generatePrescriptionBlob();
+      triggerBlobPrint(blob);
+    } catch {
+      onFutureFeature(t("patientDetail.health.prescriptions.pdfNotice"));
+    } finally {
+      setIsPrinting(false);
+    }
   }
 
   return (
@@ -94,10 +153,10 @@ export function PrescriptionDetailDrawer({
         )}
 
         <div className="flex flex-wrap gap-3 border-t border-border pt-4">
-          <Button variant="outline" size="sm" onClick={() => onFutureFeature(t("patientDetail.health.prescriptions.pdfNotice"))}>
+          <Button variant="outline" size="sm" onClick={handleDownload} loading={isDownloading}>
             {t("patientDetail.health.prescriptions.downloadPdf")}
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => onFutureFeature(t("patientDetail.health.prescriptions.pdfNotice"))}>
+          <Button variant="ghost" size="sm" onClick={handlePrint} loading={isPrinting}>
             {t("patientDetail.health.prescriptions.print")}
           </Button>
         </div>

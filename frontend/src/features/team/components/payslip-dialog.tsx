@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useLocale } from "@/i18n/locale-provider";
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,12 @@ import type { PayrollEntry, PayrollPeriod, TeamMember } from "@/components/domai
 import { formatMad } from "@/features/today/format";
 import { formatMinutesDuration, getTeamMemberFullName } from "@/features/team/format";
 import { computeBonusesTotal, computeDeductionsTotal, computeNetPayable } from "@/features/team/payroll";
+import { getCabinetProfileMockData } from "@/features/parametres/mock-cabinet-profile-data";
+import { getDocumentSettingsMockData } from "@/features/parametres/mock-document-settings-data";
+import { buildPayslipDocument } from "@/features/documents/payslip-document";
+import { PayslipDocumentPdf } from "@/features/documents/payslip-document-pdf";
+import { generateDocumentBlob, triggerBlobDownload, triggerBlobPrint } from "@/features/documents/download";
+import { isDocumentLanguageSupported } from "@/features/documents/capabilities";
 
 export interface PayslipDialogProps {
   open: boolean;
@@ -14,16 +21,59 @@ export interface PayslipDialogProps {
   member: TeamMember;
   period: PayrollPeriod;
   entry: PayrollEntry;
-  onDownload: () => void;
+  /** Fires only if PDF generation itself fails (UI-DOCS-X) — mirrors UI-005D's `onFutureFeature` error-reporting pattern. */
+  onDownload: (message: string) => void;
 }
 
 /**
- * Read-only payslip detail (UI-007CDEF §49) — download/print is a
- * prototype affordance only, never real PDF generation, mirroring
- * UI-005D's own document-download future-feature notice pattern exactly.
+ * Read-only payslip detail (UI-007CDEF §49) — this dialog's own visible
+ * breakdown already serves as the document's preview surface (UI-DOCS-X);
+ * "Télécharger"/"Imprimer" generate a real PDF from this exact
+ * `PayrollEntry`, reusing `computeNetPayable` verbatim rather than a second
+ * payroll formula.
  */
 export function PayslipDialog({ open, onClose, member, period, entry, onDownload }: PayslipDialogProps) {
   const { t, locale } = useLocale();
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
+
+  async function generatePayslipBlob() {
+    const model = buildPayslipDocument(member, period, entry, getCabinetProfileMockData(), getDocumentSettingsMockData());
+    const blob = await generateDocumentBlob(<PayslipDocumentPdf model={model} />);
+    return { blob, filename: model.filename };
+  }
+
+  async function handleDownload() {
+    if (!isDocumentLanguageSupported(getDocumentSettingsMockData().documentLanguage)) {
+      onDownload(t("documents.languageUnsupportedNotice"));
+      return;
+    }
+    setIsDownloading(true);
+    try {
+      const { blob, filename } = await generatePayslipBlob();
+      triggerBlobDownload(blob, filename);
+    } catch {
+      onDownload(t("teamDetail.payroll.payslip.downloadNotice"));
+    } finally {
+      setIsDownloading(false);
+    }
+  }
+
+  async function handlePrint() {
+    if (!isDocumentLanguageSupported(getDocumentSettingsMockData().documentLanguage)) {
+      onDownload(t("documents.languageUnsupportedNotice"));
+      return;
+    }
+    setIsPrinting(true);
+    try {
+      const { blob } = await generatePayslipBlob();
+      triggerBlobPrint(blob);
+    } catch {
+      onDownload(t("teamDetail.payroll.payslip.downloadNotice"));
+    } finally {
+      setIsPrinting(false);
+    }
+  }
 
   return (
     <Dialog open={open} onClose={onClose} variant="modal" size="sm" label={t("teamDetail.payroll.payslip.title")} closeLabel={t("team.form.close")}>
@@ -65,7 +115,10 @@ export function PayslipDialog({ open, onClose, member, period, entry, onDownload
         </dl>
 
         <div className="flex items-center justify-end gap-3 border-t border-border pt-4">
-          <Button type="button" variant="outline" onClick={onDownload}>
+          <Button type="button" variant="ghost" onClick={handlePrint} loading={isPrinting}>
+            {t("patientDetail.invoices.print")}
+          </Button>
+          <Button type="button" variant="outline" onClick={handleDownload} loading={isDownloading}>
             {t("teamDetail.payroll.payslip.download")}
           </Button>
         </div>

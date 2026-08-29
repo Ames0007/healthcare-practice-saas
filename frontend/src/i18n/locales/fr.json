@@ -2385,5 +2385,60 @@
     "title": "Healthcare Practice Management SaaS",
     "description": "Fondation frontend (TASK-003). Aucune fonctionnalité métier n'est implémentée.",
     "areasTitle": "Zones de l'application"
+  },
+  "documents": {
+    "prototypeNotice": "Document généré automatiquement à titre d'exemple — prototype, non certifié.",
+    "languageUnsupportedNotice": "La génération de documents PDF en arabe n'est pas encore disponible (limitation technique en cours de résolution). Le document reste consultable ci-contre.",
+    "preview": "Aperçu",
+    "download": "Télécharger",
+    "print": "Imprimer",
+    "invoice": {
+      "title": "FACTURE",
+      "dateLabel": "Date",
+      "patientLabel": "Patient",
+      "patientNumberLabel": "N° patient",
+      "practitionerLabel": "Praticien",
+      "descriptionHeader": "Description",
+      "quantityHeader": "Qté",
+      "amountHeader": "Montant",
+      "totalLabel": "Total",
+      "paidLabel": "Payé",
+      "remainingLabel": "Solde restant",
+      "statusLabel": "Statut"
+    },
+    "receipt": {
+      "title": "REÇU",
+      "dateLabel": "Date",
+      "patientLabel": "Patient",
+      "patientNumberLabel": "N° patient",
+      "amountLabel": "Montant réglé",
+      "methodLabel": "Mode de paiement",
+      "invoiceLabel": "Facture associée",
+      "statusLabel": "Statut"
+    },
+    "prescription": {
+      "title": "ORDONNANCE",
+      "dateLabel": "Date",
+      "patientLabel": "Patient",
+      "patientNumberLabel": "N° patient",
+      "practitionerLabel": "Praticien",
+      "medicationsHeading": "Prescription",
+      "dosageLabel": "Posologie",
+      "frequencyLabel": "Fréquence",
+      "durationLabel": "Durée",
+      "instructionsLabel": "Instructions générales"
+    },
+    "payslip": {
+      "title": "BULLETIN DE PAIE",
+      "employeeLabel": "Employé",
+      "employeeNumberLabel": "N° employé",
+      "periodLabel": "Période",
+      "baseLabel": "Salaire de base",
+      "overtimeLabel": "Heures supplémentaires",
+      "bonusesLabel": "Primes",
+      "commissionLabel": "Commission",
+      "deductionsLabel": "Retenues",
+      "netLabel": "Net à payer"
+    }
   }
 }

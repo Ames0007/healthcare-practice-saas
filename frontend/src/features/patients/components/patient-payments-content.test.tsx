@@ -1,12 +1,19 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { LocaleProvider, useLocale } from "@/i18n/locale-provider";
 import type { Locale } from "@/i18n/config";
 import type { Invoice, Payment } from "@/components/domain/finance/types";
 import { PatientPaymentsContent } from "./patient-payments-content";
+import { generateDocumentBlob, triggerBlobDownload } from "@/features/documents/download";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/app/patients/pat-1/payments",
+}));
+
+vi.mock("@/features/documents/download", () => ({
+  generateDocumentBlob: vi.fn().mockResolvedValue(new Blob(["pdf"], { type: "application/pdf" })),
+  triggerBlobDownload: vi.fn(),
+  triggerBlobPrint: vi.fn(),
 }));
 
 function DirRoot({ children }: { children: React.ReactNode }) {
@@ -195,13 +202,15 @@ describe("PatientPaymentsContent", () => {
     expect(within(dialog).getByRole("link", { name: "Voir la facture" })).toHaveAttribute("href", "/app/patients/pat-1/invoices");
   });
 
-  it("shows a future-feature notice for Télécharger le reçu instead of generating a document (38)", async () => {
+  it("generates and downloads a real receipt PDF from Télécharger le reçu (UI-DOCS-X)", async () => {
     renderContent("fr", { patientId: "pat-1", invoices: [PAYABLE_INVOICE], payments: PAYMENTS_PAT1 });
 
     fireEvent.click(screen.getByText("REC-2026-00382"));
     const dialog = await screen.findByRole("dialog");
     fireEvent.click(within(dialog).getByRole("button", { name: "Télécharger le reçu" }));
-    expect(screen.getByText("La génération du reçu PDF sera connectée au moteur documentaire ultérieurement.")).toBeInTheDocument();
+
+    await waitFor(() => expect(generateDocumentBlob).toHaveBeenCalled());
+    expect(triggerBlobDownload).toHaveBeenCalledWith(expect.any(Blob), "Recu-REC-2026-00382.pdf");
   });
 
   it("shows no edit/delete action anywhere for a payment (37)", async () => {

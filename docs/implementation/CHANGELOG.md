@@ -2754,3 +2754,57 @@ All notable changes to this project are documented in this file.
   up from the UI-003C baseline of 1612), typecheck and lint pass.
   Backend regression (10 tests, 26 assertions, clean) unaffected — no
   backend files touched.
+- UI-DOCS-X — Platform Document Generation, Preview, Download & Print.
+  Activates real client-side PDF generation for Invoice, Receipt,
+  Prescription and Payslip — the four detail drawers/dialogs that already
+  showed "Télécharger PDF"/"Imprimer" as future-feature notices now
+  generate and act on a real file. New shared `frontend/src/features/
+  documents/` architecture (ADR-016): pure `buildXDocument()` projections
+  (one per type, every amount/date read directly off the existing
+  `Invoice`/`Payment`+`Receipt`/`Prescription`/`PayrollEntry`, never
+  recalculated), shared PDF page chrome (`pdf-shell.tsx`/`pdf-styles.ts`,
+  same palette as `design-system/tokens.css`), and a single
+  `download.ts` (`generateDocumentBlob`/`triggerBlobDownload`/
+  `triggerBlobPrint`) shared by all four document types — no duplicated
+  generate/download/print logic per feature. PDF technology:
+  `@react-pdf/renderer` 4.9.0, chosen over jsPDF specifically because it
+  supports real custom-font glyph embedding (jsPDF has no Arabic
+  contextual-shaping engine at all). The existing detail drawers/dialogs
+  already serve as the document Preview surface — no separate "Aperçu"
+  dialog was added. Filenames follow the task's own exact examples
+  (`Facture-FAC-2026-00143.pdf`, `Recu-REC-2026-00383.pdf`,
+  `Ordonnance-PAT-00281-2026-08-29.pdf`,
+  `Bulletin-Paie-EMP-0003-2026-08.pdf`), sanitized, never an internal id.
+
+  Real end-to-end generation (not just data-model unit tests) is proven
+  by `pdf-generation.test.ts` via `renderToBuffer`; the resulting files
+  were visually inspected through an independent renderer (poppler
+  `pdftoppm`) — French documents render correctly and professionally,
+  with money/date/reconciliation all correct on-page.
+
+  Arabic document generation is deliberately gated OFF, not shipped.
+  Real visual QA of the rendered PDFs found `@react-pdf/renderer`'s
+  Arabic text-shaping pipeline drops or corrupts individual glyphs (a
+  leading hamza-bearing letter, or an internal "ف"), reproduced
+  identically across two different embedded fonts and even after
+  pre-shaping the text into Arabic Presentation Forms to bypass the
+  library's own shaper — the task's own explicit "STOP and report the
+  limitation rather than shipping broken documents" condition.
+  `isDocumentLanguageSupported` (`capabilities.ts`) blocks generation and
+  shows a real translated notice instead whenever a cabinet's Document
+  language is set to Arabic (default is French) — recorded as RISK-015,
+  full technical detail in ADR-016.
+
+  `DocumentDetailDrawer` (clinical uploaded documents) and
+  `ExpenseDetailDrawer` (expense justificatifs) are deliberately left
+  unchanged — both represent uploaded attachments with no real file
+  bytes anywhere in this prototype's fixtures, so no real download is
+  possible without inventing file content; both already give explicit
+  future-feature feedback, never a silent dead button. No Reports/Caisse
+  export control exists in the current UI to activate. No backend
+  document storage, no electronic signature, no fiscal certification, no
+  provider APIs, no Laravel/API calls, no database, no persistence
+  beyond the browser's own download. 38 net new tests (1715 total, up
+  from the UI-LEAVE-X baseline of 1677), typecheck/lint/build pass.
+  Backend regression (10 tests, 26 assertions, clean) unaffected — no
+  backend files touched.

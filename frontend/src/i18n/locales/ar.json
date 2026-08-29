@@ -2385,5 +2385,60 @@
     "title": "منصة إدارة العيادات الصحية",
     "description": "أساس الواجهة الأمامية (TASK-003). لم يتم تنفيذ أي وظيفة تجارية.",
     "areasTitle": "أقسام التطبيق"
+  },
+  "documents": {
+    "prototypeNotice": "وثيقة مُولّدة تلقائيًا كنموذج — نسخة أولية، غير معتمدة رسميًا.",
+    "languageUnsupportedNotice": "توليد مستندات PDF باللغة العربية غير متوفر بعد (قيد تقني قيد المعالجة). تبقى المعلومات قابلة للاطلاع في هذه النافذة.",
+    "preview": "معاينة",
+    "download": "تنزيل",
+    "print": "طباعة",
+    "invoice": {
+      "title": "فاتورة",
+      "dateLabel": "التاريخ",
+      "patientLabel": "المريض",
+      "patientNumberLabel": "رقم المريض",
+      "practitionerLabel": "الممارس",
+      "descriptionHeader": "الوصف",
+      "quantityHeader": "الكمية",
+      "amountHeader": "المبلغ",
+      "totalLabel": "المجموع",
+      "paidLabel": "المدفوع",
+      "remainingLabel": "الرصيد المتبقي",
+      "statusLabel": "الحالة"
+    },
+    "receipt": {
+      "title": "إيصال",
+      "dateLabel": "التاريخ",
+      "patientLabel": "المريض",
+      "patientNumberLabel": "رقم المريض",
+      "amountLabel": "المبلغ المدفوع",
+      "methodLabel": "طريقة الدفع",
+      "invoiceLabel": "الفاتورة المرتبطة",
+      "statusLabel": "الحالة"
+    },
+    "prescription": {
+      "title": "وصفة طبية",
+      "dateLabel": "التاريخ",
+      "patientLabel": "المريض",
+      "patientNumberLabel": "رقم المريض",
+      "practitionerLabel": "الممارس",
+      "medicationsHeading": "الوصفة",
+      "dosageLabel": "الجرعة",
+      "frequencyLabel": "التكرار",
+      "durationLabel": "المدة",
+      "instructionsLabel": "تعليمات عامة"
+    },
+    "payslip": {
+      "title": "كشف الراتب",
+      "employeeLabel": "الموظف",
+      "employeeNumberLabel": "رقم الموظف",
+      "periodLabel": "الفترة",
+      "baseLabel": "الراتب الأساسي",
+      "overtimeLabel": "الساعات الإضافية",
+      "bonusesLabel": "المكافآت",
+      "commissionLabel": "العمولة",
+      "deductionsLabel": "الخصومات",
+      "netLabel": "الصافي المستحق"
+    }
   }
 }
