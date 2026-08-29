@@ -1250,6 +1250,7 @@
       "sunday": "الأحد"
     },
     "attendanceLink": "حضور اليوم",
+    "leaveCalendarLink": "جدول الإجازات",
     "attendanceStatus": {
       "notCheckedIn": "لم يسجل الحضور",
       "present": "حاضر",
@@ -1483,6 +1484,59 @@
     },
     "error": {
       "title": "تعذّر تحميل الحضور.",
+      "retry": "إعادة المحاولة"
+    }
+  },
+  "teamLeaveCalendar": {
+    "pageTitle": "جدول الإجازات",
+    "pageDescription": "اطّلع على إجازات وغيابات الفريق المخطط لها.",
+    "dateNavigation": "التنقل في جدول الإجازات",
+    "previous": "الفترة السابقة",
+    "today": "اليوم",
+    "next": "الفترة التالية",
+    "viewMode": "طريقة العرض",
+    "viewMonth": "شهر",
+    "viewWeek": "أسبوع",
+    "viewList": "قائمة",
+    "filters": {
+      "employeeLabel": "الموظف",
+      "employeeAll": "الفريق بأكمله",
+      "typeLabel": "نوع الإجازة",
+      "typeAll": "كل الأنواع",
+      "statusLabel": "الحالة",
+      "status": {
+        "operational": "موافق عليها + قيد الانتظار",
+        "approved": "موافق عليها",
+        "pending": "قيد الانتظار",
+        "rejected": "مرفوضة",
+        "all": "الكل"
+      }
+    },
+    "membersAway": "{{count}} غائبين",
+    "practitionersAway": "{{count}} ممارسين غائبين",
+    "overlapWarning": "سيغيب {{count}} أعضاء في هذا اليوم.",
+    "moreEvents": "+ {{count}} أخرى",
+    "closure": {
+      "badge": "العيادة مغلقة"
+    },
+    "metrics": {
+      "awayToday": "في إجازة اليوم",
+      "pending": "طلبات قيد الانتظار",
+      "plannedThisMonth": "غيابات مخطط لها هذا الشهر"
+    },
+    "drawer": {
+      "startLabel": "من",
+      "endLabel": "إلى",
+      "durationLabel": "المدة",
+      "reasonLabel": "السبب",
+      "viewRequest": "عرض الطلب"
+    },
+    "empty": {
+      "title": "لا توجد إجازات في هذه الفترة.",
+      "description": "ستظهر هنا الإجازات الموافق عليها والطلبات قيد الانتظار."
+    },
+    "error": {
+      "title": "تعذّر تحميل جدول الإجازات.",
       "retry": "إعادة المحاولة"
     }
   },

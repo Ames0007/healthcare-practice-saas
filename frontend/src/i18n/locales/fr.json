@@ -1250,6 +1250,7 @@
       "sunday": "Dimanche"
     },
     "attendanceLink": "Présence du jour",
+    "leaveCalendarLink": "Agenda des congés",
     "attendanceStatus": {
       "notCheckedIn": "Non pointé",
       "present": "Présent",
@@ -1483,6 +1484,59 @@
     },
     "error": {
       "title": "Impossible de charger les présences.",
+      "retry": "Réessayer"
+    }
+  },
+  "teamLeaveCalendar": {
+    "pageTitle": "Agenda des congés",
+    "pageDescription": "Visualisez les congés et absences planifiés de l'équipe.",
+    "dateNavigation": "Navigation de l'agenda des congés",
+    "previous": "Période précédente",
+    "today": "Aujourd'hui",
+    "next": "Période suivante",
+    "viewMode": "Mode d'affichage",
+    "viewMonth": "Mois",
+    "viewWeek": "Semaine",
+    "viewList": "Liste",
+    "filters": {
+      "employeeLabel": "Employé",
+      "employeeAll": "Équipe entière",
+      "typeLabel": "Type de congé",
+      "typeAll": "Tous les types",
+      "statusLabel": "Statut",
+      "status": {
+        "operational": "Approuvé + En attente",
+        "approved": "Approuvé",
+        "pending": "En attente",
+        "rejected": "Refusé",
+        "all": "Tous"
+      }
+    },
+    "membersAway": "{{count}} absents",
+    "practitionersAway": "{{count}} praticiens absents",
+    "overlapWarning": "{{count}} membres seront absents ce jour.",
+    "moreEvents": "+ {{count}} autres",
+    "closure": {
+      "badge": "Cabinet fermé"
+    },
+    "metrics": {
+      "awayToday": "En congé aujourd'hui",
+      "pending": "Demandes en attente",
+      "plannedThisMonth": "Absences planifiées ce mois"
+    },
+    "drawer": {
+      "startLabel": "Du",
+      "endLabel": "Au",
+      "durationLabel": "Durée",
+      "reasonLabel": "Motif",
+      "viewRequest": "Voir la demande"
+    },
+    "empty": {
+      "title": "Aucun congé sur cette période.",
+      "description": "Les congés approuvés et demandes en attente apparaîtront ici."
+    },
+    "error": {
+      "title": "Impossible de charger l'agenda des congés.",
       "retry": "Réessayer"
     }
   },

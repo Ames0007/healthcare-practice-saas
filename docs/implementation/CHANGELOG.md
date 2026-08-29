@@ -2698,3 +2698,59 @@ All notable changes to this project are documented in this file.
   plus 1 existing AR/RTL test extended, typecheck and lint pass. Backend
   regression (10 tests, 26 assertions, clean) unaffected — no backend
   files touched.
+
+- UI-LEAVE-X — Cabinet Leave Agenda. Adds a cabinet-wide "Agenda des
+  congés" to the existing Équipe/HR module, at
+  `/app/equipe/leave-calendar` — a static route sibling of the dynamic
+  `/app/equipe/[id]`, reached from the Équipe directory's own header
+  (alongside the existing "Présence du jour" link), never added to the
+  main sidebar. The per-employee Congés tab (`TeamMemberLeaveContent`,
+  UI-007CDEF) is entirely unchanged and remains the only place a leave
+  request is created, approved or rejected.
+
+  The Leave Agenda is a **pure read projection**, never a second
+  `LeaveRequest` model or fixture universe: `features/team/leave-
+  calendar.ts`'s `LeaveCalendarEvent` is a derived view model built by
+  `buildLeaveCalendarEvents` from the existing `LeaveRequest[]`/
+  `TeamMember[]` sources, consumed identically by the new Month/Week/
+  List views and a read-only detail drawer whose only action ("Voir la
+  demande") links back to the existing per-employee workflow. A multi-
+  day request correctly repeats across every calendar date it spans
+  (`date >= start && date <= end`), not only its start date — proven
+  directly with a real 3-day fixture. `getApprovedTeamMembersAway`/
+  `countApprovedPractitionersAway` only ever count `status ===
+  "approved"`; pending never counts as confirmed absence, rejected is
+  hidden by default (the Status filter's restrained "Approuvé + En
+  attente" default) but remains reachable explicitly. Practitioner-
+  overlap derives from `TeamRole === "practitioner"`, deliberately not
+  the narrower Agenda `practitionerId` link Commission eligibility
+  requires (ADR-015 §2) — an inactive or not-yet-linked practitioner
+  still counts.
+
+  `mock-leave-data.ts`'s existing single fixture array gains two new
+  rows, `lr-5`/`lr-6` (Amal Idrissi and Hamza Rifai, both real team
+  members, both approved and overlapping on 2026-08-27) — the one
+  real-world scenario the prior 4 fixtures never demonstrated: two
+  people simultaneously on approved leave, one of them a practitioner.
+  Every pre-existing fixture, and the team-4 empty-state guarantee, is
+  byte-for-byte unchanged (ADR-015 §1). Dashboard metrics ("En congé
+  aujourd'hui"/"Demandes en attente"/"Absences planifiées ce mois") are
+  always whole-cabinet and anchored to the real business date, never
+  scoped to whichever period the calendar is currently browsing (ADR-015
+  §4). Cabinet closure context (task's own explicitly optional
+  integration) is surfaced by reusing `resolveEffectiveCabinetAvailability`
+  outright — a real `CabinetCalendarException` closure shows a distinct
+  "Cabinet fermé" badge, never converted into a per-employee leave
+  request; an ordinary non-working weekday from the recurring weekly
+  schedule never triggers it (ADR-015 §5).
+
+  Routing regression: `/app/equipe/leave-calendar` and
+  `/app/equipe/attendance` are proven to never collide with the dynamic
+  `/app/equipe/[id]` route — no real TeamMember id equals either string,
+  and `TeamMemberDetailPage` degrades to its own real not-found state
+  even in the theoretical case of a collision. No automatic leave
+  approval/rejection, no payroll changes, no Laravel/API calls, no
+  database, no LocalStorage/persistence. 65 net new tests (1677 total,
+  up from the UI-003C baseline of 1612), typecheck and lint pass.
+  Backend regression (10 tests, 26 assertions, clean) unaffected — no
+  backend files touched.

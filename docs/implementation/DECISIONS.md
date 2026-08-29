@@ -1281,3 +1281,103 @@ storing a patient's declared AMO régime count as an "AMO workflow"?
 ### Date
 
 2026-08-29
+
+## ADR-015 — UI-LEAVE-X Cabinet Leave Agenda: a pure calendar projection over the existing LeaveRequest array, extended (never duplicated) fixtures, and a business-date-anchored dashboard
+
+### Status
+
+Accepted
+
+### Context
+
+The task requires a cabinet-wide Leave Agenda that is explicitly a
+read-only *projection* of the existing `LeaveRequest[]`/`TeamMember[]`
+sources (UI-007CDEF Gate 2/UI-007A) — "Do not create another
+`LeaveRequest` model. Do not create another leave fixture universe." Five
+genuine interpretive questions arose while implementing this.
+
+### Decision
+
+1.  **"No second fixture universe" means no second *model/array* — it
+    does not forbid adding realistic rows to the EXISTING
+    `getLeaveRequestsMockData()` array.** The pre-existing 4 fixtures
+    (`lr-1`..`lr-4`) never produce two team members simultaneously on
+    approved leave, and no fixture spans more than 2 days — insufficient
+    to prove the task's own core multi-day-visible-on-every-date (§8) and
+    overlap (§22-25) requirements with real data. `lr-5`/`lr-6` (Amal
+    Idrissi, team-2, 2026-08-26 to 08-28; Hamza Rifai, team-5,
+    2026-08-27) were added to the SAME array/model, chosen to overlap on
+    2026-08-27 — proving a real 3-day span and a real 2-person, 1-
+    practitioner simultaneous absence, never an invented count. `lr-1`
+    through `lr-4` and `team-4`'s empty-state guarantee are byte-for-byte
+    unchanged (proven by `mock-leave-data.test.ts`).
+2.  **Practitioner-overlap (§24) derives from `TeamRole === "practitioner"`,
+    not the narrower Agenda `practitionerId` link.** `practitionerId`
+    only exists to connect a TeamMember to Agenda's *schedulable*
+    identity for commission eligibility (UI-007CDEF Gate 4) — an
+    inactive practitioner, or one not yet linked (Othmane Zouiten), is
+    still a practitioner for absence-visibility purposes. Using the
+    narrower link here would silently under-count.
+3.  **The Status filter's default is a resolvable 5th value,
+    `"operational"` (Approuvé + En attente), not `"all"` narrowed
+    client-side.** `resolveStatusFilterValues` is the single place this
+    mapping lives; every consumer (Month/Week/List, dashboard metrics
+    excepted — see point 4) reads through it, so the restrained default
+    the task's own §16 asks for can never drift between views.
+4.  **Dashboard metrics (§30) are always whole-cabinet and anchored to
+    the real business date, never scoped to whichever period the header
+    nav has currently browsed to.** This mirrors every other "today"/
+    "this month" metric widget already in this product (Aujourd'hui,
+    Finance dashboard) — a manager browsing forward to check December
+    should not see the "En congé aujourd'hui" metric change.
+5.  **Cabinet closure context (§26, the task's own explicitly optional
+    integration) was implemented**, reusing
+    `resolveEffectiveCabinetAvailability` outright via a new
+    `getCabinetClosureForDate` — never reimplemented, never converting a
+    closure into a per-employee `LeaveRequest`. It is gated to
+    `source === "calendar_exception"` only, so an ordinary non-working
+    weekday (the recurring weekly schedule) never renders a "Cabinet
+    fermé" badge — only a genuine one-off exception does. Adjacent-month
+    overflow cells in Month view never render event/closure content at
+    all (only the dimmed day number) — the standard month-calendar
+    convention, and the fix for a real ambiguity a leading-week
+    `public_holiday` fixture (`cal-exc-1`, 2026-07-30, inside August's
+    own leading grid days) would otherwise have caused.
+6.  **Navigation shares one "period" position across all three views**,
+    exactly mirroring `AgendaHeader`'s own day/week step-size-by-mode
+    precedent: Month/List navigate by whole calendar month
+    (`shiftMonthIso`), Week navigates by 7 days (`addDaysIso`) — the
+    wireframe shows one shared nav row with no per-view position, and
+    this is the only reading consistent with that.
+
+### Alternatives considered
+
+- **Treating the task's "no fixture universe" instruction as forbidding
+  any new fixture row at all** — rejected: it would leave the task's own
+  core multi-day/overlap requirements unprovable with real data, and the
+  instruction's own wording targets a second *model*, not additional
+  rows in the one that already exists (the same reading already applied
+  throughout this session, e.g. UI-AGENDA-X's calendar-exception
+  fixtures).
+- **Deriving practitioner-overlap from `practitionerId`** — rejected: it
+  would silently exclude a real practitioner (Othmane Zouiten) from
+  "praticiens absents" purely because of an unrelated commission-linkage
+  gap, contradicting §24's own plain "practitioner-linked" framing.
+- **Skipping the optional cabinet-closure integration** (§26) — rejected,
+  unlike ADR-013 §7's skip of the optional Agenda banner: here the
+  reused resolver already exists, the integration is small, and it
+  directly prevents a real point of confusion (an approved-leave-free day
+  that is nonetheless a cabinet-wide closure).
+
+### Consequences
+
+- If a future task adds a fourth or fifth simultaneously-absent fixture,
+  `getApprovedTeamMembersAway`/`countApprovedPractitionersAway` need no
+  change — both are already count-agnostic.
+- If Public Booking (UI-012) or a future staffing feature needs "who is
+  away on date X," it can call `getApprovedTeamMembersAway` directly —
+  no rework of this task's resolver is anticipated.
+
+### Date
+
+2026-08-29

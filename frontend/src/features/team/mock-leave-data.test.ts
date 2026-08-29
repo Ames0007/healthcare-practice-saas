@@ -44,6 +44,33 @@ describe("getLeaveRequestsMockData fixture integrity (UI-007CDEF Gate 2)", () =>
     );
     expect(attendanceDates.has("2026-08-25")).toBe(false);
   });
+
+  it("UI-LEAVE-X: lr-5/lr-6 (team-2, team-5) add real simultaneous approved leave without disturbing any existing fixture's id/values", () => {
+    const requests = getLeaveRequestsMockData();
+    const original = ["lr-1", "lr-2", "lr-3", "lr-4"].map((id) => requests.find((request) => request.id === id));
+    expect(original.every(Boolean)).toBe(true);
+
+    const lr5 = requests.find((request) => request.id === "lr-5")!;
+    const lr6 = requests.find((request) => request.id === "lr-6")!;
+    expect(lr5.teamMemberId).toBe("team-2");
+    expect(lr6.teamMemberId).toBe("team-5");
+    expect(lr5.status).toBe("approved");
+    expect(lr6.status).toBe("approved");
+    // 2026-08-27 is covered by both — the real simultaneous-absence scenario.
+    expect(lr5.startDate <= "2026-08-27" && lr5.endDate >= "2026-08-27").toBe(true);
+    expect(lr6.startDate <= "2026-08-27" && lr6.endDate >= "2026-08-27").toBe(true);
+  });
+
+  it("team-4 (Nawal Chaoui) still has no leave requests at all after the UI-LEAVE-X additions — the empty-state demo is unaffected", () => {
+    const requestedMemberIds = new Set(getLeaveRequestsMockData().map((request) => request.teamMemberId));
+    expect(requestedMemberIds.has("team-4")).toBe(false);
+  });
+
+  it("lr-5/lr-6's own dates do not collide with any existing Gate 1 attendance fixture for team-2/team-5 (neither has one, confirmed directly)", () => {
+    const attendanceMemberIds = new Set(getAttendanceMockData().map((record) => record.teamMemberId));
+    expect(attendanceMemberIds.has("team-2")).toBe(false);
+    expect(attendanceMemberIds.has("team-5")).toBe(false);
+  });
 });
 
 describe("getLeaveBalancesMockData fixture integrity", () => {

@@ -169,9 +169,14 @@ export function TeamPage({ members: providedMembers, state = "loaded", onRetry }
           </Button>
         }
         secondaryAction={
-          <Link href="/app/equipe/attendance" className={buttonClassNames("outline", "md")}>
-            {t("team.attendanceLink")}
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/app/equipe/attendance" className={buttonClassNames("outline", "md")}>
+              {t("team.attendanceLink")}
+            </Link>
+            <Link href="/app/equipe/leave-calendar" className={buttonClassNames("outline", "md")}>
+              {t("team.leaveCalendarLink")}
+            </Link>
+          </div>
         }
       />
 

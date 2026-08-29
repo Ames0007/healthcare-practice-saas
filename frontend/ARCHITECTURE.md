@@ -1243,6 +1243,50 @@ src/features/
             be double-counted onto one practitioner (Spec #3 WF-40's own
             acceptance criterion).
 
+            UI-LEAVE-X adds a cabinet-wide Leave Agenda,
+            `team-leave-calendar-page.tsx` at `/app/equipe/leave-calendar`
+            (a static route sibling of `/app/equipe/[id]`, mirroring
+            `team-attendance-page.tsx`'s exact precedent; reached from the
+            Équipe directory's own header, alongside "Présence du jour" —
+            no new main-sidebar entry, ADR-015). It is a **pure read
+            projection** over the existing `LeaveRequest[]`/`TeamMember[]`
+            — `features/team/leave-calendar.ts`'s `LeaveCalendarEvent` is
+            a derived view model (one per `LeaveRequest`, never a second
+            authoritative record) built by `buildLeaveCalendarEvents`,
+            which the Month/Week/List views (`components/leave-calendar-
+            {month,week,list}-view.tsx`) and the read-only
+            `leave-event-drawer.tsx` all consume identically — "Voir la
+            demande" only ever links to the existing per-employee Congés
+            tab (`TeamMemberLeaveContent`), never a second create/approve/
+            reject surface. A multi-day request repeats across every date
+            it spans (`doesEventCoverDate`, `date >= start && date <=
+            end`) — never only its start date. `getApprovedTeamMembersAway`/
+            `countApprovedPractitionersAway` only ever count
+            `status === "approved"` — pending/rejected never contribute to
+            confirmed-absence visibility, independent of whatever the
+            page's own Status filter is currently showing (ADR-015 §3-4).
+            Practitioner-overlap derives from `TeamRole === "practitioner"`,
+            deliberately not the narrower Agenda `practitionerId` link that
+            Commission eligibility (Gate 4, above) requires (ADR-015 §2).
+            Dashboard metrics (`En congé aujourd'hui`/`Demandes en
+            attente`/`Absences planifiées ce mois`) are always whole-
+            cabinet and anchored to the real business date, never scoped
+            to the currently browsed period (ADR-015 §4). Cabinet-level
+            closure context (`getCabinetClosureForDate`) reuses
+            `features/parametres/calendar-exceptions.ts`'s
+            `resolveEffectiveCabinetAvailability` outright — a genuine
+            `CabinetCalendarException` closure surfaces as a distinct
+            "Cabinet fermé" badge, never converted into a per-employee
+            `LeaveRequest` (ADR-015 §5): Cabinet closure and Employee
+            leave remain two separate concepts that can independently
+            co-occur on the same date (`cal-exc-3`'s 2026-08-26 closure
+            and Amal Idrissi's own approved leave both real, both shown).
+            `lr-5`/`lr-6` extend `mock-leave-data.ts`'s existing single
+            `LeaveRequest[]` fixture array (never a second fixture
+            universe, ADR-015 §1) with the one real scenario the prior 4
+            fixtures never demonstrated: two team members simultaneously
+            on approved leave.
+
   stock/    Pharmacie & Stock (UI-008ABCD), replacing the generic Stock
             placeholder at `/app/stock` — Vue d'ensemble/Articles/
             Mouvements/Lots & expirations, executed as four gates

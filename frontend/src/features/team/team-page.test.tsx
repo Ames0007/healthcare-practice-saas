@@ -195,6 +195,13 @@ describe("TeamPage", () => {
     const openLinks = screen.getAllByRole("link", { name: "Ouvrir" });
     expect(openLinks[0]).toHaveAttribute("href", "/app/equipe/team-1");
   });
+
+  it("exposes both the Présence and Agenda des congés cabinet-level workspaces (UI-LEAVE-X §3), without touching the main sidebar", () => {
+    renderTeam();
+
+    expect(screen.getByRole("link", { name: "Présence du jour" })).toHaveAttribute("href", "/app/equipe/attendance");
+    expect(screen.getByRole("link", { name: "Agenda des congés" })).toHaveAttribute("href", "/app/equipe/leave-calendar");
+  });
 });
 
 function tableRowFor(name: string) {
