@@ -2371,10 +2371,7 @@
       "description": "أساس التخطيط فقط. سيتم تنفيذ مسار الإعداد الفعلي في مهمة لاحقة."
     },
     "book": {
-      "title": "الحجز عبر الإنترنت",
-      "description": "أساس التخطيط فقط. سيتم تنفيذ نموذج الحجز العام الفعلي في مهمة لاحقة.",
-      "cabinetPlaceholder": "هوية العيادة (مثال)",
-      "primaryActionPlaceholder": "احجز موعداً"
+      "title": "الحجز عبر الإنترنت"
     },
     "admin": {
       "title": "إدارة المنصة",
@@ -2439,6 +2436,82 @@
       "commissionLabel": "العمولة",
       "deductionsLabel": "الخصومات",
       "netLabel": "الصافي المستحق"
+    }
+  },
+  "booking": {
+    "hero": {
+      "title": "حجز موعد"
+    },
+    "progress": {
+      "service": "الخدمة",
+      "practitioner": "الممارس",
+      "date": "التاريخ والوقت",
+      "details": "معلوماتكم"
+    },
+    "backAction": "رجوع",
+    "minutesSuffix": "دقيقة",
+    "service": {
+      "heading": "اختر خدمة",
+      "empty": "لا توجد خدمة متاحة حاليًا."
+    },
+    "practitioner": {
+      "heading": "اختر ممارسًا",
+      "changeService": "تغيير الخدمة",
+      "empty": "لا يوجد ممارس متاح لهذه الخدمة."
+    },
+    "date": {
+      "heading": "اختر تاريخًا",
+      "changeService": "تغيير الخدمة",
+      "changePractitioner": "تغيير الممارس",
+      "previousMonth": "الشهر السابق",
+      "nextMonth": "الشهر التالي",
+      "legendAvailable": "متاح",
+      "legendUnavailable": "غير متاح",
+      "legendSelected": "محدَّد",
+      "slotsHeadingFor": "المواعيد المتاحة — {{date}}",
+      "selectDatePrompt": "اختر تاريخًا لعرض المواعيد المتاحة.",
+      "reasonClosed": "العيادة مغلقة",
+      "reasonFull": "مكتمل",
+      "reasonUnavailable": "غير متاح",
+      "reasonPast": "تاريخ منقضٍ",
+      "noAvailabilityInPeriod": "لا يوجد موعد متاح خلال هذه الفترة.",
+      "noAvailabilityHint": "جرّب ممارسًا آخر أو خدمة أخرى، أو عاود المحاولة لاحقًا.",
+      "slotNoLongerAvailable": "لم يعد هذا الموعد متاحًا. يرجى اختيار موعد آخر."
+    },
+    "details": {
+      "heading": "معلوماتكم",
+      "firstNameLabel": "الاسم الشخصي",
+      "lastNameLabel": "الاسم العائلي",
+      "phoneLabel": "الهاتف",
+      "noteLabel": "ملاحظة (اختياري)",
+      "requiredError": "هذا الحقل مطلوب.",
+      "invalidPhoneError": "رقم الهاتف غير صالح.",
+      "continueAction": "متابعة"
+    },
+    "review": {
+      "heading": "تحقق من موعدك",
+      "serviceLabel": "الخدمة",
+      "practitionerLabel": "الممارس",
+      "dateLabel": "التاريخ",
+      "timeLabel": "الوقت",
+      "durationLabel": "المدة",
+      "priceLabel": "التعرفة",
+      "contactLabel": "معلومات الاتصال",
+      "noteLabel": "ملاحظة",
+      "editAction": "تعديل",
+      "confirmAction": "تأكيد الموعد"
+    },
+    "confirmation": {
+      "heading": "تم إرسال الطلب",
+      "message": "تم تسجيل طلب موعدكم بنجاح.",
+      "pendingNotice": "لا يزال يتعين على العيادة تأكيد موعدكم.",
+      "communicationNotice": "ستصلكم رسالة تأكيد عبر واتساب أو الرسائل القصيرة.",
+      "referenceLabel": "المرجع",
+      "serviceLabel": "الخدمة",
+      "practitionerLabel": "الممارس",
+      "dateLabel": "التاريخ",
+      "timeLabel": "الوقت",
+      "newBookingAction": "حجز موعد آخر"
     }
   }
 }

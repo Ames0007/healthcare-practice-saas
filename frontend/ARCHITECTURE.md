@@ -1733,6 +1733,111 @@ src/features/
             `cross-governance-integrity.test.ts`, mirroring
             `cross-subscription-integrity.test.ts`'s own discipline.
 
+  booking/  Public Booking & Effective Availability (UI-012ABCDE),
+            replacing the `/book` visual placeholder with a real,
+            accountless patient-facing booking journey (ADR-017). Every
+            input — services, cabinet hours, calendar exceptions,
+            practitioner schedules, approved leave, existing appointments
+            — is read from the same real fixture sources
+            Paramètres/Équipe/Agenda already own; no second booking-
+            availability fixture universe exists anywhere.
+
+            `availability.ts` is a pure, React-free engine
+            (`getDayAvailability`/`getMonthAvailability`) resolving, per
+            service+practitioner+date: past date -> cabinet closure/
+            holiday (`resolveEffectiveCabinetAvailability`, reused
+            outright from `features/parametres/calendar-exceptions.ts`)
+            -> approved leave (`doesApprovedLeaveCoverDate`, reused
+            outright from `features/team/leave.ts` — pending/rejected
+            never block) -> practitioner `WorkInterval` intersection
+            (`intersectIntervals`, the one centralized interval-
+            intersection helper) -> duration-fitting slot generation
+            (`generateCandidateSlots`, each effective interval walked
+            independently so a slot can never bridge a split-hours/lunch
+            closure) -> existing-appointment occupancy
+            (`computeOccupiedIntervals`/`isSlotFree`, reusing `toRange`/
+            `overlaps`/`TERMINAL_STATUSES` newly exported from
+            `features/agenda/conflict.ts` rather than a third
+            re-implementation of the same overlap math).
+            `getSchedulablePractitioners` is the canonical schedulable-
+            practitioner projection — `TeamMember.role === "practitioner"`
+            AND `status === "active"` AND a real `practitionerId` link to
+            `AgendaPractitioner`, never `role === "practitioner"` alone
+            (Othmane Zouiten, a practitioner with no `practitionerId`
+            link, is integrity-tested absent). Every internal
+            `UnavailableReason` (`past_date`/`cabinet_closed`/`holiday`/
+            `practitioner_not_scheduled`/`practitioner_on_leave`/
+            `fully_booked`) collapses to one of 4 public-safe labels via
+            `labels.ts`'s `getUnavailableReasonLabelKey` before ever
+            reaching the UI — `practitioner_on_leave` and
+            `practitioner_not_scheduled` deliberately render the exact
+            same generic "Indisponible," so a patient can never infer
+            that a specific practitioner is on leave (task §38/§66).
+            Slot-step granularity (30 minutes) and the deliberate absence
+            of any booking-horizon/minimum-notice rule are both recorded
+            architectural decisions (ADR-017) — neither concept exists
+            anywhere in `AppointmentSettings` or the approved
+            specifications.
+
+            `booking-state.ts`'s `bookingReducer` drives the 5-step
+            wizard (Service -> Praticien -> Date & heure -> Vos
+            informations -> Confirmation, `components/booking-
+            progress.tsx`) — a documented, deliberate extension of Spec
+            #9 Screen 51's older single-form wireframe (no practitioner
+            field) into a stepped flow with explicit practitioner
+            selection, per this task's own explicit instructions (ADR-017
+            §3). Changing an earlier selection invalidates only the
+            steps that actually depend on it, and only when the
+            selection genuinely changes — re-confirming the same
+            service/practitioner (e.g. via Review's "Modifier") never
+            silently wipes an already-picked date/slot.
+            `components/availability-calendar.tsx` is a purpose-built
+            month grid (never `<input type=date>`, which has no per-day
+            availability to visualize) — unavailable days are disabled,
+            struck through, and carry a safe `aria-label` reason, never
+            color-only (task §33). The contact form
+            (`components/patient-details-step.tsx`) is bounded to Spec #9
+            Screen 51's own exact field list (Prénom/Nom/Téléphone/
+            Commentaire) — no CIN, no social coverage, no clinical data
+            (task §42/§43); its `<form>` carries `noValidate` so the
+            app's own custom validation messages (not the browser's
+            native required-field tooltip) are what patients actually
+            see.
+
+            Submission (`public-booking-page.tsx`'s `handleConfirm`)
+            re-validates the exact selected slot against live sources
+            immediately before creating the local record (task §47) — a
+            slot taken in the meantime returns the user to date
+            selection with `slotUnavailableNotice`, never a silent
+            failure. The local booking record reuses the canonical
+            `AgendaAppointment` shape outright (`buildLocalBookingAppointment`),
+            always created with `status: "requested"` (never
+            auto-confirmed, matching Spec #9 Screen 52 / WF-04 §5
+            exactly) and a synthetic `public-*` `patientId` — never a
+            link to a real `PATIENTS` fixture id, no probabilistic
+            patient matching (task §45). A deterministic `DEM-{date}-
+            {seq}` reference (`buildBookingReference`) is a recorded
+            prototype-local convention, distinct from the backend's own
+            `NumberingSequenceRow` registry (PAT/EMP/FAC/REC only —
+            appointments were never part of it). Confirmed bookings
+            accumulate in `sessionBookings` (component state only, no
+            `localStorage`) and are merged into the engine's own
+            appointment source for the rest of the browser session, so a
+            just-booked slot cannot be immediately double-booked locally
+            — without ever mutating Agenda's own real appointment array.
+            Production concurrency safety (two different sessions
+            booking the same slot simultaneously) is explicitly out of
+            scope for this frontend-only revalidation and is recorded as
+            RISK-016 — a future backend booking endpoint must perform an
+            atomic check-and-create.
+
+            The former placeholder `BookPage`/`FoundationBadge` is
+            removed outright — `FoundationBadge` is explicitly documented
+            as "never used on real product screens," and `/book` now is
+            one; `app/book/layout.tsx`'s max width grew from `max-w-sm`
+            to `max-w-xl` to fit the calendar/slot grid, still bounded
+            well short of a full admin layout (task §73).
+
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,
 `setUTCDate`/`getUTCDate`, `toISOString()`) — mixing local-time `Date`

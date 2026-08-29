@@ -2808,3 +2808,73 @@ All notable changes to this project are documented in this file.
   from the UI-LEAVE-X baseline of 1677), typecheck/lint/build pass.
   Backend regression (10 tests, 26 assertions, clean) unaffected — no
   backend files touched.
+- UI-012ABCDE — Public Booking & Effective Availability. Replaces the
+  `/book` visual placeholder with a real, accountless public booking
+  journey, built entirely on existing operational configuration and
+  scheduling data (Cabinet Services, Cabinet Working Hours, Cabinet
+  Calendar Exceptions, Practitioner Work Schedules, approved Practitioner
+  Leave, existing Agenda appointments) — no second booking-availability
+  fixture universe anywhere.
+
+  New pure, React-free availability engine
+  (`frontend/src/features/booking/availability.ts`) resolves, per
+  service+practitioner+date: past date, cabinet closure/holiday (reusing
+  `resolveEffectiveCabinetAvailability` from UI-AGENDA-X outright),
+  approved leave (reusing `doesApprovedLeaveCoverDate` from UI-007CDEF —
+  pending/rejected leave never blocks), practitioner `WorkInterval`
+  intersection (one centralized `intersectIntervals` helper), service-
+  duration-fitting slot generation (never bridges a split-hours/lunch
+  closure), and existing-appointment occupancy (reusing `toRange`/
+  `overlaps`/`TERMINAL_STATUSES`, newly exported from
+  `features/agenda/conflict.ts` — an additive `export` on 3 already-
+  shipped pure functions, zero behavior change, rather than a third
+  re-implementation of the same overlap math). A schedulable practitioner
+  is exactly `TeamMember.role === "practitioner"` AND `status ===
+  "active"` AND a real `practitionerId` link to the canonical
+  `AgendaPractitioner` — never `role === "practitioner"` alone (Othmane
+  Zouiten, a practitioner with no `practitionerId` link, is integrity-
+  tested absent).
+
+  Slot-step granularity (30 minutes) is a recorded architectural decision
+  (ADR-017) reusing the one real existing precedent in this codebase
+  (Agenda's own day-view grid and conflict-suggestion stepping) — no spec
+  or `AppointmentSettings` field defines a granularity. No booking
+  horizon and no minimum-notice rule are implemented: neither exists
+  anywhere in the approved specifications or `AppointmentSettings`; the
+  calendar's own month-navigation is separately capped 3 months forward
+  as a plain UI convenience, never an engine business rule.
+
+  Every internal `UnavailableReason` collapses to one of 4 public-safe
+  labels before ever reaching the UI — a practitioner's approved leave
+  and "not scheduled that day" render the exact same generic
+  "Indisponible," proven by a dedicated privacy test, so a patient can
+  never infer that a specific practitioner is on leave.
+
+  `/book` becomes a real 5-step journey (Service → Praticien → Date &
+  heure → Vos informations → Confirmation) with a purpose-built public
+  availability calendar (never color-only — unavailable days are also
+  disabled and struck through with a safe `aria-label`), a real slot
+  grid, and a bounded contact form (Prénom/Nom/Téléphone/Commentaire
+  only — no CIN, no social coverage, no clinical data, matching Spec #9
+  Screen 51's own exact field list). Submission re-validates the selected
+  slot against live sources immediately before creating the local
+  booking record; a slot taken in the meantime returns the user to date
+  selection with an explicit notice, never a silent failure. The local
+  record reuses the canonical `AgendaAppointment` shape outright, always
+  created with status `"requested"` (never auto-confirmed, matching Spec
+  #9 Screen 52 / WF-04 exactly), with a synthetic `public-*` patient id —
+  never a link to a real `PATIENTS` fixture, no probabilistic patient
+  matching. Confirmed local bookings accumulate for the browser session
+  only (no `localStorage`) and are merged into the engine's own
+  appointment source so a just-booked slot cannot be immediately
+  double-booked in the same session, without ever mutating Agenda's own
+  real appointment array.
+
+  The former placeholder `BookPage`/`FoundationBadge` is removed outright
+  — `FoundationBadge` is explicitly documented as "never used on real
+  product screens," and `/book` now is one. No Laravel integration, no
+  API calls, no database changes, no real SMS/WhatsApp sending, no
+  payment gateway, no CAPTCHA, no calendar-provider integration, no real
+  persistence. 89 net new tests (1804 total, up from the UI-DOCS-X
+  baseline of 1715), typecheck/lint/build pass. Backend regression (10
+  tests, 26 assertions, clean) unaffected — no backend files touched.

@@ -1,9 +1,10 @@
 import { addMinutesToTime, parseTimeToMinutes } from "./format";
 import type { AgendaAppointment, AppointmentDraft } from "./types";
 
-const TERMINAL_STATUSES = new Set(["cancelled_by_patient", "cancelled_by_practice", "no_show", "completed"]);
+/** Reused by UI-012ABCDE's booking availability engine (`doesAppointmentBlockAvailability`) — the single source for which statuses no longer occupy a slot. */
+export const TERMINAL_STATUSES = new Set(["cancelled_by_patient", "cancelled_by_practice", "no_show", "completed"]);
 
-interface TimeRange {
+export interface TimeRange {
   start: number;
   end: number;
 }
@@ -13,7 +14,7 @@ type DraftLike = Pick<
   "practitionerId" | "date" | "schedulingType" | "time" | "endTime" | "durationMinutes"
 >;
 
-function toRange(input: {
+export function toRange(input: {
   schedulingType: string;
   time: string;
   endTime?: string;
@@ -27,7 +28,7 @@ function toRange(input: {
   return { start, end };
 }
 
-function overlaps(a: TimeRange, b: TimeRange): boolean {
+export function overlaps(a: TimeRange, b: TimeRange): boolean {
   return a.start < b.end && b.start < a.end;
 }
 

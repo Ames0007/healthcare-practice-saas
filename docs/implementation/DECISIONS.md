@@ -1504,3 +1504,127 @@ Arabic/RTL.
 ### Date
 
 2026-08-29
+
+---
+
+## ADR-017 — UI-012ABCDE Public Booking: 30-minute slot-step granularity, no invented booking horizon/minimum notice, and a 5-step flow with explicit practitioner selection
+
+### Status
+
+Accepted
+
+### Context
+
+The task builds a real availability engine and public booking journey at
+`/book` on top of existing Cabinet Service/Working Hours/Calendar
+Exception/Practitioner Schedule/Leave/Appointment sources. Three points
+were left genuinely unresolved by the approved specifications and
+required an explicit decision rather than a silent guess (CLAUDE.md §1/
+§3, task §16/§18/§19):
+
+1.  What time increment separates one offered slot from the next.
+2.  Whether a booking horizon (how far ahead a patient may book) or a
+    minimum-notice rule exists.
+3.  Whether Public Booking is a single form (Spec #9 Screen 51's own
+    wireframe: Prénom/Nom/Téléphone/Motif/Date/Créneau/Commentaire, no
+    practitioner field) or a stepped flow with explicit practitioner
+    selection (this task's own explicit §13-17/§30-32 instructions).
+
+### Decision
+
+1.  **Slot-step granularity: 30 minutes**
+    (`BOOKING_SLOT_STEP_MINUTES`, `features/booking/availability.ts`). No
+    spec and no `AppointmentSettings` field defines a granularity
+    (grep-confirmed). Rather than inventing an arbitrary new number, this
+    reuses the one real, already-shipped precedent in the exact same
+    problem space: Agenda's own day-view time grid
+    (`features/agenda/components/day-view.tsx`'s `SLOT_MINUTES = 30`) and
+    its own conflict-suggestion stepping
+    (`features/agenda/conflict.ts`'s `suggestAlternativeTimes`, `+= 30`).
+    A candidate slot must still fully fit its service's own
+    `durationMinutes` within an effective interval — the step only
+    controls how far apart two consecutive candidate start times are,
+    never a promise that every multiple-of-30 minute is offered
+    regardless of duration.
+2.  **No booking horizon, no minimum-notice rule implemented in the
+    engine.** Neither concept exists anywhere in `AppointmentSettings`
+    (`components/domain/settings/types.ts`'s own doc comment already
+    states `/book` "is still a documented visual placeholder with no
+    real request flow, so a toggle controlling it would configure a
+    feature that does not exist yet") or in the approved specifications
+    (grep-confirmed across all 10 spec files). Inventing either would
+    silently fabricate a business rule with no source of truth. The
+    calendar's own month-navigation UI is separately capped 3 months
+    forward (`MONTH_NAVIGATION_WINDOW_MONTHS`,
+    `components/date-slot-step.tsx`) — this is explicitly a UI
+    navigation convenience only ("do not allow navigating into
+    meaningless unrestricted years," task §34), never an availability
+    engine rule: the engine itself never rejects a date on this basis,
+    and `getDayAvailability` called directly with any future date still
+    resolves normally.
+3.  **A 5-step flow (Service → Praticien → Date & heure → Vos
+    informations → Confirmation) with an explicit practitioner-selection
+    step, extending Spec #9 Screen 51's older single-form wireframe.**
+    Screen 51 predates this task's own real multi-practitioner
+    availability engine and shows no practitioner field at all. This
+    task's own GATE 2 instructions (§13-17) explicitly and repeatedly
+    require a dedicated practitioner-selection step ("After service
+    selection: show eligible schedulable practitioners," §30) and a
+    stepped flow (§26-27). Per CLAUDE.md §1's own explicit priority
+    order — "1. Explicit current task instructions" outranks
+    "4. Specifications #1–#10" — the task's own instructions govern here.
+    This is recorded as a deliberate, traceable decision (not a silent
+    deviation): the underlying domain fields Screen 51 collects
+    (Prénom/Nom/Téléphone/Motif/Date/Créneau/Commentaire) are all still
+    collected, in the same order, across the new steps — nothing from
+    the wireframe's own data model was dropped or contradicted, only its
+    single-form layout was extended into a stepped one with one added
+    selection (practitioner).
+
+### Alternatives considered
+
+- **Reuse Agenda's `generateTimeSlots(startHour, endHour, stepMinutes)`
+  directly for slot stepping.** That helper is hour-grid-oriented
+  (whole-hour boundaries) and not designed for arbitrary `"HH:mm"`
+  effective-interval boundaries (e.g. a modified-hours exception starting
+  at `13:00`, or a practitioner interval starting at `08:30`); reusing
+  its underlying `parseTimeToMinutes`/`addMinutesToTime` primitives
+  directly, with the same `30`-minute constant, achieves the same
+  precedent-following goal without forcing an hour-aligned grid onto
+  irregular effective intervals.
+- **15-minute slot-step.** Considered since it is a common real-world
+  booking-widget default, but rejected — no precedent for it exists
+  anywhere in this codebase (Agenda's own grid/suggestion logic both use
+  30), and introducing a second, finer granularity with no source of
+  truth would itself be an invented rule.
+- **Invent a booking horizon (e.g. "30 days ahead") for realism.**
+  Rejected outright per the task's own explicit §18 instruction ("If no
+  booking horizon is actually implemented/spec-defined: do not invent
+  one") — a fabricated horizon would misrepresent this prototype's actual
+  guarantees to a future implementer reading the code.
+- **Keep Public Booking as Screen 51's single form, omit practitioner
+  selection.** Rejected — the task's own GATE 2 instructions are
+  explicit and repeated (not merely "recommended" in the sense of
+  optional), and the real availability engine this task builds is
+  fundamentally per-practitioner; a single form with no practitioner
+  field would have nothing meaningful to bind "Motif" + "Créneau" to
+  when two practitioners have different effective availability for the
+  same service.
+
+### Consequences
+
+- A future task that formally defines a booking horizon, minimum-notice
+  policy, or a different slot-step granularity in `AppointmentSettings`
+  or the specifications should update `BOOKING_SLOT_STEP_MINUTES` and add
+  the corresponding engine-level check (a new `UnavailableReason` such as
+  `outside_booking_horizon`) rather than leaving the UI-layer month cap
+  as the only bound — the two are conceptually different and this ADR's
+  own text should be revisited alongside that change.
+- `/book`'s flow shape (5 steps, explicit practitioner selection) is now
+  the canonical Public Booking IA; any future spec update to Screen 51
+  should reconcile against this ADR rather than being treated as a fresh,
+  unexplained contradiction.
+
+### Date
+
+2026-08-29

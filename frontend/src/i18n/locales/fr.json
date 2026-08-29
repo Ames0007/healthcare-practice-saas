@@ -2371,10 +2371,7 @@
       "description": "Fondation de mise en page uniquement. Le parcours d'intégration réel sera implémenté dans une tâche ultérieure."
     },
     "book": {
-      "title": "Réservation en ligne",
-      "description": "Fondation de mise en page uniquement. Le formulaire de réservation publique réel sera implémenté dans une tâche ultérieure.",
-      "cabinetPlaceholder": "Identité du cabinet (exemple)",
-      "primaryActionPlaceholder": "Prendre rendez-vous"
+      "title": "Réservation en ligne"
     },
     "admin": {
       "title": "Administration de la plateforme",
@@ -2439,6 +2436,82 @@
       "commissionLabel": "Commission",
       "deductionsLabel": "Retenues",
       "netLabel": "Net à payer"
+    }
+  },
+  "booking": {
+    "hero": {
+      "title": "Prendre rendez-vous"
+    },
+    "progress": {
+      "service": "Service",
+      "practitioner": "Praticien",
+      "date": "Date & heure",
+      "details": "Vos informations"
+    },
+    "backAction": "Retour",
+    "minutesSuffix": "min",
+    "service": {
+      "heading": "Choisissez un service",
+      "empty": "Aucun service disponible pour le moment."
+    },
+    "practitioner": {
+      "heading": "Choisissez un praticien",
+      "changeService": "Changer de service",
+      "empty": "Aucun praticien disponible pour ce service."
+    },
+    "date": {
+      "heading": "Choisissez une date",
+      "changeService": "Changer de service",
+      "changePractitioner": "Changer de praticien",
+      "previousMonth": "Mois précédent",
+      "nextMonth": "Mois suivant",
+      "legendAvailable": "Disponible",
+      "legendUnavailable": "Indisponible",
+      "legendSelected": "Sélectionné",
+      "slotsHeadingFor": "Créneaux disponibles — {{date}}",
+      "selectDatePrompt": "Sélectionnez une date pour voir les créneaux disponibles.",
+      "reasonClosed": "Cabinet fermé",
+      "reasonFull": "Complet",
+      "reasonUnavailable": "Indisponible",
+      "reasonPast": "Date passée",
+      "noAvailabilityInPeriod": "Aucun créneau disponible sur cette période.",
+      "noAvailabilityHint": "Essayez un autre praticien, un autre service, ou revenez plus tard.",
+      "slotNoLongerAvailable": "Ce créneau n'est plus disponible. Merci d'en choisir un autre."
+    },
+    "details": {
+      "heading": "Vos informations",
+      "firstNameLabel": "Prénom",
+      "lastNameLabel": "Nom",
+      "phoneLabel": "Téléphone",
+      "noteLabel": "Commentaire (facultatif)",
+      "requiredError": "Ce champ est requis.",
+      "invalidPhoneError": "Numéro de téléphone invalide.",
+      "continueAction": "Continuer"
+    },
+    "review": {
+      "heading": "Vérifiez votre rendez-vous",
+      "serviceLabel": "Service",
+      "practitionerLabel": "Praticien",
+      "dateLabel": "Date",
+      "timeLabel": "Heure",
+      "durationLabel": "Durée",
+      "priceLabel": "Tarif",
+      "contactLabel": "Contact",
+      "noteLabel": "Commentaire",
+      "editAction": "Modifier",
+      "confirmAction": "Confirmer le rendez-vous"
+    },
+    "confirmation": {
+      "heading": "Demande envoyée",
+      "message": "Votre demande de rendez-vous a bien été enregistrée.",
+      "pendingNotice": "Le cabinet doit encore confirmer votre rendez-vous.",
+      "communicationNotice": "Vous recevrez une confirmation par WhatsApp ou SMS.",
+      "referenceLabel": "Référence",
+      "serviceLabel": "Service",
+      "practitionerLabel": "Praticien",
+      "dateLabel": "Date",
+      "timeLabel": "Heure",
+      "newBookingAction": "Prendre un autre rendez-vous"
     }
   }
 }

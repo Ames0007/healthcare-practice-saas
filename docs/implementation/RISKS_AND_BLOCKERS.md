@@ -197,3 +197,31 @@ unfixed, or (c) move authoritative document rendering server-side
 (Laravel) with a more mature Arabic-shaping toolchain — consistent with
 the task's own documented "future production architecture may move
 authoritative document rendering to the backend" boundary.
+
+---
+
+### RISK-016
+
+**Topic:** Frontend-only public booking slot revalidation is not
+concurrency-safe
+**Status:** OPEN (documented boundary, not a defect — ADR-017/UI-012ABCDE)
+**Affected Tasks:** UI-012ABCDE, any future backend booking-request
+endpoint
+**Description:** `/book`'s submission flow re-runs the availability engine
+against the current in-memory sources immediately before creating a local
+booking record (task §47), which correctly protects against a *stale
+selection within the same browser session* — but two different browser
+sessions booking the same practitioner/date/time concurrently would both
+pass this check and both "succeed" locally, since there is no shared
+backend state, no database, and no atomic check-and-create anywhere in
+this frontend prototype. This is an explicit, task-mandated non-scope
+item (task §81: "Frontend slot revalidation is NOT sufficient for
+production... Do not claim this frontend prototype guarantees concurrency
+safety"), not an oversight.
+**Decision Required Before:** Any real backend `POST
+/api/v1/public/practices/{slug}/booking-requests` implementation must
+perform an atomic availability check + `Appointment`/booking-request
+creation (e.g. a database-level unique constraint or row lock on
+practitioner+date+time, mirroring CLAUDE.md §45's own "Database
+Concurrency" guidance for invoice/receipt numbering and payment posting)
+before this can be considered production-safe.
