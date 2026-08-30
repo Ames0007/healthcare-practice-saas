@@ -2878,3 +2878,45 @@ All notable changes to this project are documented in this file.
   persistence. 89 net new tests (1804 total, up from the UI-DOCS-X
   baseline of 1715), typecheck/lint/build pass. Backend regression (10
   tests, 26 assertions, clean) unaffected — no backend files touched.
+
+- **UI-013ABCDE — SaaS Platform Administration.** A new `/admin/*`
+  Platform Admin console — a genuinely separate product surface from
+  `/app/*` (cabinet) and `/book` (public), its own shell
+  (`app/admin/layout.tsx`, never `AppShell`/`AppSidebar`) with a 5-item
+  nav (Vue d'ensemble/Cabinets/Abonnements/Utilisateurs/Activité,
+  `lib/admin-nav-config.ts`) replacing TASK-003's 8-item placeholder.
+  New `features/platform-admin/` module built entirely on real, reused
+  sources — a new `Tenant` directory (7 fixtures, all 3 `TenantStatus`
+  and all 6 `SubscriptionStatus` values represented at least once) joined
+  against the real `Subscription`/`SubscriptionPlan` fixtures UI-011ABC
+  already shipped (`tenant-1`'s own subscription is the exact same object
+  `/app/abonnement` itself reads, never a duplicate), and a platform-wide
+  `PlatformUser`/`PlatformUserTenantMembership` directory whose `tenant-1`
+  rows are *derived* from the real Access Governance fixtures
+  (`mapAccessUsersToPlatformUsers`) rather than re-authored — proven by
+  `cross-platform-admin-integrity.test.ts`. Dashboard KPIs (Cabinets
+  actifs/en essai/restreints, Abonnements actifs/à renouveler/expirés,
+  Utilisateurs total/actifs) and the attention queue are pure derivations
+  over these same arrays — `À renouveler` reuses UI-011ABC's own
+  `isExpiringSoon`/D-15 threshold rather than a second invented number.
+  Tenant 360° (`/admin/tenants/[id]`) hosts tenant status
+  (suspend/reactivate), subscription status (manual renewal/forced
+  blackout/cancel, reusing `GRACE_PERIOD_DAYS`) and a read-only
+  entitlements/users/history view — bounded actions require a reason
+  (Spec #2 §55.2 "controlled and audited") and update local state only
+  (task: "NO real tenant suspension... NO real subscription mutation");
+  no `/admin/subscriptions/[id]`/`/admin/users/[id]` routes exist (task
+  §9), so subscription detail lives on Tenant 360° and user detail is a
+  drawer on `/admin/users` (mirrors `UserAccessDrawer`). `/admin/activity`
+  covers the Gate 5 audit log and attention queue; a dedicated support/
+  impersonation workspace was deliberately not built — both are marked
+  conditional-future by the specifications themselves (Spec #1 §27, Spec
+  #2 §55.6), not merely unspecified (see ADR-018/RISK-017/RISK-018 for
+  the full set of recorded scope decisions and boundaries). No Laravel
+  integration, no API calls, no database changes, no real tenant
+  suspension/impersonation/subscription mutation, no payment gateway, no
+  authentication (task §6: "Frontend Admin UI ≠ Platform authorization"),
+  no LocalStorage/persistence. 109 net new tests (1913 total, up from the
+  UI-012ABCDE baseline of 1804), typecheck/lint/build clean. Backend
+  regression (10 tests, 26 assertions, clean) unaffected — no backend
+  files touched.

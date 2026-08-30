@@ -1628,3 +1628,149 @@ required an explicit decision rather than a silent guess (CLAUDE.md §1/
 ### Date
 
 2026-08-29
+
+---
+
+## ADR-018 — UI-013ABCDE SaaS Platform Admin: Gate 4 user-directory scope, nav trimming, session-local bounded actions, and deferred impersonation/support
+
+### Status
+
+Accepted
+
+### Context
+
+The task builds a separate `/admin/*` Platform Admin console in 5 gates.
+Several points were left genuinely unresolved by the approved
+specifications and required an explicit decision rather than a silent
+guess (CLAUDE.md §1/§3, task §4: "Specifications are authoritative. Do
+not invent commercial/security behavior"):
+
+1.  Gate 4 asks for "platform user administration" with a directory,
+    "user/tenant relationships," detail and bounded status actions — but
+    grep across all 10 specs found no dedicated wireframe, no screen
+    number, no i18n nav key and no field list for this surface. The only
+    concrete mention anywhere is Spec #4 §55's bare `platform_admin_users`/
+    `platform_admin_roles` *table names*, with zero fields — that table
+    names the SaaS operator's own login identity, which task §6 already
+    defers entirely ("Do NOT implement real authentication in this task").
+2.  TASK-003's original `/admin` foundation shipped an 8-item nav
+    (`dashboard/cabinets/subscriptions/plans/masterData/referrals/
+    operations/audit`), but this task's own §7 "Potential navigation" list
+    names only 5 (`Vue d'ensemble/Cabinets/Abonnements/Utilisateurs/
+    Activité`), and this task's own Gate scope (§1) never asks for Plans/
+    Master Data/Referral admin screens.
+3.  Bounded tenant/subscription/user status actions (task §15/§20/§25)
+    must be "controlled and audited" (Spec #2 §55.2) but are explicitly
+    fake ("NO real tenant suspension... NO real subscription mutation,"
+    task §1) — where does the resulting local state/audit trail live?
+4.  Task §9 lists preferred routes (`/admin`, `/admin/tenants`,
+    `/admin/tenants/[id]`, `/admin/subscriptions`, `/admin/users`,
+    `/admin/activity`) with no `/admin/subscriptions/[id]` and no
+    `/admin/users/[id]` — yet Gate 3/§19 asks for "subscription detail"
+    and Gate 4/§24 asks for "user detail."
+5.  Spec #2 §55.6 itself marks "Support/operations" **"Future/controlled"**
+    and Spec #1 §27 phrases impersonation as conditional-future only
+    ("Safe impersonation/support access only if later implemented") — the
+    task's own §28 asks to "implement support/tenant-context workspace
+    where specified."
+
+### Decision
+
+1.  **Gate 4 = a directory over Spec #4 §4.1 `users` / §4.2
+    `tenant_memberships`, never `platform_admin_users`.** The platform
+    user directory (`features/platform-admin/platform-users.ts`) models
+    the practice-side users (owners/practitioners/staff) the operator
+    *observes* across every tenant — grounded in the tenant list's own
+    "Owner" column (Spec #2 §55.2) and the fully-specified `users`/
+    `tenant_memberships` schema (Spec #4 §4.1/§4.2), genuinely spanning
+    multiple tenants (unlike UI-011X's `TenantMembership`, which its own
+    doc comment narrows to one synthetic tenant). The SaaS operator's own
+    `platform_admin_users`/`platform_admin_roles` login identity (who may
+    open `/admin/*` at all) is never modeled — it has zero field
+    specification anywhere and is squarely inside task §6's own deferred
+    "Future authentication/authorization must protect `/admin/*`."
+    `tenant-1`'s rows are *derived* from the real `access` module fixtures
+    (`mapAccessUsersToPlatformUsers`), never re-authored — proven by
+    `cross-platform-admin-integrity.test.ts`.
+2.  **Admin nav trimmed to exactly the 5 items task §7 names.**
+    `ADMIN_NAV_ITEMS` (`lib/admin-nav-config.ts`) replaces TASK-003's
+    8-item placeholder outright. Plans/Master Data/Referral admin screens
+    (Spec #2 §55.3/§55.4/§55.5) are real, spec-defined future screens, not
+    invented ones — but this task's own Gate scope never asks for them,
+    and CLAUDE.md §3 ("do not expand scope merely because implementation
+    makes an additional feature convenient") argues against shipping three
+    nav entries that lead nowhere. A future task adding Plans/Master
+    Data/Referral admin can extend this same array.
+3.  **Bounded actions are session-local to the page that performs them,
+    never globally synchronized.** Suspending/reactivating a tenant
+    (Tenant 360° Overview tab), changing a subscription's status (Tenant
+    360° Subscription tab) and disabling/reactivating/unlocking a user
+    (`/admin/users`' drawer) each update that page's own local component
+    state and append to that page's own local history list — they do
+    **not** propagate to `/admin/activity`'s static audit feed or to any
+    other open page. This mirrors UI-012ABCDE's own `sessionBookings`
+    precedent (component-scoped state, never a new global store) and
+    avoids inventing "a large new subsystem" (CLAUDE.md §3) merely to make
+    a fake action's fake audit trail appear consistent everywhere at once.
+    See RISK-017.
+4.  **No `/admin/subscriptions/[id]` or `/admin/users/[id]` routes.**
+    Subscription detail (task §19) lives inside Tenant 360°'s own
+    "Abonnement" tab — Spec #2 §55.2's own note that tenant detail exposes
+    "subscription/operational metadata," and wireframe Screen 56's own
+    tenant-detail-with-subscription-tabs shape, both support this
+    directly. User detail (task §24) is a drawer on `/admin/users`
+    (mirrors `UserAccessDrawer`'s own established pattern) rather than a
+    third detail route. Both choices follow task §9's explicit "do not
+    invent unnecessarily deep routing."
+5.  **No impersonation, no dedicated support/tenant-context workspace.**
+    Both are conditional-future per the specifications themselves (Spec #1
+    §27, Spec #2 §55.6 "Future/controlled") — not merely unspecified but
+    explicitly deferred by the specs' own wording. `/admin/activity`
+    covers Gate 5's audit log and attention-queue requirements (task §27/
+    §29) without adding a support surface the specs themselves say isn't
+    ready yet.
+
+### Alternatives considered
+
+- **Model `platform_admin_users` as Gate 4's subject instead.** Rejected
+  — zero field specification exists anywhere for that table, so any form
+  built around it would be pure invention, directly contradicting task
+  §4's "do not invent commercial/security behavior." The `users`/
+  `tenant_memberships` grounding is fully specified and directly serves
+  the tenant directory's own "Owner" column besides.
+- **Keep all 8 original nav items, with 3 pointing at a placeholder.**
+  Rejected — a nav entry leading to an unimplemented stub inside a task
+  that just shipped 5 *real* surfaces reads as a defect, not a foundation;
+  trimming is honest about current scope and easily reversible later.
+- **Wire bounded actions into a shared cross-page store so they appear
+  everywhere at once.** Rejected — this is exactly the kind of new
+  subsystem CLAUDE.md §3 warns against for a frontend prototype whose
+  actions were never going to persist past a refresh anyway; the
+  session-local approach demonstrates the same UX behavior (confirm →
+  reason → local update → toast) without pretending to a consistency
+  guarantee no backend exists to actually provide.
+- **Build a minimal impersonation/support surface anyway, "just in case."**
+  Rejected outright — the specs' own conditional-future wording is the
+  clearest possible signal this is not current scope; building it would
+  be inventing security-sensitive behavior no specification approved.
+
+### Consequences
+
+- A future task that formally specifies `platform_admin_users`/platform
+  operator authentication should extend Gate 1's admin shell with a real
+  auth gate, not retrofit the Gate 4 user directory built here — they
+  answer different questions ("who may open `/admin/*`" vs. "which
+  practice-side users exist across tenants").
+- If a later task wires bounded admin actions to a real backend, the
+  session-local scoping in this task should be replaced by real API calls
+  that also update `/admin/activity` server-side — this ADR's point 3
+  should be revisited alongside that change, mirroring ADR-017/RISK-016's
+  own "frontend prototype boundary" precedent for Public Booking.
+- Plans/Master Data/Referral admin screens remain a real, spec-grounded
+  gap a future task can fill by extending `ADMIN_NAV_ITEMS` and adding
+  their own route/feature module — not something this task silently
+  dropped.
+
+### Date
+
+2026-08-30

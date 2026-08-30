@@ -1,7 +1,5 @@
-import { AreaPlaceholder } from "@/components/app/area-placeholder";
+import { AdminDashboardPage } from "@/features/platform-admin/admin-dashboard-page";
 
 export default function AdminPage() {
-  return (
-    <AreaPlaceholder titleKey="areas.admin.title" descriptionKey="areas.admin.description" />
-  );
+  return <AdminDashboardPage />;
 }

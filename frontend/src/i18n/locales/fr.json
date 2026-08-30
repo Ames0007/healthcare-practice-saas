@@ -2349,16 +2349,210 @@
     }
   },
   "admin": {
-    "brand": "Platform Admin",
+    "brand": "Administration SaaS",
     "nav": {
-      "dashboard": "Tableau de bord",
+      "ariaLabel": "Navigation administration",
+      "dashboard": "Vue d'ensemble",
       "cabinets": "Cabinets",
       "subscriptions": "Abonnements",
-      "plans": "Plans",
-      "masterData": "Master Data",
-      "referrals": "Parrainages",
-      "operations": "Operations",
-      "audit": "Audit"
+      "users": "Utilisateurs",
+      "activity": "Activité"
+    },
+    "dashboard": {
+      "pageTitle": "Vue d'ensemble de la plateforme",
+      "pageDescription": "Prototype frontend uniquement — aucune donnée réelle, aucun appel API.",
+      "tenantsSection": "Cabinets",
+      "tenants": {
+        "active": "Actifs",
+        "trial": "En essai",
+        "restricted": "Restreints"
+      },
+      "subscriptionsSection": "Abonnements",
+      "subscriptions": {
+        "active": "Actifs",
+        "expiringSoon": "À renouveler",
+        "expired": "Expirés"
+      },
+      "usersSection": "Utilisateurs",
+      "users": {
+        "total": "Total",
+        "active": "Actifs"
+      },
+      "attentionTitle": "Nécessite votre attention",
+      "attentionEmpty": "Rien ne nécessite votre attention pour le moment.",
+      "attention": {
+        "expired": "{{count}} abonnement(s) expiré(s)",
+        "grace": "{{count}} abonnement(s) en période de grâce",
+        "blackout": "{{count}} abonnement(s) en blackout",
+        "suspended": "{{count}} cabinet(s) suspendu(s)"
+      },
+      "recentActivityTitle": "Activité récente",
+      "viewAllActivity": "Voir toute l'activité",
+      "activityEmpty": "Aucune activité récente."
+    },
+    "tenants": {
+      "pageTitle": "Cabinets",
+      "pageDescription": "Annuaire des cabinets abonnés à la plateforme.",
+      "filters": {
+        "search": "Rechercher",
+        "searchPlaceholder": "Nom du cabinet ou du propriétaire",
+        "plan": "Plan",
+        "status": "Statut",
+        "allPlans": "Tous les plans",
+        "allStatuses": "Tous les statuts"
+      },
+      "empty": {
+        "title": "Aucun cabinet ne correspond à ces critères.",
+        "description": "Modifiez votre recherche ou vos filtres."
+      },
+      "table": {
+        "cabinet": "Cabinet",
+        "owner": "Propriétaire",
+        "specialty": "Spécialité",
+        "plan": "Plan",
+        "subscriptionStatus": "Abonnement",
+        "tenantStatus": "Statut",
+        "users": "Utilisateurs",
+        "actions": "Actions",
+        "viewAction": "Voir"
+      },
+      "status": {
+        "active": "Actif",
+        "suspended": "Suspendu",
+        "closed": "Fermé"
+      },
+      "detail": {
+        "backLink": "← Retour aux cabinets",
+        "tabsAriaLabel": "Sections du cabinet",
+        "tabs": {
+          "overview": "Aperçu",
+          "subscription": "Abonnement",
+          "users": "Utilisateurs",
+          "history": "Historique"
+        },
+        "fields": {
+          "city": "Ville",
+          "createdAt": "Créé le",
+          "slug": "Identifiant",
+          "currentPeriodEnd": "Fin de période",
+          "trialEndsAt": "Fin d'essai",
+          "graceEndsAt": "Fin de grâce"
+        },
+        "actions": {
+          "tenant_suspended": "Suspendre le cabinet",
+          "tenant_reactivated": "Réactiver le cabinet",
+          "subscription_manual_renewal": "Enregistrer un renouvellement manuel",
+          "subscription_blackout_forced": "Forcer le blackout",
+          "subscription_cancelled": "Annuler l'abonnement"
+        },
+        "actionReasonPrompt": "Cette action est contrôlée et journalisée. Veuillez indiquer un motif.",
+        "actionReasonLabel": "Motif",
+        "actionCancel": "Annuler",
+        "actionConfirm": "Confirmer",
+        "toast": {
+          "tenantUpdated": "Statut du cabinet mis à jour.",
+          "subscriptionUpdated": "Abonnement mis à jour."
+        },
+        "noSubscription": "Aucun abonnement modélisé pour ce cabinet.",
+        "noUsers": "Aucun utilisateur pour ce cabinet.",
+        "noHistory": "Aucun historique pour ce cabinet.",
+        "notFound": {
+          "title": "Cabinet introuvable.",
+          "description": "Ce cabinet n'existe pas ou a été retiré de l'annuaire."
+        },
+        "entitlementsTitle": "Fonctionnalités incluses",
+        "usersTable": {
+          "name": "Nom",
+          "profile": "Profil",
+          "status": "Statut"
+        }
+      }
+    },
+    "subscriptions": {
+      "pageTitle": "Abonnements",
+      "pageDescription": "Annuaire des abonnements de tous les cabinets.",
+      "filters": {
+        "status": "Statut",
+        "plan": "Plan",
+        "allStatuses": "Tous les statuts",
+        "allPlans": "Tous les plans"
+      },
+      "empty": {
+        "title": "Aucun abonnement ne correspond à ces critères.",
+        "description": "Modifiez vos filtres."
+      },
+      "table": {
+        "tenant": "Cabinet",
+        "plan": "Plan",
+        "status": "Statut",
+        "currentPeriodEnd": "Fin de période",
+        "actions": "Actions",
+        "viewAction": "Voir"
+      }
+    },
+    "users": {
+      "pageTitle": "Utilisateurs",
+      "pageDescription": "Annuaire des utilisateurs de tous les cabinets et leurs rattachements.",
+      "table": {
+        "name": "Nom",
+        "status": "Statut",
+        "tenants": "Cabinets",
+        "actions": "Actions"
+      },
+      "manageAction": "Gérer",
+      "toast": {
+        "updated": "Statut de l'utilisateur mis à jour."
+      },
+      "drawer": {
+        "close": "Fermer",
+        "membershipsTitle": "Rattachements",
+        "noMemberships": "Aucun rattachement."
+      },
+      "profileType": {
+        "owner_admin": "Propriétaire / Admin",
+        "practitioner": "Praticien",
+        "staff": "Personnel"
+      },
+      "ownerBadge": "Propriétaire",
+      "membershipStatus": {
+        "invited": "Invité",
+        "active": "Actif",
+        "disabled": "Désactivé"
+      },
+      "actions": {
+        "user_disabled": "Désactiver le compte",
+        "user_reactivated": "Réactiver le compte",
+        "user_unlocked": "Déverrouiller le compte"
+      },
+      "actionPrompt": "Cette action est contrôlée et journalisée.",
+      "actionCancel": "Annuler",
+      "actionConfirm": "Confirmer"
+    },
+    "activity": {
+      "pageTitle": "Activité",
+      "pageDescription": "Journal d'audit et file d'attention de la plateforme.",
+      "attentionTitle": "Nécessite votre attention",
+      "attentionEmpty": "Rien ne nécessite votre attention pour le moment.",
+      "auditTitle": "Journal d'audit",
+      "auditEmpty": "Aucun événement d'audit.",
+      "table": {
+        "date": "Date",
+        "action": "Action",
+        "tenant": "Cabinet",
+        "reason": "Motif"
+      },
+      "audit": {
+        "action": {
+          "tenant_suspended": "Cabinet suspendu",
+          "tenant_reactivated": "Cabinet réactivé",
+          "subscription_manual_renewal": "Renouvellement manuel enregistré",
+          "subscription_blackout_forced": "Blackout forcé",
+          "subscription_cancelled": "Abonnement annulé",
+          "user_disabled": "Compte désactivé",
+          "user_reactivated": "Compte réactivé",
+          "user_unlocked": "Compte déverrouillé"
+        }
+      }
     }
   },
   "areas": {
@@ -2374,8 +2568,7 @@
       "title": "Réservation en ligne"
     },
     "admin": {
-      "title": "Administration de la plateforme",
-      "description": "Fondation de mise en page uniquement, surface distincte de l'application du cabinet. L'administration SaaS réelle sera implémentée dans une tâche ultérieure."
+      "title": "Administration de la plateforme"
     }
   },
   "home": {

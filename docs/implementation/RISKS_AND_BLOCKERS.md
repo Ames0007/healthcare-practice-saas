@@ -225,3 +225,51 @@ creation (e.g. a database-level unique constraint or row lock on
 practitioner+date+time, mirroring CLAUDE.md §45's own "Database
 Concurrency" guidance for invoice/receipt numbering and payment posting)
 before this can be considered production-safe.
+
+---
+
+### RISK-017
+
+**Topic:** Platform Admin bounded actions are session-local per page, not
+synchronized across pages or persisted
+**Status:** OPEN (documented boundary, not a defect — ADR-018/UI-013ABCDE)
+**Affected Tasks:** UI-013ABCDE, any future backend platform-admin API
+**Description:** Tenant 360°'s tenant-status/subscription-status actions
+and `/admin/users`' user-status actions (task §15/§20/§25) update only
+that page's own local component state and append to that page's own
+local history list. Suspending a tenant on Tenant 360° does not update
+the dashboard's KPI cards, the tenant/subscription directories, or
+`/admin/activity`'s static audit feed until the page is refreshed (at
+which point the fixture reverts to its original state, since nothing is
+persisted — task §1: "NO real tenant suspension... NO real subscription
+mutation... NO LocalStorage/global persistence"). This is an explicit
+scope boundary (ADR-018 point 3), not an oversight: building a shared
+cross-page store to make a fake action's fake audit trail appear globally
+consistent would itself be "a large new subsystem" CLAUDE.md §3 warns
+against for actions that were never going to survive a refresh anyway.
+**Decision Required Before:** A real backend implementation of tenant/
+subscription/user status mutations must write to the actual `audit_events`
+table (Spec #4 §30.1) and every admin screen must read live/refetched
+state so all surfaces agree — the session-local scoping in this task
+should be replaced entirely, not extended.
+
+---
+
+### RISK-018
+
+**Topic:** `/admin/*` has no authentication/authorization gate
+**Status:** OPEN (documented boundary, not a defect — task §6/UI-013ABCDE)
+**Affected Tasks:** UI-013ABCDE, TASK-202 (SaaS Admin authentication/
+authorization, per `06-master-implementation-plan.md` PHASE 15)
+**Description:** The Platform Admin console renders at `/admin/*` with no
+login/session check of any kind — task §6's own explicit instruction:
+"Do NOT implement real authentication in this task... The Admin frontend
+may be rendered directly for prototype QA... Future authentication/
+authorization must protect `/admin/*`." Anyone who can reach this route
+in the deployed prototype can view/act on the tenant, subscription and
+user directories built here. This is intentional for a frontend
+prototype but must never be mistaken for a security boundary.
+**Decision Required Before:** TASK-202 (or equivalent) must implement
+real platform-operator authentication and server-side authorization
+guarding every `/admin/*` route/API before this console is exposed
+anywhere beyond a controlled prototype-review environment.

@@ -2351,14 +2351,208 @@
   "admin": {
     "brand": "إدارة المنصة",
     "nav": {
-      "dashboard": "لوحة التحكم",
+      "ariaLabel": "التنقل في الإدارة",
+      "dashboard": "نظرة عامة",
       "cabinets": "العيادات",
       "subscriptions": "الاشتراكات",
-      "plans": "الخطط",
-      "masterData": "البيانات المرجعية",
-      "referrals": "الإحالات",
-      "operations": "العمليات",
-      "audit": "التدقيق"
+      "users": "المستخدمون",
+      "activity": "النشاط"
+    },
+    "dashboard": {
+      "pageTitle": "نظرة عامة على المنصة",
+      "pageDescription": "نموذج أولي للواجهة الأمامية فقط — لا بيانات حقيقية ولا استدعاءات API.",
+      "tenantsSection": "العيادات",
+      "tenants": {
+        "active": "نشطة",
+        "trial": "تجريبية",
+        "restricted": "مقيدة"
+      },
+      "subscriptionsSection": "الاشتراكات",
+      "subscriptions": {
+        "active": "نشطة",
+        "expiringSoon": "قريبة التجديد",
+        "expired": "منتهية"
+      },
+      "usersSection": "المستخدمون",
+      "users": {
+        "total": "الإجمالي",
+        "active": "نشطون"
+      },
+      "attentionTitle": "يتطلب انتباهكم",
+      "attentionEmpty": "لا شيء يتطلب انتباهكم حاليًا.",
+      "attention": {
+        "expired": "{{count}} اشتراك(ات) منتهية",
+        "grace": "{{count}} اشتراك(ات) في فترة السماح",
+        "blackout": "{{count}} اشتراك(ات) في حالة الحظر",
+        "suspended": "{{count}} عيادة (عيادات) موقوفة"
+      },
+      "recentActivityTitle": "النشاط الأخير",
+      "viewAllActivity": "عرض كل النشاط",
+      "activityEmpty": "لا يوجد نشاط حديث."
+    },
+    "tenants": {
+      "pageTitle": "العيادات",
+      "pageDescription": "دليل العيادات المشتركة في المنصة.",
+      "filters": {
+        "search": "بحث",
+        "searchPlaceholder": "اسم العيادة أو المالك",
+        "plan": "الخطة",
+        "status": "الحالة",
+        "allPlans": "كل الخطط",
+        "allStatuses": "كل الحالات"
+      },
+      "empty": {
+        "title": "لا توجد عيادة مطابقة لهذه المعايير.",
+        "description": "عدّلوا البحث أو المرشحات."
+      },
+      "table": {
+        "cabinet": "العيادة",
+        "owner": "المالك",
+        "specialty": "التخصص",
+        "plan": "الخطة",
+        "subscriptionStatus": "الاشتراك",
+        "tenantStatus": "الحالة",
+        "users": "المستخدمون",
+        "actions": "إجراءات",
+        "viewAction": "عرض"
+      },
+      "status": {
+        "active": "نشطة",
+        "suspended": "موقوفة",
+        "closed": "مغلقة"
+      },
+      "detail": {
+        "backLink": "← العودة إلى العيادات",
+        "tabsAriaLabel": "أقسام العيادة",
+        "tabs": {
+          "overview": "نظرة عامة",
+          "subscription": "الاشتراك",
+          "users": "المستخدمون",
+          "history": "السجل"
+        },
+        "fields": {
+          "city": "المدينة",
+          "createdAt": "تاريخ الإنشاء",
+          "slug": "المعرّف",
+          "currentPeriodEnd": "نهاية الفترة",
+          "trialEndsAt": "نهاية التجربة",
+          "graceEndsAt": "نهاية فترة السماح"
+        },
+        "actions": {
+          "tenant_suspended": "إيقاف العيادة",
+          "tenant_reactivated": "إعادة تفعيل العيادة",
+          "subscription_manual_renewal": "تسجيل تجديد يدوي",
+          "subscription_blackout_forced": "فرض الحظر",
+          "subscription_cancelled": "إلغاء الاشتراك"
+        },
+        "actionReasonPrompt": "هذا الإجراء مراقب ويتم تسجيله. يرجى ذكر السبب.",
+        "actionReasonLabel": "السبب",
+        "actionCancel": "إلغاء",
+        "actionConfirm": "تأكيد",
+        "toast": {
+          "tenantUpdated": "تم تحديث حالة العيادة.",
+          "subscriptionUpdated": "تم تحديث الاشتراك."
+        },
+        "noSubscription": "لا يوجد اشتراك مرتبط بهذه العيادة.",
+        "noUsers": "لا يوجد مستخدمون لهذه العيادة.",
+        "noHistory": "لا يوجد سجل لهذه العيادة.",
+        "notFound": {
+          "title": "العيادة غير موجودة.",
+          "description": "هذه العيادة غير موجودة أو أُزيلت من الدليل."
+        },
+        "entitlementsTitle": "الميزات المتضمنة",
+        "usersTable": {
+          "name": "الاسم",
+          "profile": "الملف",
+          "status": "الحالة"
+        }
+      }
+    },
+    "subscriptions": {
+      "pageTitle": "الاشتراكات",
+      "pageDescription": "دليل اشتراكات جميع العيادات.",
+      "filters": {
+        "status": "الحالة",
+        "plan": "الخطة",
+        "allStatuses": "كل الحالات",
+        "allPlans": "كل الخطط"
+      },
+      "empty": {
+        "title": "لا يوجد اشتراك مطابق لهذه المعايير.",
+        "description": "عدّلوا المرشحات."
+      },
+      "table": {
+        "tenant": "العيادة",
+        "plan": "الخطة",
+        "status": "الحالة",
+        "currentPeriodEnd": "نهاية الفترة",
+        "actions": "إجراءات",
+        "viewAction": "عرض"
+      }
+    },
+    "users": {
+      "pageTitle": "المستخدمون",
+      "pageDescription": "دليل مستخدمي جميع العيادات وارتباطاتهم.",
+      "table": {
+        "name": "الاسم",
+        "status": "الحالة",
+        "tenants": "العيادات",
+        "actions": "إجراءات"
+      },
+      "manageAction": "إدارة",
+      "toast": {
+        "updated": "تم تحديث حالة المستخدم."
+      },
+      "drawer": {
+        "close": "إغلاق",
+        "membershipsTitle": "الارتباطات",
+        "noMemberships": "لا يوجد ارتباط."
+      },
+      "profileType": {
+        "owner_admin": "مالك / مدير",
+        "practitioner": "ممارس",
+        "staff": "طاقم"
+      },
+      "ownerBadge": "المالك",
+      "membershipStatus": {
+        "invited": "مدعو",
+        "active": "نشط",
+        "disabled": "معطّل"
+      },
+      "actions": {
+        "user_disabled": "تعطيل الحساب",
+        "user_reactivated": "إعادة تفعيل الحساب",
+        "user_unlocked": "إلغاء قفل الحساب"
+      },
+      "actionPrompt": "هذا الإجراء مراقب ويتم تسجيله.",
+      "actionCancel": "إلغاء",
+      "actionConfirm": "تأكيد"
+    },
+    "activity": {
+      "pageTitle": "النشاط",
+      "pageDescription": "سجل التدقيق وقائمة الانتباه الخاصة بالمنصة.",
+      "attentionTitle": "يتطلب انتباهكم",
+      "attentionEmpty": "لا شيء يتطلب انتباهكم حاليًا.",
+      "auditTitle": "سجل التدقيق",
+      "auditEmpty": "لا توجد أحداث تدقيق.",
+      "table": {
+        "date": "التاريخ",
+        "action": "الإجراء",
+        "tenant": "العيادة",
+        "reason": "السبب"
+      },
+      "audit": {
+        "action": {
+          "tenant_suspended": "تم إيقاف العيادة",
+          "tenant_reactivated": "تمت إعادة تفعيل العيادة",
+          "subscription_manual_renewal": "تم تسجيل تجديد يدوي",
+          "subscription_blackout_forced": "تم فرض الحظر",
+          "subscription_cancelled": "تم إلغاء الاشتراك",
+          "user_disabled": "تم تعطيل الحساب",
+          "user_reactivated": "تمت إعادة تفعيل الحساب",
+          "user_unlocked": "تم إلغاء قفل الحساب"
+        }
+      }
     }
   },
   "areas": {
@@ -2374,8 +2568,7 @@
       "title": "الحجز عبر الإنترنت"
     },
     "admin": {
-      "title": "إدارة المنصة",
-      "description": "أساس التخطيط فقط، وهو سطح منفصل عن تطبيق العيادة. سيتم تنفيذ إدارة SaaS الفعلية في مهمة لاحقة."
+      "title": "إدارة المنصة"
     }
   },
   "home": {

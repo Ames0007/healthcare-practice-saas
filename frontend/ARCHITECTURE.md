@@ -26,7 +26,7 @@ src/app/
   onboarding/    /onboarding  — centered wizard-shaped layout.
   app/           /app         — the tenant practice application (AppShell).
   book/          /book        — mobile-first public booking layout.
-  admin/         /admin       — separate SaaS Super Admin shell.
+  admin/         /admin       — SaaS Platform Admin console (UI-013ABCDE).
   page.tsx       /            — route-architecture index (not a marketing page).
 ```
 
@@ -1837,6 +1837,110 @@ src/features/
             one; `app/book/layout.tsx`'s max width grew from `max-w-sm`
             to `max-w-xl` to fit the calendar/slot grid, still bounded
             well short of a full admin layout (task §73).
+
+  platform-admin/
+            SaaS Platform Administration (UI-013ABCDE) — a genuinely
+            separate product surface at `/admin/*` from `/app/*`
+            (cabinet) and `/book` (public patient). `app/admin/layout.tsx`
+            is its own shell (never `AppShell`/`AppSidebar`), with a
+            5-item nav (`lib/admin-nav-config.ts`: Vue d'ensemble/
+            Cabinets/Abonnements/Utilisateurs/Activité) replacing
+            TASK-003's 8-item placeholder — trimmed to exactly this
+            task's own Gate scope (ADR-018 §2). No authentication gates
+            `/admin/*` (task §6: "Frontend Admin UI ≠ Platform
+            authorization," RISK-018) — a future task must add one.
+
+            `Tenant` (`components/domain/platform-admin/types.ts`) is a
+            new type built from scratch — no `Tenant` entity existed
+            anywhere in this codebase before this task (`CabinetProfile`
+            represents only the single prototype tenant, has no `id`/
+            `status`). 7 fixture tenants (`mock-tenants-data.ts`) cover
+            every `TenantStatus` and every `SubscriptionStatus` at least
+            once; `tenant-1`'s own `name`/`specialty` read directly from
+            the real `CabinetProfile`, and its subscription
+            (`mock-platform-subscriptions-data.ts`) is the exact same
+            object `/app/abonnement` itself reads via
+            `getSubscriptionMockData()` — never a duplicate. The other 6
+            subscriptions reuse UI-011ABC's own status-variant builders
+            (`getTrialingSubscriptionMockData()`, etc.) with only
+            `id`/`tenantId` overridden, so every internal date
+            relationship those builders already prove consistent
+            (grace = expiry + `GRACE_PERIOD_DAYS`) is inherited, never
+            recomputed by hand.
+
+            The platform user directory
+            (`platform-users.ts`/`mock-platform-users-data.ts`) answers
+            Gate 4's "platform user administration" from Spec #4 §4.1
+            `users`/§4.2 `tenant_memberships`, genuinely spanning
+            multiple tenants — never the SaaS operator's own
+            `platform_admin_users` login identity, which has zero field
+            specification anywhere and stays inside task §6's deferred
+            authentication boundary (ADR-018 §1). `tenant-1`'s 5 rows are
+            *derived* from the real Access Governance fixtures
+            (`mapAccessUsersToPlatformUsers`, mapping
+            `role-owner-admin`/`role-practitioner`/`role-receptionist` to
+            Spec #4 §4.2's own `profile_type` ENUM) rather than
+            re-authored — Othmane Zouiten (`user-5`) stays `disabled` at
+            the platform level too, proven by
+            `cross-platform-admin-integrity.test.ts`. The other 6 tenants
+            get genuinely new fixtures, deliberately covering all 4
+            `UserAccountStatus` values (an `invited` owner who has never
+            logged in, a `locked` owner, a `disabled` owner) that
+            `tenant-1`'s own real data alone does not exercise.
+
+            Dashboard KPIs and the attention queue
+            (`tenants.ts`'s `computeTenantKpis`, `subscriptions.ts`'s
+            `computeSubscriptionKpis`, `platform-users.ts`'s
+            `computePlatformUserKpis`, `attention.ts`'s
+            `computeAttentionItems`) are pure re-derivations over the
+            same `Tenant[]`/`Subscription[]`/`PlatformUser[]` arrays every
+            other admin screen reads — never an independently authored
+            dashboard-only number. "À renouveler" reuses UI-011ABC's own
+            `isExpiringSoon`/`EXPIRING_SOON_THRESHOLD_DAYS` (D-15) rather
+            than a second invented threshold; "Restreints" is the union
+            of `tenant.status === "suspended"` OR
+            `subscription.status === "blackout"`, counting a tenant once
+            even when both independently hold (Spec #4 §57.7: "never
+            infer one domain status solely from another").
+
+            Tenant 360° (`/admin/tenants/[id]`) is a local JS-only
+            tablist (`role="tablist"`, not the shared href-based `Tabs`
+            component — task §9's "do not invent unnecessarily deep
+            routing" rules out per-tab routes) with 4 panels: Aperçu,
+            Abonnement (plan/dates/entitlements, reusing the exact
+            `abonnement.usage.*`/`abonnement.plans.row.*` translation
+            keys `/app/abonnement` already ships, never a new
+            entitlement-label namespace), Utilisateurs (read-only — every
+            tenant relationship for this tenant) and Historique. Bounded
+            status actions (`tenants.ts`'s `getAvailableTenantActions`/
+            `applyTenantAction`, `subscriptions.ts`'s
+            `getAvailableSubscriptionActions`/`applySubscriptionAction`)
+            are offered only from the states they make sense from (e.g. a
+            `closed` tenant offers none — terminal, task §1: "NO
+            destructive tenant deletion"), require a reason
+            (`ConfirmDialog` + `Textarea`, Spec #2 §55.2 "controlled and
+            audited"), and update local component state only — task §1:
+            "NO real tenant suspension... NO real subscription mutation."
+            User-status actions (`getAvailableUserActions`/
+            `applyUserAction`) follow the identical pattern on
+            `/admin/users`' `PlatformUserDrawer` (mirrors
+            `UserAccessDrawer`'s established drawer pattern). None of
+            these bounded actions propagate to other pages or to
+            `/admin/activity`'s own static feed — a deliberate,
+            documented boundary (ADR-018 §3, RISK-017), not an oversight;
+            no `/admin/subscriptions/[id]` or `/admin/users/[id]` routes
+            exist, so subscription detail lives on Tenant 360° and user
+            detail is a drawer (ADR-018 §4).
+
+            `/admin/activity` covers Gate 5's audit log
+            (`mock-platform-audit-data.ts` — 5 static events, every one
+            traceable to a real fixture fact, e.g. `paudit-1` mirrors
+            Access Governance's own real `audit-7` deactivation event
+            exactly) and attention queue. No dedicated support/
+            tenant-context workspace or impersonation surface was built —
+            both are marked conditional-future by the specifications
+            themselves (Spec #1 §27, Spec #2 §55.6 "Future/controlled"),
+            not merely unspecified (ADR-018 §5).
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,
