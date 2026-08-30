@@ -2555,14 +2555,120 @@
       }
     }
   },
+  "auth": {
+    "login": {
+      "heading": "تسجيل الدخول إلى مساحتك",
+      "emailLabel": "البريد الإلكتروني",
+      "passwordLabel": "كلمة المرور",
+      "showPassword": "إظهار كلمة المرور",
+      "hidePassword": "إخفاء كلمة المرور",
+      "rememberMe": "تذكرني",
+      "submitAction": "تسجيل الدخول",
+      "forgotPasswordLink": "نسيت كلمة المرور؟",
+      "requiredError": "هذا الحقل مطلوب.",
+      "invalidEmailError": "عنوان بريد إلكتروني غير صالح.",
+      "pendingBackendNotice": "ستتوفر المصادقة الفعلية بعد تكامل الخادم."
+    },
+    "forgotPassword": {
+      "heading": "نسيت كلمة المرور",
+      "description": "أدخلوا عنوان بريدكم الإلكتروني: إذا كان الحساب موجودًا، ستُرسل إليكم تعليمات إعادة التعيين.",
+      "emailLabel": "البريد الإلكتروني",
+      "submitAction": "إرسال الرابط",
+      "requiredError": "هذا الحقل مطلوب.",
+      "invalidEmailError": "عنوان بريد إلكتروني غير صالح.",
+      "successHeading": "تحققوا من بريدكم الإلكتروني",
+      "successMessage": "إذا كان هناك حساب لهذا العنوان، ستُرسل تعليمات إعادة التعيين.",
+      "backToLogin": "العودة إلى تسجيل الدخول"
+    },
+    "resetPassword": {
+      "heading": "إعادة تعيين كلمة المرور",
+      "description": "اختاروا كلمة مرور جديدة لحسابكم.",
+      "passwordLabel": "كلمة المرور الجديدة",
+      "confirmPasswordLabel": "تأكيد كلمة المرور",
+      "submitAction": "إعادة التعيين",
+      "requiredError": "هذا الحقل مطلوب.",
+      "mismatchError": "كلمتا المرور غير متطابقتين.",
+      "successHeading": "تم تحديث كلمة المرور",
+      "successMessage": "هذه معاينة للمسار فقط — لم يتم تطبيق أي تغيير فعلي على الخادم بعد.",
+      "backToLogin": "العودة إلى تسجيل الدخول"
+    }
+  },
+  "onboarding": {
+    "progress": {
+      "stepLabel": "الخطوة {{current}} من {{total}}",
+      "cabinet": "العيادة",
+      "hours": "أوقات العمل",
+      "services": "الخدمات",
+      "team": "الفريق",
+      "preferences": "التفضيلات",
+      "review": "الملخص"
+    },
+    "nav": {
+      "back": "رجوع",
+      "continue": "متابعة"
+    },
+    "cabinet": {
+      "heading": "إعداد العيادة",
+      "description": "أدخلوا المعلومات الأساسية لعيادتكم."
+    },
+    "hours": {
+      "heading": "أوقات عملكم",
+      "description": "حددوا أوقات العمل المعتادة لعيادتكم."
+    },
+    "services": {
+      "heading": "خدماتكم وأسعاركم",
+      "description": "أضيفوا الخدمات التي تقدمونها. يمكنكم إضافة المزيد لاحقًا من الإعدادات.",
+      "emptyTitle": "لم تتم إضافة أي خدمة بعد",
+      "emptyDescription": "أضيفوا خدمة واحدة على الأقل، أو تابعوا وأكملوا هذه الخطوة لاحقًا."
+    },
+    "team": {
+      "heading": "فريقكم",
+      "description": "أضيفوا أول عضو في فريقكم إذا رغبتم — هذه الخطوة اختيارية.",
+      "addButton": "إضافة عضو",
+      "firstNameLabel": "الاسم الشخصي",
+      "lastNameLabel": "الاسم العائلي",
+      "professionalTitleLabel": "اللقب المهني",
+      "roleLabel": "الدور",
+      "phoneLabel": "الهاتف",
+      "emailLabel": "البريد الإلكتروني",
+      "requiredError": "هذا الحقل مطلوب.",
+      "invalidPhoneError": "رقم هاتف غير صالح.",
+      "invalidEmailError": "عنوان بريد إلكتروني غير صالح.",
+      "addedListTitle": "الأعضاء المضافون",
+      "removeAction": "إزالة",
+      "emptyNotice": "لم تتم إضافة أي عضو — يمكنكم إضافة أعضاء من الفريق في أي وقت."
+    },
+    "preferences": {
+      "heading": "تفضيلاتكم",
+      "description": "حددوا القيم الافتراضية المستخدمة لمواعيدكم."
+    },
+    "review": {
+      "heading": "الملخص",
+      "description": "راجعوا المعلومات قبل إنهاء الإعداد.",
+      "cabinetSection": "العيادة",
+      "servicesSection": "الخدمات",
+      "hoursSection": "أوقات العمل",
+      "teamSection": "الفريق",
+      "preferencesSection": "التفضيلات",
+      "editAction": "تعديل",
+      "finishAction": "إنهاء الإعداد",
+      "noServices": "لم تتم إضافة أي خدمة",
+      "noTeam": "لم تتم إضافة أي عضو",
+      "closedDay": "مغلق"
+    },
+    "complete": {
+      "heading": "مساحتكم جاهزة",
+      "description": "يمكنكم البدء باكتشاف مساحتكم.",
+      "serverNotice": "معاينة للإعداد فقط — سيتم إنشاء عيادتكم فعليًا عند تفعيل تكامل الخادم. لم يتم حفظ أي شيء.",
+      "exploreAction": "اكتشاف مساحتي (معاينة)"
+    }
+  },
   "areas": {
     "auth": {
-      "title": "المصادقة",
-      "description": "أساس التخطيط فقط. سيتم تنفيذ المصادقة الفعلية (تسجيل الدخول، الجلسة، نسيت كلمة المرور) في مهمة لاحقة."
+      "title": "المصادقة"
     },
     "onboarding": {
-      "title": "الإعداد الأولي للعيادة",
-      "description": "أساس التخطيط فقط. سيتم تنفيذ مسار الإعداد الفعلي في مهمة لاحقة."
+      "title": "الإعداد الأولي للعيادة"
     },
     "book": {
       "title": "الحجز عبر الإنترنت"

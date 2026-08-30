@@ -2555,14 +2555,120 @@
       }
     }
   },
+  "auth": {
+    "login": {
+      "heading": "Connexion à votre espace",
+      "emailLabel": "Email",
+      "passwordLabel": "Mot de passe",
+      "showPassword": "Afficher le mot de passe",
+      "hidePassword": "Masquer le mot de passe",
+      "rememberMe": "Se souvenir de moi",
+      "submitAction": "Se connecter",
+      "forgotPasswordLink": "Mot de passe oublié ?",
+      "requiredError": "Ce champ est requis.",
+      "invalidEmailError": "Adresse email invalide.",
+      "pendingBackendNotice": "L'authentification réelle sera disponible après l'intégration du serveur."
+    },
+    "forgotPassword": {
+      "heading": "Mot de passe oublié",
+      "description": "Saisissez votre adresse email : si un compte existe, des instructions de réinitialisation vous seront envoyées.",
+      "emailLabel": "Email",
+      "submitAction": "Envoyer le lien",
+      "requiredError": "Ce champ est requis.",
+      "invalidEmailError": "Adresse email invalide.",
+      "successHeading": "Vérifiez votre boîte de réception",
+      "successMessage": "Si un compte existe pour cette adresse, des instructions de réinitialisation seront envoyées.",
+      "backToLogin": "Retour à la connexion"
+    },
+    "resetPassword": {
+      "heading": "Réinitialiser le mot de passe",
+      "description": "Choisissez un nouveau mot de passe pour votre compte.",
+      "passwordLabel": "Nouveau mot de passe",
+      "confirmPasswordLabel": "Confirmer le mot de passe",
+      "submitAction": "Réinitialiser",
+      "requiredError": "Ce champ est requis.",
+      "mismatchError": "Les mots de passe ne correspondent pas.",
+      "successHeading": "Mot de passe mis à jour",
+      "successMessage": "Ceci est une prévisualisation du parcours — aucune modification n'est encore appliquée côté serveur.",
+      "backToLogin": "Retour à la connexion"
+    }
+  },
+  "onboarding": {
+    "progress": {
+      "stepLabel": "Étape {{current}} sur {{total}}",
+      "cabinet": "Cabinet",
+      "hours": "Horaires",
+      "services": "Services",
+      "team": "Équipe",
+      "preferences": "Préférences",
+      "review": "Récapitulatif"
+    },
+    "nav": {
+      "back": "Retour",
+      "continue": "Continuer"
+    },
+    "cabinet": {
+      "heading": "Configuration du cabinet",
+      "description": "Renseignez les informations de base de votre cabinet."
+    },
+    "hours": {
+      "heading": "Vos horaires",
+      "description": "Définissez les horaires d'ouverture habituels de votre cabinet."
+    },
+    "services": {
+      "heading": "Vos services et tarifs",
+      "description": "Ajoutez les services que vous proposez. Vous pourrez en ajouter d'autres plus tard depuis Paramètres.",
+      "emptyTitle": "Aucun service ajouté pour le moment",
+      "emptyDescription": "Ajoutez au moins un service, ou continuez et complétez cette étape plus tard."
+    },
+    "team": {
+      "heading": "Votre équipe",
+      "description": "Ajoutez un premier membre de votre équipe si vous le souhaitez — cette étape est facultative.",
+      "addButton": "Ajouter un membre",
+      "firstNameLabel": "Prénom",
+      "lastNameLabel": "Nom",
+      "professionalTitleLabel": "Titre professionnel",
+      "roleLabel": "Rôle",
+      "phoneLabel": "Téléphone",
+      "emailLabel": "Email",
+      "requiredError": "Ce champ est requis.",
+      "invalidPhoneError": "Numéro de téléphone invalide.",
+      "invalidEmailError": "Adresse email invalide.",
+      "addedListTitle": "Membres ajoutés",
+      "removeAction": "Retirer",
+      "emptyNotice": "Aucun membre ajouté — vous pourrez en ajouter depuis Équipe à tout moment."
+    },
+    "preferences": {
+      "heading": "Vos préférences",
+      "description": "Configurez les valeurs par défaut utilisées pour vos rendez-vous."
+    },
+    "review": {
+      "heading": "Récapitulatif",
+      "description": "Vérifiez les informations avant de terminer la configuration.",
+      "cabinetSection": "Cabinet",
+      "servicesSection": "Services",
+      "hoursSection": "Horaires",
+      "teamSection": "Équipe",
+      "preferencesSection": "Préférences",
+      "editAction": "Modifier",
+      "finishAction": "Terminer la configuration",
+      "noServices": "Aucun service ajouté",
+      "noTeam": "Aucun membre ajouté",
+      "closedDay": "Fermé"
+    },
+    "complete": {
+      "heading": "Votre espace est prêt",
+      "description": "Vous pouvez commencer à découvrir votre espace.",
+      "serverNotice": "Aperçu de configuration uniquement — votre cabinet sera réellement créé lorsque l'intégration serveur sera active. Rien n'a été enregistré.",
+      "exploreAction": "Découvrir mon espace (aperçu)"
+    }
+  },
   "areas": {
     "auth": {
-      "title": "Authentification",
-      "description": "Fondation de mise en page uniquement. L'authentification réelle (connexion, session, mot de passe oublié) sera implémentée dans une tâche ultérieure."
+      "title": "Authentification"
     },
     "onboarding": {
-      "title": "Intégration du cabinet",
-      "description": "Fondation de mise en page uniquement. Le parcours d'intégration réel sera implémenté dans une tâche ultérieure."
+      "title": "Intégration du cabinet"
     },
     "book": {
       "title": "Réservation en ligne"

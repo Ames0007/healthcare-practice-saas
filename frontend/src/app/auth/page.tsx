@@ -1,7 +1,5 @@
-import { AreaPlaceholder } from "@/components/app/area-placeholder";
+import { LoginPage } from "@/features/auth/login-page";
 
 export default function AuthPage() {
-  return (
-    <AreaPlaceholder titleKey="areas.auth.title" descriptionKey="areas.auth.description" />
-  );
+  return <LoginPage />;
 }

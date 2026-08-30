@@ -2920,3 +2920,37 @@ All notable changes to this project are documented in this file.
   UI-012ABCDE baseline of 1804), typecheck/lint/build clean. Backend
   regression (10 tests, 26 assertions, clean) unaffected — no backend
   files touched.
+
+- **UI-013X — Authentication UX & Cabinet Onboarding.** Replaces the last
+  two TASK-003 Foundation/Demo placeholders with real frontend UX.
+  **Authentication** (`features/auth/`): Login (`/auth`), Forgot password
+  (`/auth/forgot-password`) and Reset password (`/auth/reset-password`) —
+  explicitly NOT real authentication (no session/cookie/LocalStorage/JWT
+  ever set; a valid Login submission shows a bounded Toast reusing the
+  established "future-feature" convention instead, ADR-019 §1, since no
+  spec authorizes a demo-credential mechanism). A new `PasswordInput`
+  show/hide field (no such pattern existed anywhere before). Forgot
+  password never discloses account existence; Reset password never
+  verifies a real token (no backend exists to check one against). No
+  password-policy invention beyond required + email-format + must-match.
+  **Cabinet Onboarding** (`features/onboarding/`): a 6-step wizard —
+  Cabinet → Horaires → Services → Équipe → Préférences → Récapitulatif →
+  Terminé — composing EXISTING Paramètres form-value types/validators
+  outright (`validateCabinetSettingsForm`, `isValidWorkingHoursForm`, the
+  literal `ServiceTable`/`ServiceFormDialog` components,
+  `validateAppointmentSettingsForm`) rather than a parallel
+  Onboarding-prefixed domain (task §14, proven by
+  `cross-onboarding-integrity.test.ts`). The step sequence reconciles Spec
+  #7 §28's own 5-screen order (Horaires before Services, no Équipe/
+  Préférences step) with this task's own explicit Gate 2 checklist —
+  recorded in ADR-019. No minimum-one-service requirement (unspecified
+  anywhere); Équipe is explicitly optional/non-blocking and never creates
+  a `UserAccount`/login credential; Récapitulatif shows every section
+  with per-section "Modifier" links; completion never claims a tenant was
+  actually provisioned (RISK-020). `app/onboarding/layout.tsx` widened
+  `max-w-lg` → `max-w-2xl`, top-aligned instead of centered (mirrors
+  UI-012ABCDE's `book/layout.tsx` precedent). No Laravel integration, no
+  API calls, no database changes, no credential persistence, no tenant
+  provisioning. 55 net new tests (1968 total, up from the UI-013ABCDE
+  baseline of 1913), typecheck/lint/build clean. Backend regression (10
+  tests, 26 assertions, clean) unaffected — no backend files touched.

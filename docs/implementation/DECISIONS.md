@@ -1774,3 +1774,100 @@ not invent commercial/security behavior"):
 ### Date
 
 2026-08-30
+
+---
+
+## ADR-019 — UI-013X Authentication UX & Cabinet Onboarding: no demo-credential mechanism, and a reconciled onboarding step sequence
+
+### Status
+
+Accepted
+
+### Context
+
+The task replaces the last two TASK-003 Foundation/Demo placeholders,
+`/auth` and `/onboarding`, with production-shaped frontend UX — explicitly
+NOT real authentication or tenant provisioning. Two points required an
+explicit decision rather than a silent guess (CLAUDE.md §1/§3):
+
+1.  Task §8 says a valid Login submission must not fake a session, but
+    allows reusing "an already approved prototype identity mechanism" if
+    one exists. Does one?
+2.  Task §15 says: "Follow exact specifications if defined. Otherwise use
+    the smallest coherent sequence…" The task's own §14/§17-25 suggest a
+    6-step onboarding sequence (Cabinet → Services → Horaires → Équipe →
+    Préférences → Review). Spec #7 §28 and wireframe Screens 03-07 define
+    a different 5-screen sequence (Spécialité → Cabinet → Horaires →
+    Services → Complete) with no Équipe/Préférences step at all, and with
+    Horaires *before* Services. Which sequence governs?
+
+### Decision
+
+1.  **No demo-credential mechanism — Login validates, then shows a
+    bounded "awaiting backend" notice, never a fake success.** Grepped
+    all 10 specs for "demo"/"démo"/"identifiants de démonstration"/
+    "prototype login" — zero matches anywhere. The one directly analogous
+    precedent already in this codebase, `/admin/*`'s own "no real auth"
+    boundary (UI-013ABCDE, ADR-018), is "render without a gate," not "fake
+    a successful check" — not a demo-credential pattern either. Per task
+    §8's own explicit fallback, `LoginPage` validates the form fully
+    (email format, required fields) and, on a valid submission, shows a
+    Toast reusing the exact established "future-feature Toast" convention
+    (UI-FIX's dead-button audit) rather than setting any
+    session/cookie/LocalStorage/JWT. The form is never inert — it always
+    validates and always gives visible feedback.
+2.  **Onboarding sequence: Cabinet → Horaires → Services → Équipe →
+    Préférences → Récapitulatif → Terminé (6 steps + terminal
+    completion).** This reconciles both sources rather than picking one
+    wholesale: Horaires-before-Services follows the specs' own explicit
+    order (task §15's own instruction to follow specs where they exist —
+    and here they do, for that one fact); Spécialité is folded into the
+    Cabinet step's field list rather than kept as Screen 03's separate
+    screen, matching this task's own explicit §17 field list
+    ("Nom du cabinet *, Spécialité principale *, …") — a granularity
+    choice, not a contradiction of anything the spec asserts. Équipe and
+    Préférences are kept as their own steps, and a rich section-by-section
+    Récapitulatif precedes completion — none of this contradicts the
+    specs (which are simply silent on both), and all of it is this task's
+    own explicit, repeated Gate 2 instruction (§16/§22-25). Per CLAUDE.md
+    §1, explicit task instructions outrank specs when they genuinely
+    conflict; here the two sources are reconciled rather than one being
+    silently overridden.
+
+### Alternatives considered
+
+- **Invent a bounded demo login (e.g. a fixed "demo@cabinet.test" /
+  "demo123" pair that "succeeds").** Rejected outright — the task
+  explicitly forbids inventing fake authentication, and no spec/wireframe
+  authorizes a specific demo identity; inventing one would misrepresent
+  this prototype's actual guarantees to anyone reading the code later.
+- **Follow the spec's 5-screen sequence exactly, dropping Équipe/
+  Préférences/Récapitulatif.** Rejected — the task's own Gate 2
+  instructions repeatedly and explicitly ask for these three additions;
+  the specs never say "no Équipe step," they simply don't mention one
+  (Spec #2 §6.6 in fact frames initial staff/team capture as a real,
+  optional, non-blocking product concept the wireframes just never
+  screen-numbered).
+- **Follow the task's own suggested order verbatim (Cabinet → Services →
+  Horaires…), ignoring the spec's Horaires-before-Services sequence.**
+  Rejected — task §15 itself subordinates its own suggested order to the
+  specs whenever the specs actually define one, which they do here.
+
+### Consequences
+
+- A future task that adds real backend authentication replaces
+  `LoginPage`'s Toast-on-submit with a genuine session-establishing call —
+  the bounded validation logic (`validateLoginForm`) stays reusable as-is.
+- A future task that adds real tenant provisioning wires
+  `OnboardingWizard`'s accumulated draft state (`cabinet`/`hours`/
+  `services`/`team`/`preferences`) into real `POST` calls at the
+  Récapitulatif step's "Terminer la configuration" action — the step
+  components and their reused Paramètres validators need no rework, only
+  the final submission boundary changes.
+- If a future spec revision adds an explicit onboarding wireframe with a
+  different Équipe/Préférences treatment, reconcile against this ADR
+  rather than treating the difference as an unexplained regression.
+
+### Date
+
+2026-08-30

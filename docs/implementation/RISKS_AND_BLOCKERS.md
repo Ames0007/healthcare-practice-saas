@@ -273,3 +273,56 @@ prototype but must never be mistaken for a security boundary.
 real platform-operator authentication and server-side authorization
 guarding every `/admin/*` route/API before this console is exposed
 anywhere beyond a controlled prototype-review environment.
+
+---
+
+### RISK-019
+
+**Topic:** `/auth` has no real credential verification — Login/Forgot
+password/Reset password never authenticate anyone
+**Status:** OPEN (documented boundary, not a defect — task/UI-013X, ADR-019)
+**Affected Tasks:** UI-013X, `06-master-implementation-plan.md` TASK-014
+("Authentication") / TASK-016 ("Login security")
+**Description:** `LoginPage` validates form shape only (required fields,
+email format) — any well-formed email/password pair "succeeds" in the
+sense that a bounded Toast notice appears; no session, cookie,
+LocalStorage entry or JWT is ever created, and no backend call is ever
+made (task's own explicit instruction). `ForgotPasswordPage` never sends
+a real email; its success state is shown for any well-formed email,
+matching or not, and is deliberately worded to never disclose whether an
+account exists. `ResetPasswordPage` never verifies a real reset token —
+it renders and validates the form regardless of any `token` query string
+a genuine emailed link would carry, since there is no backend to check it
+against. None of this is a defect: it is the explicit "Authentication UX
+≠ real authentication" boundary the task itself mandates.
+**Decision Required Before:** TASK-014/TASK-016 (or equivalent) must
+implement real credential verification, session establishment, a genuine
+password-reset token/email flow, and server-side enforcement before any
+of `/auth`'s screens can be treated as an actual security boundary.
+
+---
+
+### RISK-020
+
+**Topic:** Cabinet Onboarding never provisions a real tenant — the wizard
+draft is session-only and is discarded on refresh
+**Status:** OPEN (documented boundary, not a defect — task/UI-013X, ADR-019)
+**Affected Tasks:** UI-013X, `06-master-implementation-plan.md` TASK-037
+("Cabinet onboarding flow") and its backend-provisioning counterpart
+**Description:** `OnboardingWizard` accumulates a Cabinet/Horaires/
+Services/Équipe/Préférences draft entirely in local component state — no
+`localStorage`, no API call, no database write (task's own explicit
+instruction). "Terminer la configuration" moves to a completion screen
+that explicitly states no cabinet was actually created and that a real
+tenant will only exist once server integration is active; the one
+completion action link (`/app`, "Découvrir mon espace (aperçu)") is
+labeled as a non-persistent preview, never framed as the real product.
+Refreshing at any point in the wizard loses all in-progress input — this
+is the expected consequence of "no persistence," not a bug to fix within
+this task.
+**Decision Required Before:** A future backend-integration task must wire
+"Terminer la configuration" to real tenant-provisioning API calls
+(Cabinet/Services/WorkingHours/TeamMember/AppointmentSettings creation,
+transactionally) before onboarding can be considered functionally
+complete — the step components and their reused Paramètres validators
+need no rework for that change, only the final submission boundary.

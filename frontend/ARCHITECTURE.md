@@ -22,8 +22,8 @@ URL — `/book/{slug}` is referenced directly by `CLAUDE.md` §17):
 
 ```text
 src/app/
-  auth/          /auth        — centered, minimal layout. No real auth yet.
-  onboarding/    /onboarding  — centered wizard-shaped layout.
+  auth/          /auth        — Login/Forgot/Reset password UX (UI-013X). No real auth.
+  onboarding/    /onboarding  — Cabinet Onboarding wizard (UI-013X). No real provisioning.
   app/           /app         — the tenant practice application (AppShell).
   book/          /book        — mobile-first public booking layout.
   admin/         /admin       — SaaS Platform Admin console (UI-013ABCDE).
@@ -1941,6 +1941,84 @@ src/features/
             both are marked conditional-future by the specifications
             themselves (Spec #1 §27, Spec #2 §55.6 "Future/controlled"),
             not merely unspecified (ADR-018 §5).
+
+  auth/     Authentication UX (UI-013X Gate 1) — Login (`/auth`), Forgot
+            password (`/auth/forgot-password`), Reset password
+            (`/auth/reset-password`). Explicitly NOT real authentication
+            (task's own "Authentication UX ≠ real authentication"): no
+            approved spec/wireframe defines a bounded demo-credential
+            mechanism anywhere (grep-confirmed across all 10 specs), so a
+            valid Login submission never sets a session/cookie/
+            LocalStorage entry/JWT — `validateLoginForm` passes, then a
+            Toast reuses the exact "future-feature" convention UI-FIX's
+            dead-button audit already established, rather than faking a
+            successful check (ADR-019 §1). `PasswordInput`
+            (`components/password-input.tsx`) is a from-scratch show/hide
+            field — no such pattern existed anywhere in this codebase
+            before (grep-confirmed) — mirroring `Input`'s own label/error/
+            describedby structure exactly. `ForgotPasswordPage` never
+            sends a real email; its generic success state never discloses
+            whether an account exists, for any well-formed address alike
+            (CLAUDE.md §17's own patient-existence-disclosure rule applied
+            here to accounts). `ResetPasswordPage` renders and validates
+            unconditionally — there is no backend token to verify, so it
+            never claims one was checked. `validateLoginForm`/
+            `validateForgotPasswordForm`/`validateResetPasswordForm`
+            (`validation.ts`) reuse `isValidEmail`
+            (`features/patients/patient-form-validation.ts`) outright and
+            deliberately invent no password-policy rule (task §7/§10).
+
+  onboarding/
+            Cabinet Onboarding wizard (UI-013X Gate 2), replacing the
+            `/onboarding` Foundation/Demo placeholder. Composes EXISTING
+            Paramètres form-value types outright
+            (`CabinetProfileFormValues`/`CabinetService`/
+            `CabinetWorkingHoursFormValues`/`AppointmentSettingsFormValues`,
+            task §14) — there is no `OnboardingCabinet`/`OnboardingService`/
+            `OnboardingWorkingHours` type anywhere. Step sequence (ADR-019
+            §2): Cabinet -> Horaires -> Services -> Équipe -> Préférences
+            -> Récapitulatif -> Terminé — reconciling Spec #7 §28's own
+            5-screen sequence (which orders Horaires before Services, and
+            has no Équipe/Préférences step at all) with this task's own
+            explicit Gate 2 checklist, rather than picking one source
+            wholesale. Each step manages its own local form state and
+            only reports upward via `onChange`/`onContinue`
+            (`OnboardingWizard` just holds the accumulated draft plus
+            which step is active) — the Cabinet step reuses
+            `validateCabinetSettingsForm`/`CABINET_SPECIALTY_MAP` outright,
+            the Horaires step reuses `isValidWorkingHoursForm` outright,
+            the Services step reuses `ServiceTable`/`ServiceFormDialog`
+            outright (the literal same components Paramètres → Services &
+            tarifs renders), and the Préférences step reuses
+            `validateAppointmentSettingsForm` outright — never a second
+            Cabinet/Service/WorkingHours/Preferences vocabulary (task
+            §30-34, proven by `cross-onboarding-integrity.test.ts`). No
+            minimum-one-active-service requirement exists anywhere in the
+            approved specifications (grep-confirmed) — Continue from
+            Services is never blocked on an empty list (task §19). The
+            Équipe step is explicitly optional/non-blocking (Spec #2
+            §6.6's own framing) and captures only a bounded
+            `OnboardingDraftTeamMember` (first/last name, professional
+            title, role, phone, email) — never a full `TeamMemberFormValues`
+            reused wholesale, and never a `UserAccount`/login credential
+            (task §22-23: a Cabinet owner/TeamMember/UserAccount/
+            Practitioner are never automatically conflated). Récapitulatif
+            shows every section read directly from the wizard's own
+            accumulated state with per-section "Modifier" links back to
+            that step (task §25) — no approved wireframe defines this
+            review-before-completion pattern (Spec #9 Screen 07 goes
+            straight to completion), so it is this task's own explicit
+            addition, not a spec contradiction (ADR-019). Completion never
+            claims a tenant/database was actually provisioned — the
+            server notice is always shown, and the one "Découvrir mon
+            espace (aperçu)" link to `/app` is explicitly labeled a
+            non-persistent preview (task §26, RISK-020). `app/onboarding/
+            layout.tsx`'s max width grew from `max-w-lg` to `max-w-2xl`
+            and switched from vertically-centered to top-aligned,
+            mirroring UI-012ABCDE's own `book/layout.tsx` widening
+            precedent — the real wizard (services table, weekly hours
+            grid, review sections) needs more room than a single centered
+            form.
 
 Date-only arithmetic (`addDaysIso` in `features/agenda/format.ts`) must
 stay entirely UTC-based end to end (`Date.UTC()` construction,

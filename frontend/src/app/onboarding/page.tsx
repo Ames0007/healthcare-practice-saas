@@ -1,10 +1,5 @@
-import { AreaPlaceholder } from "@/components/app/area-placeholder";
+import { OnboardingWizard } from "@/features/onboarding/onboarding-wizard";
 
 export default function OnboardingPage() {
-  return (
-    <AreaPlaceholder
-      titleKey="areas.onboarding.title"
-      descriptionKey="areas.onboarding.description"
-    />
-  );
+  return <OnboardingWizard />;
 }
