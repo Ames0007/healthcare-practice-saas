@@ -2954,3 +2954,37 @@ All notable changes to this project are documented in this file.
   provisioning. 55 net new tests (1968 total, up from the UI-013ABCDE
   baseline of 1913), typecheck/lint/build clean. Backend regression (10
   tests, 26 assertions, clean) unaffected — no backend files touched.
+
+- **UI-014 — Final Frontend QA, UX Hardening & Prototype Freeze
+  Checkpoint.** A whole-product audit-and-repair pass, not a
+  feature-building task: **frontend prototype is now considered
+  complete**. All 68 registered routes verified; the Paramètres ↔ Access
+  Governance nav hierarchy re-verified intact (22 tests); dead-control
+  sweep found zero bugs (the previously-flagged dead global "Créer"
+  button is confirmed fixed); the previously-reported Finance
+  duplicate-key warning is confirmed already fixed (stable id-based keys
+  throughout); the previously-reported Attendance "everyone shows Repos"
+  state is confirmed **correct, not a bug** (the mock business date is
+  genuinely a Sunday, and the mock schedules intentionally cover
+  Monday–Saturday only — traced end to end with existing test coverage
+  for both cases). One genuine cross-domain defect found and fixed:
+  Agenda's own appointment-creation form read a disconnected local
+  `SERVICES` string list instead of Paramètres' real `CabinetService[]`,
+  so an inactive service stayed bookable internally and duration was
+  disconnected from the selected service — `agenda-page.tsx` and
+  `appointment-form-dialog.tsx` now source and filter by the real
+  `getCabinetServicesMockData()`, auto-filling duration from the matched
+  service (`scheduling-fields.tsx`'s quantized duration options widened
+  to include 20 min), with a targeted regression test added. `fr.json`/
+  `ar.json` key parity reconfirmed at exactly 2102/2102, no hardcoded
+  leaks, no unexpected placeholder language on any completed route.
+  Security audit clean (no `fetch`/`axios`/API calls, no
+  `dangerouslySetInnerHTML`/`eval`, no `localStorage`/`IndexedDB`
+  writes anywhere). RISK-015 (Arabic PDF) reconfirmed still open and
+  safely gated, untouched. No real browser-rendered visual QA tooling
+  exists in this project — desktop/tablet/mobile pixel-level checks were
+  honestly not performed rather than faked via curl/jsdom. 1 net new
+  test (1969 total, up from the UI-013X baseline of 1968), full isolated
+  regression clean (179 files, 0 failures), typecheck/lint/build clean.
+  Backend regression (10 tests, 26 assertions, clean) unaffected — no
+  backend files touched.

@@ -167,6 +167,22 @@ describe("AgendaPage", () => {
     expect(screen.getAllByText("Omar El Fassi")).toHaveLength(2);
   });
 
+  it("only offers active Paramètres services and auto-fills duration from the selected service (UI-014 §20/24 — Agenda reconciles with Services & tarifs, never a disconnected list)", async () => {
+    renderAgenda();
+
+    fireEvent.click(screen.getByRole("button", { name: "Nouveau RDV" }));
+    await screen.findByRole("heading", { name: "Nouveau rendez-vous" });
+
+    const serviceSelect = screen.getByLabelText("Service / Motif *");
+    // "Suivi" (svc-5) is inactive in Paramètres > Services & tarifs — it must never be offered when creating a new appointment.
+    expect(within(serviceSelect).queryByRole("option", { name: "Suivi" })).not.toBeInTheDocument();
+    expect(within(serviceSelect).getByRole("option", { name: "Consultation" })).toBeInTheDocument();
+
+    fireEvent.change(serviceSelect, { target: { value: "Contrôle" } });
+    // "Contrôle" is 20 minutes in Paramètres — the default 30-minute duration must update to match, not stay hardcoded.
+    expect(screen.getByLabelText("Durée")).toHaveValue("20");
+  });
+
   it("shows a conflict message with alternative slots when the requested slot overlaps (14)", async () => {
     renderAgenda();
 

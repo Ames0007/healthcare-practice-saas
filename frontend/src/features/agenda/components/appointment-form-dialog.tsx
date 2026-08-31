@@ -11,6 +11,7 @@ import { SchedulingFields } from "./scheduling-fields";
 import { addMinutesToTime, parseTimeToMinutes } from "@/features/agenda/format";
 import type { AgendaPatient, AgendaPractitioner, AppointmentDraft } from "@/features/agenda/types";
 import type { AppointmentSchedulingType } from "@/components/domain/appointments/types";
+import type { CabinetService } from "@/components/domain/settings/types";
 
 export interface AppointmentFormResult {
   ok: boolean;
@@ -25,7 +26,8 @@ export interface AppointmentFormDialogProps {
   initialValues?: Partial<AppointmentDraft>;
   patients: AgendaPatient[];
   practitioners: AgendaPractitioner[];
-  services: string[];
+  /** The real Paramètres > Services & tarifs catalog (never a second, disconnected service list — UI-014 §20/24). */
+  services: CabinetService[];
 }
 
 /**
@@ -61,6 +63,19 @@ export function AppointmentFormDialog({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [conflictSuggestions, setConflictSuggestions] = useState<string[] | null>(null);
   const [showCreatePatientNotice, setShowCreatePatientNotice] = useState(false);
+
+  const selectedService = services.find((candidate) => candidate.name === service);
+  const activeServices = services.filter((candidate) => candidate.active);
+  const serviceOptions =
+    selectedService && !selectedService.active ? [...activeServices, selectedService] : activeServices;
+
+  function handleServiceChange(name: string) {
+    setService(name);
+    const matched = services.find((candidate) => candidate.name === name);
+    if (matched) {
+      setDurationMinutes(matched.durationMinutes);
+    }
+  }
 
   function applySuggestion(suggestion: string) {
     if (schedulingType === "window") {
@@ -161,10 +176,10 @@ export function AppointmentFormDialog({
           label={t("agenda.form.serviceLabel")}
           required
           value={service}
-          onChange={(event) => setService(event.target.value)}
+          onChange={(event) => handleServiceChange(event.target.value)}
           error={errors.service}
           placeholder={t("agenda.form.servicePlaceholder")}
-          options={services.map((item) => ({ value: item, label: item }))}
+          options={serviceOptions.map((item) => ({ value: item.name, label: item.name }))}
         />
 
         <Input

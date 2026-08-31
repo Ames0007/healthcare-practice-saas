@@ -547,7 +547,22 @@ src/features/
             unchanged (still passes every callback).
             A `features/<name>/` folder is the convention for screen-
             specific composition that isn't a reusable `components/ui` or
-            `components/domain` piece.
+            `components/domain` piece. `mock-data.ts`'s own `SERVICES`
+            array is now only the name-literal source Paramètres'
+            `getCabinetServicesMockData()` builds from (UI-010ABC) — the
+            live appointment-creation form itself (`AppointmentFormDialog`)
+            was found during UI-014 QA to still be reading that raw name
+            array directly, letting an inactive service stay bookable
+            internally and duration go disconnected from the service's
+            real `durationMinutes`. Fixed: `agenda-page.tsx` now passes
+            `services={getCabinetServicesMockData()}` (the real
+            `CabinetService[]`), the dialog filters its options to
+            `active` (while still showing an already-selected-but-now-
+            inactive service so editing a pre-existing "Suivi" appointment
+            never loses data), and selecting a service auto-fills
+            duration from the matched fixture (`SchedulingFields`'
+            quantized `DURATION_OPTIONS` widened to include 20 min so
+            Contrôle/Suivi's real duration is an exact, selectable value).
   patients/ Patients list (UI-003A) plus create/edit (UI-003B):
             `types.ts`/`mock-data.ts` (16 synthetic patients — optional
             administrative fields only, no clinical data, see CLAUDE.md

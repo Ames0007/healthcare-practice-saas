@@ -18,7 +18,8 @@ export interface SchedulingFieldsProps {
   windowError?: string;
 }
 
-const DURATION_OPTIONS = [15, 30, 45, 60].map((minutes) => ({ value: String(minutes), label: `${minutes} min` }));
+/** 20 min is included alongside the original 15/30/45/60 set so a service's real Paramètres duration (e.g. Contrôle, 20 min) is always a selectable, exact option (UI-014 §20/24). */
+const DURATION_OPTIONS = [15, 20, 30, 45, 60].map((minutes) => ({ value: String(minutes), label: `${minutes} min` }));
 
 /**
  * Exact-time vs arrival-window fields (§23-25), shared by the create/edit

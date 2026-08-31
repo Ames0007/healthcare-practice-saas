@@ -22,10 +22,10 @@ import {
   MOCK_NOW_TIME,
   PATIENTS,
   PRACTITIONERS,
-  SERVICES,
   getAgendaMockAppointments,
   getEmptyAgendaMockAppointments,
 } from "./mock-data";
+import { getCabinetServicesMockData } from "@/features/parametres/mock-cabinet-services-data";
 import { addDaysIso, addMinutesToTime, formatBusinessDate, formatWeekRangeLabel, getWeekDates, getWeekStart } from "./format";
 import { findConflict, suggestAlternativeTimes } from "./conflict";
 import type { AgendaAppointment, AppointmentDraft } from "./types";
@@ -333,7 +333,7 @@ export function AgendaPage({ state = "loaded", onRetry }: AgendaPageProps) {
         onSubmit={handleFormSubmit}
         patients={PATIENTS}
         practitioners={PRACTITIONERS}
-        services={SERVICES}
+        services={getCabinetServicesMockData()}
       />
 
       <RescheduleDialog

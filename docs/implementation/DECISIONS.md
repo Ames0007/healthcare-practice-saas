@@ -1871,3 +1871,78 @@ explicit decision rather than a silent guess (CLAUDE.md §1/§3):
 ### Date
 
 2026-08-30
+
+---
+
+## ADR-020 — UI-014 Final QA: Agenda's appointment form must read Paramètres' real `CabinetService[]`, not its own disconnected name list
+
+### Status
+
+Accepted
+
+### Context
+
+UI-014's Gate 4 cross-domain audit found that `AppointmentFormDialog`
+(`features/agenda/components/appointment-form-dialog.tsx`) had never been
+updated when UI-010ABC introduced Paramètres → Services & tarifs
+(`CabinetService`, with `active`/`durationMinutes`/`price`). The dialog
+still read Agenda's own pre-existing `SERVICES` string array
+(`features/agenda/mock-data.ts`) directly — the same array
+`getCabinetServicesMockData()` itself derives its `name` fields from, but
+never the other way around. Two concrete consequences: (1) `svc-5`
+("Suivi") is `active: false` in Paramètres, correctly excluded from
+Public Booking (`features/booking/availability.ts`), yet still fully
+bookable via the internal Agenda create-appointment form; (2) duration
+was a free `useState(30)` never tied to the selected service's real
+`durationMinutes` (e.g. Contrôle is 20 minutes in Paramètres). Two
+existing mock appointments (`apt-10`, `apt-11`) are already booked under
+"Suivi" from before it was deactivated, so any fix must not break editing
+those.
+
+### Decision
+
+**`agenda-page.tsx` now passes `services={getCabinetServicesMockData()}`
+— the real `CabinetService[]` — instead of the raw `SERVICES` name
+array.** `AppointmentFormDialog`'s service `<Select>` options are
+computed as "every `active` service, plus the currently-selected service
+if it exists but is inactive" (so opening `apt-10`/`apt-11` for edit
+still shows "Suivi" correctly instead of silently blanking/reassigning
+the field) — creating a *new* appointment only ever offers active
+services. Selecting a service now looks up its `durationMinutes` and
+seeds the duration field with it. `SchedulingFields`' quantized
+`DURATION_OPTIONS` (previously `[15,30,45,60]`) is widened to
+`[15,20,30,45,60]` so Contrôle/Suivi's real 20-minute duration is an
+exact, selectable value rather than silently coercing to the nearest
+option (verified this was the actual failure mode: without widening the
+set, selecting a 20-minute service left the `<select>` showing 15).
+
+### Alternatives considered
+
+- **Round the auto-filled duration to the nearest existing 15/30/45/60
+  option instead of widening the set.** Rejected — this would silently
+  present a duration that doesn't match Paramètres' own configured value
+  for that service, reintroducing exactly the kind of quiet
+  cross-domain drift this fix exists to close.
+- **Filter out inactive services unconditionally, including on
+  edit.** Rejected — `apt-10`/`apt-11` are real, already-booked
+  appointments under "Suivi"; making them un-editable (or silently
+  reassigning their service on open) would be a data-integrity
+  regression, not a fix.
+- **Leave duration as a fully free `useState`, only fixing the service
+  list.** Rejected — the task's own Gate 4 §20 explicitly calls out
+  duration as one of the fields that must reconcile with Paramètres, not
+  only the service name/active-status.
+
+### Consequences
+
+- Any future service added in Paramètres → Services & tarifs is
+  automatically available (or correctly excluded, if created inactive)
+  in Agenda's own appointment-creation form with no second place to
+  update.
+- A future task adding per-practitioner service eligibility (none exists
+  today, `features/booking/availability.ts`'s own doc comment) would
+  extend this same `CabinetService`-sourced list, not invent a third one.
+
+### Date
+
+2026-08-31
